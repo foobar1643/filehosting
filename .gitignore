@@ -1,0 +1,3 @@
+# Ignoring composer binary files and directories
+vendor/
+composer.phar

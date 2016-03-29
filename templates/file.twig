@@ -1,0 +1,94 @@
+{% extends "skeleton.twig" %}
+{% block pageTitle %} Просмотр файла {% endblock %}
+{% block pageBody %}
+<div class="container-fluid">
+    {% if error %}
+        <div id="error-report" class="alert alert-danger" role="alert">
+            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+            <span class="sr-only">Ошибка:</span>
+            Вы не заполнили поле комментария.
+        </div>
+    {% endif %}
+    <div class="panel panel-info file-panel">
+        <div class="panel-heading"><h3 class="panel-title">{{ file.name }}</h3></div>
+        <div class="panel-body">
+            <div class="btn-group btn-group" role="group">
+                <a href="/file/get/{{ file.id }}" type="button" class="btn btn-success">Скачать</a>
+                {% if authToken == file.getAuthToken %}
+                    <button class="btn btn-danger"
+                        onClick="if(confirm('Действительно удалить?')) post(window.location.href + '/delete', {token: '{{ csrfToken }}'});">
+                            Удалить
+                    </button>
+                {% endif %}
+            </div>
+            {% if 'image' in fileInfo['mime_type'] %}
+                <div class="row">
+                    <div class="col-xs-6 col-md-3">
+                        <img src="/storage/previews/thumb_{{fileHelper.getDiskName(file)}}" alt="Preview">
+                    </div>
+                </div>
+            {% endif %}
+            {% if 'audio' in fileInfo['mime_type'] %}
+                <br>
+                <audio controls>
+                    <source src="/storage/{{ file.getFolder }}/{{fileHelper.getDiskName(file) }}" type='audio/mpeg' preload="auto">
+                    Your browser does not support the audio element.
+                </audio>
+            {% endif %}
+            {% if 'webm' in fileInfo['mime_type'] %}
+                <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360"
+                    poster="/media/img/placeholder.png" data-setup="{}">
+                    <source src="/storage/{{ file.getFolder }}/{{fileHelper.getDiskName(file) }}" type='video/webm'>
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a web browser that
+                        <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                    </p>
+                </video>
+            {% endif %}
+            {% include "file_info.twig" %}
+        </div>
+        <div class="panel-footer">
+            <span class="foot-text"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyph-text">{{ file.uploader }}</span></span>
+            <span class="foot-text"><span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span><span class="glyph-text">{{ file.getUploadDate }}</span></span>
+            <span class="foot-text"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span><span class="glyph-text">{{ file.downloads }} скачиваний</span></span>
+        </div>
+    </div>
+    <div class="row" id="comments-section">
+        <div class="col-md-12">
+            {% if comments|length == 0 %}
+                <h4>У этого файла еще нет комментариев. Вы можете оставить комментарий воспользовавшись формой ниже.</h4>
+            {% else %}
+                <div class="page-header">
+                    <h3><small class="pull-right">{{ comments|length }} комментариев</small> Комментарии </h3>
+                </div>
+            {% endif %}
+            <div class="comments-list">
+                {% for comment in comments %}
+                    <div class="media" id="comment-{{ comment.id }}" style="margin-top: 5px; margin-left: {{ commentHelper.getMargin(comment.getParentPath) }}px;">
+                        <p class="pull-right"><small>{{ comment.getDatePosted }}</small></p>
+                        <div class="media-body">
+                            <h4 class="media-heading user_name">{{ comment.author }}</h4>
+                            {{ comment.commentText }}
+                            <p><small><a class="comments-reply-button" onClick="displayReplyForm({{ comment.id }})">Ответить</a><!-- - <a href="">Удалить</a>!--></small></p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <form method="post" id="comment-form">
+                <div class="page-header">
+                    <h3>Оставить комментарий</h3>
+                </div>
+                <div class="form-group {% if error %} has-error {% endif %}">
+                    <label for="comment">Комментарий:</label>
+                    <textarea class="form-control" rows="5" id="comment" name="comment"></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="btn btn-default"
+                    onClick="post(location.pathname + '/comment/post',
+                    {comment: document.getElementById('comment').value});">Отправить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

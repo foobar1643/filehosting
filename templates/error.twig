@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <link rel="shortcut icon" type="image/x-icon" href="/media/img/favicon.ico"/>
+        <link rel="shortcut icon" type="image/x-icon" href="/media/img/favicon.ico"/>
+        <title>{{ title }}</title>
+        <style>
+            body {
+                margin:0;
+                padding:30px;
+                font:12px/1.5 Helvetica,Arial,Verdana,sans-serif;
+            }
+            h1 {
+                margin:0;
+                font-size:48px;
+                font-weight:normal;
+                line-height:48px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>{{ title }}</h1>
+        <p>{{ messageTitle }}</p>
+        <p>{{ messageHelp }} или вернитесь на <a href="/">главную страницу</a>.</p>
+        {% if displayErrors == 1 %}
+            <p>{{ debugInfo }}</p>
+        {% endif %}
+    </body>
+</html>

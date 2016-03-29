@@ -1,0 +1,107 @@
+body { font-family: Tahoma, sans-serif, arial, times; }
+.navbar-default .navbar-nav>li>a:active { background-color: #2A6796; }
+.navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>li>a:focus,
+.navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover { background-color: #2E70A5; }
+.navbar-default .navbar-nav>.active>a { background-color: #2C6C9E; }
+.navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus { background-color: #2D74A3; }
+.navbar-default .navbar-toggle .icon-bar { background-color: white; }
+#upload-form { text-align: center; }
+.footer-link { margin-left: 10px; }
+#popular-files { margin-right: 9px; }
+#comment-form .page-header, #reply-form .page-header { margin: 0; }
+#comments-section .page-header { margin: 0; }
+#file-info .table { margin-bottom: 0; }
+.comments-reply-button { cursor: pointer; }
+.container .panel .panel-default { margin: 7px; }
+#page-nav { background-color: #337ab7; }
+.navbar-default .navbar-brand, .navbar-default .navbar-nav>li>a { color: white; }
+.file-panel .panel-footer span.glyphicon, .file-panel .panel-footer .glyph-text  { font-size: 8pt; }
+.file-panel .panel-footer { background-color: white; }
+.file-panel .panel-footer .glyph-text { margin-left: 4px; }
+#search-panel { margin-top: 8px; }
+
+.navbar-default .navbar-nav>li>a:active,
+.navbar-default .navbar-nav>li>a:hover,
+.navbar-default .navbar-nav>li>a:focus,
+.navbar-default .navbar-nav>.active>a:focus,
+.navbar-default .navbar-nav>.active>a,
+.navbar-default .navbar-nav>.active>a:hover {
+    color: white;
+}
+
+#search-panel nav {
+    text-align: center;
+}
+
+#search-box {
+    margin-right: 0;
+    margin-left: 0;
+}
+
+#page-footer {
+    border: 0;
+    min-height: 5px;
+    height: 25px;
+}
+
+#error-report, #search-error-report {
+    text-align: left;
+    width: 35%;
+    margin: auto;
+    margin-bottom: 13px;
+}
+
+#bar-title:hover {
+    background-color: #337ab7;
+    color: #D8D8D8;
+}
+
+#last-files .panel-body h4, #popular-files .panel-body h4 {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+#file-info {
+    margin-top: 5px;
+}
+
+.file-panel {
+  text-align: left;
+}
+
+.file-panel .btn-success {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.file-panel .panel-footer:first-child {
+  padding-left: 0;
+  margin-right: 9px;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.vertical {
+    position: absolute;
+    top: 50%;
+    left:50%;
+    transform: translate(-50%,-50%);
+}

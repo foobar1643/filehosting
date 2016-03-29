@@ -1,0 +1,22 @@
+{% extends "skeleton.twig" %}
+{% block pageTitle %} Главная страница {% endblock %}
+{% block pageBody %}
+<div class="container-fluid">
+    <div class="panel panel-default col-md-4 col-md-offset-2" id="popular-files">
+        <div class="panel-body">
+            <h4>Популярные файлы</h4>
+            {% for popularFile in popularFiles %}
+                <a href="file/{{ popularFile.id }}">{{ popularFile.name }}</a><br>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="panel panel-default col-md-4" id="last-files">
+        <div class="panel-body">
+            <h4>Последние файлы</h4>
+            {% for lastFile in lastFiles %}
+                <a href="file/{{ lastFile.id }}">{{ lastFile.name }}</a><br>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

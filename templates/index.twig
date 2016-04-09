@@ -2,21 +2,29 @@
 {% block pageTitle %} Главная страница {% endblock %}
 {% block pageBody %}
 <div class="container-fluid">
-    <div class="panel panel-default col-md-4 col-md-offset-2" id="popular-files">
-        <div class="panel-body">
-            <h4>Популярные файлы</h4>
-            {% for popularFile in popularFiles %}
-                <a href="file/{{ popularFile.id }}">{{ popularFile.name }}</a><br>
-            {% endfor %}
+    {% if popularFiles == null and lastFiles == null %}
+        <h2 class="col-md-4 col-md-offset-5">Список файлов пуст.</h2>
+    {% else %}
+        <div class="panel panel-default col-md-4 col-md-offset-2" id="popular-files">
+            <div class="panel-body">
+                <h4>Популярные файлы</h4>
+                <ol>
+                    {% for popularFile in popularFiles %}
+                        <li><a href="file/{{ popularFile.id }}">{{ popularFile.name }}</a></li>
+                    {% endfor %}
+                </ol>
+            </div>
         </div>
-    </div>
-    <div class="panel panel-default col-md-4" id="last-files">
-        <div class="panel-body">
-            <h4>Последние файлы</h4>
-            {% for lastFile in lastFiles %}
-                <a href="file/{{ lastFile.id }}">{{ lastFile.name }}</a><br>
-            {% endfor %}
+        <div class="panel panel-default col-md-4" id="last-files">
+            <div class="panel-body">
+                <h4>Последние файлы</h4>
+                <ol>
+                    {% for lastFile in lastFiles %}
+                        <li><a href="file/{{ lastFile.id }}">{{ lastFile.name }}</a></li>
+                    {% endfor %}
+                </ol>
+            </div>
         </div>
-    </div>
+    {% endif %}
 </div>
 {% endblock %}

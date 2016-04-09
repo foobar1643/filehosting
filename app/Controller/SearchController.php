@@ -4,8 +4,6 @@ namespace Filehosting\Controller;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use \Filehosting\Model\File;
-use \Filehosting\Helper\SearchHelper;
 use \Filehosting\Helper\PaginationHelper;
 
 class SearchController
@@ -32,7 +30,7 @@ class SearchController
             if(trim($params["query"]) != null) {
                 $searchGateway = $this->container->get('SearchGateway');
                 $fileMapper = $this->container->get('FileMapper');
-                $searchHelper = new SearchHelper();
+                $searchHelper = $this->container->get('SearchHelper');
                 $query = $params["query"];
                 $searchCount = $searchGateway->countSearchResults($searchHelper->escapeString($query));
                 $pager = new PaginationHelper($searchCount, self::RESULTS_PER_PAGE, "/search?query={$query}");
@@ -41,7 +39,7 @@ class SearchController
                 }
                 $offset = $pager->getOffset($page);
                 $searchIds = $searchGateway->search($searchHelper->escapeString($query), self::RESULTS_PER_PAGE, $offset);
-                $searchResults = $searchHelper->filterSearchResults($fileMapper, $searchIds);
+                $searchResults = $fileMapper->getFilteredFiles($searchHelper->filterArray($searchIds));
             } else {
                 $error = true;
             }

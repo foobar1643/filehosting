@@ -1,3 +1,3 @@
 #!/bin/bash
-php ./rt.php
 indexer --all --rotate --quiet
+php rt_truncate.php

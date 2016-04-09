@@ -6,34 +6,32 @@ use \Filehosting\Model\File;
 
 class PreviewHelper
 {
+    private $fileHelper;
+    private $thumbnailsFolder;
     private $image;
     private $file;
 
     const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif"];
 
-    public function __construct(File $file)
+    public function __construct(FileHelper $h, $thumbnailsFolder)
     {
-        $this->file = $file;
+        $this->fileHelper = $h;
+        $this->thumbnailsFolder = $thumbnailsFolder;
     }
 
-    private function loadImage()
+    private function loadImage(File $file)
     {
-        $fileHelper = new FileHelper();
-        $filename = "storage/{$this->file->getFolder()}/{$fileHelper->getDiskName($this->file)}";
-        switch($this->file->getExtention()) {
+        $filename = $this->fileHelper->getPathToFileFolder($file);
+        switch($file->getExtention()) {
             case "jpeg":
             case "jpg":
-                $this->image = imagecreatefromjpeg($filename);
-                break;
+                return imagecreatefromjpeg($filename);
             case "png":
-                $this->image = imagecreatefrompng($filename);
-                break;
+                return imagecreatefrompng($filename);
             case "gif":
-                $this->image = imagecreatefromgif($filename);
-                break;
+                return imagecreatefromgif($filename);
             default:
                 throw new \Exception("Can't load this filetype.");
-                break;
         }
     }
 
@@ -64,23 +62,21 @@ class PreviewHelper
         return ["width" => ceil($width * $ratio), "height" => ceil($height * $ratio)];
     }
 
-    public function generatePreview()
+    public function generatePreview(File $file)
     {
-        if(!in_array($this->file->getExtention(), self::ALLOWED_EXTENSIONS)) {
+        if(!in_array($file->getExtention(), self::ALLOWED_EXTENSIONS)) {
             return false;
         }
-        $this->loadImage();
-        $imageWidth = imagesx($this->image);
-        $imageHeight = imagesy($this->image);
+        $image = $this->loadImage($file);
+        $imageWidth = imagesx($image);
+        $imageHeight = imagesy($image);
         $previewSize = $this->getPreviewSize($imageWidth, $imageHeight);
         $previewWidth = $previewSize["width"];
         $previewHeight = $previewSize["height"];
         $preview = imagecreatetruecolor($previewWidth, $previewHeight);
-        imagecopyresampled($preview, $this->image, 0, 0, 0, 0, $previewWidth, $previewHeight, $imageWidth, $imageHeight);
-        $fileHelper = new FileHelper();
-        $diskName = $fileHelper->getDiskName($this->file);
-        imagejpeg($preview, "storage/previews/thumb_{$diskName}");
+        imagecopyresampled($preview, $image, 0, 0, 0, 0, $previewWidth, $previewHeight, $imageWidth, $imageHeight);
+        imagejpeg($preview, "{$this->thumbnailsFolder}/thumb_{$this->fileHelper->getDiskName($file)}");
         imagedestroy($preview);
-        imagedestroy($this->image);
+        imagedestroy($image);
     }
 }

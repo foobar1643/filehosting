@@ -20,17 +20,19 @@ class DownloadController
     public function __invoke(Request $request, Response $response, $args)
     {
         $file = new File();
-        $fileHelper = new FileHelper();
         $fileMapper = $this->container->get('FileMapper');
+        $fileHelper = $this->container->get('FileHelper');
+        $params = $request->getQueryParams();
         $file = $fileMapper->getFile($args['id']);
-        $filePath = "storage/{$file->getFolder()}/{$fileHelper->getDiskName($file)}";
+        $filePath = $fileHelper->getPathToFileFolder($file);
         if($file != null && file_exists($filePath)) {
-            $file->setDownloads($file->getDownloads() + 1);
-            $fileMapper->updateFile($file);
+            if(!isset($params['flag']) || $params['flag'] != 'nocount') {
+                $file->setDownloads($file->getDownloads() + 1);
+                $fileMapper->updateFile($file);
+            }
             $responseHeader = $response->withHeader('Content-Description', "File Transfer")
                 ->withHeader('Content-Type', "application/octet-stream")
                 ->withHeader('Content-Disposition', "attachment; filename={$file->getName()}")
-                ->withHeader('Expires', "0")
                 ->withHeader('Cache-Control', "must-revalidate")
                 ->withHeader('Pragma', "public")
                 ->withHeader('Content-Length', filesize($filePath));

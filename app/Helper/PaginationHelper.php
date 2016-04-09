@@ -42,12 +42,6 @@ class PaginationHelper
 
     private function countPages()
     {
-        $pages = null;
-        $page = $this->records;
-        while(0 < $page) {
-            $page -= $this->recordsPerPage;
-            $pages++;
-        }
-        return $pages;
+        return ceil($this->records / $this->recordsPerPage);
     }
 }

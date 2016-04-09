@@ -3,33 +3,38 @@
 {% set navLink = 'upload' %}
 {% block pageBody %}
 {% block error %}
-    {% if error %}
-        <div id="error-report" class="alert alert-danger" role="alert">
-            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            <span class="sr-only">Ошибка:</span>
-            {{ errorMessage }}
-        </div>
+    {% if errors %}
+        {% for error in errors %}
+            <div id="error-report" class="alert alert-danger" role="alert">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <span class="sr-only">Ошибка:</span>
+                {{ error }}
+            </div>
+        {% endfor %}
     {% endif %}
 {% endblock %}
 <div class="container">
-    <div class="vertical col-lg-8 col-md-offset-2">
-        <form method="post" id="upload-form" enctype="multipart/form-data">
-            <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />
-            <div class="col-lg-5">
-                <div class="input-group">
-                    <span class="input-group-btn">
-                        <span class="btn btn-primary btn-file">
-                            Browse<input type="file" name="filename" multiple>
-                        </span>
-                    </span>
-                    <input type="text" class="form-control" readonly>
-                </div>
-                <span class="help-block">
-                    Максимальный размер загружаемого файла - {{ sizeLimit }}МБ
-                </span>
-                <button type="submit" class="btn btn-default">Загрузить файл</button>
+    <div class="vertical col-lg-6">
+        <form action="/upload" method="post" enctype="multipart/form-data" class="dropzone" id="fileUploadForm">
+            <div class="fallback">
+                <input name="filename" type="file">
+                <button id="upload-button" type="submit" class="btn btn-default">Загрузить</button>
             </div>
         </form>
     </div>
 </div>
+{% block customScript %}
+<script>
+Dropzone.options.fileUploadForm = {
+    url: "/upload",
+    paramName: "filename",
+    dictDefaultMessage: "Нажмите или перетащите файл чтобы начать загрузку",
+    maxFiles: 1,
+};
+var dropzone = new Dropzone("#fileUploadForm");
+dropzone.on("success", function(file) {
+    window.location.href = "/";
+});
+</script>
+{% endblock %}
 {% endblock %}

@@ -1,0 +1,21 @@
+<nav>
+    <ul class="pagination">
+        <li {% if page == 1 %} class="disabled" {% endif %}>
+            <a {% if page != 1 %} href="{{ pager.getLink(page - 1) }}" {% endif %} aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% for i in range(1, pager.getPages) %}
+            {% if page == i %}
+                <li class="active"><a>{{ i }}</a></li>
+            {% else %}
+                <li><a href="{{ pager.getLink(i) }}">{{ i }}</a></li>
+            {% endif %}
+        {% endfor %}
+        <li {% if page == pager.getPages %} class="disabled" {% endif %}>
+            <a {% if page != pager.getPages %} href="{{ pager.getLink(page + 1) }}" {% endif %} aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>

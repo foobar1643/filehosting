@@ -6,10 +6,13 @@
  {
      private $id;
      private $file_id;
+     private $parent_id;
      private $author;
      private $date_posted;
      private $comment_text;
      private $parent_path;
+
+     private $childNodes = [];
 
      public function getId()
      {
@@ -19,6 +22,16 @@
      public function setId($id)
      {
          $this->id = $id;
+     }
+
+     public function getParentId()
+     {
+         return intval($this->parent_id);
+     }
+
+     public function setParentId($parentId)
+     {
+         $this->parent_id = $parentId;
      }
 
      public function getFileId()
@@ -71,5 +84,21 @@
      public function setParentPath($parentPath)
      {
          $this->parent_path = $parentPath;
+     }
+
+     public function addChildNode(Comment $child)
+     {
+         $this->childNodes[$child->id] = $child;
+         return $child;
+     }
+
+     public function getChildren()
+     {
+         return $this->childNodes;
+     }
+
+     public function countChildNodes()
+     {
+         return count($this->childNodes);
      }
  }

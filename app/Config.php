@@ -6,6 +6,7 @@ class Config
 {
     /* Default settings */
     private $appSizeLimit = 10;
+    private $appThumbnailsFolder = "/var/www/filehosting/public/thumbnails";
 
     private $dbHost = "127.0.0.1";
     private $dbPort = "5432";

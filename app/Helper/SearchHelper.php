@@ -13,14 +13,14 @@ class SearchHelper
         return str_replace($from, $to, $string);
     }
 
-    public function filterSearchResults(FileMapper $fileMapper, $fileIds)
+    public function filterArray($array)
     {
         $files = [];
-        foreach($fileIds as $searchId) {
-            $file = $fileMapper->getFile($searchId['id']);
-            if($file != null) {
-                array_push($files, $file);
-            }
+        foreach($array as $searchId) {
+            array_push($files, $searchId['id']);
+        }
+        if(empty($array)) {
+            $files[0] = null;
         }
         return $files;
     }

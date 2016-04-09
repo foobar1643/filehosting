@@ -5,41 +5,43 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="shortcut icon" type="image/x-icon" href="/media/img/favicon.ico"/>
-        <link rel="shortcut icon" type="image/x-icon" href="/media/img/favicon.ico"/>
         <link href="/media/bootstrap/css/bootstrap.min.css" rel="stylesheet">
         <link href="/media/css/style.css" rel="stylesheet">
-        <link href="/media/css/video-js.css" rel="stylesheet">
+        <!-- <link href="/media/css/dropzone/dropzone.min.css" rel="stylesheet"> !-->
+        <link href="/media/css/videojs/video-js.min.css" rel="stylesheet">
         <title>Filehosting - {% block pageTitle%}{% endblock %}</title>
     </head>
     <body>
     {% block pageNav %}
-    <nav class="navbar navbar-default navbar-static-top" id="page-nav">
-        <div class="container-fluid">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="/" id="bar-title">Filehosting</a>
+        <nav class="navbar navbar-default navbar-static-top" id="page-nav">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/" id="bar-title">Filehosting</a>
+                </div>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li {% if navLink == "search" %} class="active" {% endif %}><a href="/search">Поиск</a></li>
+                        <li {% if navLink == "upload" %} class="active" {% endif %}><a href="/upload">Загрузить файл</a></li>
+                    </ul>
+                </div>
             </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                    <li {% if navLink == "search" %} class="active" {% endif %}><a href="/search">Поиск</a></li>
-                    <li {% if navLink == "upload" %} class="active" {% endif %}><a href="/upload">Загрузить файл</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+        </nav>
     {% endblock %}
     {% block pageBody %}{% endblock %}
     {% block javascript %}
-        <script src="/media/js/video.js"></script>
-        <script src="/media/js/jquery.min.js"></script>
+        <script src="/media/js/videojs/video.min.js"></script>
+        <script src="/media/js/jquery/jquery.min.js"></script>
+        <!-- <script src="/media/js/dropzone/dropzone.min.js"></script> !-->
         <script src="/media/bootstrap/js/bootstrap.min.js"></script>
         <script src="/media/js/filehosting.js"></script>
     {% endblock %}
+    {% block customScript %}{% endblock %}
     </body>
 </html>

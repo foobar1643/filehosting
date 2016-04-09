@@ -38,6 +38,22 @@ body { font-family: Tahoma, sans-serif, arial, times; }
     margin-left: 0;
 }
 
+#fileUploadForm {
+    border: 2px dashed #337ab7;
+}
+
+#fileUploadForm .fallback input {
+    margin: auto;
+}
+
+#fileUploadForm .fallback {
+    text-align: center;
+}
+
+#fileUploadForm .fallback #upload-button {
+    margin-top: 20px;
+}
+
 #page-footer {
     border: 0;
     min-height: 5px;

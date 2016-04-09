@@ -6,6 +6,7 @@ class File
 {
     private $id;
     private $name;
+    private $originalName;
     private $uploader;
     private $upload_date;
     private $downloads;
@@ -29,6 +30,16 @@ class File
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    public function getOriginalName()
+    {
+        return $this->originalName;
+    }
+
+    public function setOriginalName($originalName)
+    {
+        $this->originalName = $originalName;
     }
 
     public function getUploader()

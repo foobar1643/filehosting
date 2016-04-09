@@ -4,12 +4,11 @@ namespace Filehosting\Controller;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use Dflydev\FigCookies\SetCookie;
+use Dflydev\FigCookies\FigResponseCookies;
+use Dflydev\FigCookies\FigRequestCookies;
 use \Filehosting\Model\File;
-use \Filehosting\Helper\FileHelper;
-use \Filehosting\Helper\AuthHelper;
-use \Filehosting\Helper\PreviewHelper;
 use \Filehosting\Helper\TokenGenerator;
-use \Filehosting\Exception\FileUploadException;
 
 class UploadController
 {
@@ -22,42 +21,34 @@ class UploadController
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        if(!isset($_FILES['filename'])) {
-            throw new FileUploadException(UPLOAD_ERR_NO_FILE);
-        }
-        if($_FILES['filename']['error'] == "UPLOAD_ERR_OK") {
-            $fileMapper = $this->container->get('FileMapper');
-            $searchGateway = $this->container->get('SearchGateway');
-            $config = $this->container->get('config');
-            if($_FILES['filename']['size'] > $config->getValue('app', 'sizeLimit') * 1000000) {
-                throw new FileUploadException(UPLOAD_ERR_FORM_SIZE);
-            }
+        $errors = null;
+        if($request->isPost() && isset($_FILES)) {
+            $fileHelper = $this->container->get('FileHelper');
+            $uploadHelper = $this->container->get('UploadHelper');
             $file = new File();
-            $fileHelper = new FileHelper();
-            $authHelper = new AuthHelper();
-            $file->setName($_FILES['filename']['name']);
-            $file->setAuthToken($authHelper->getAuthCookie());
-            $fileMapper->beginTransaction();
-            $file->setId($fileMapper->createFile($file));
-            try {
-                $fileHelper->isFolderAvailable($file);
-            } catch(FileUploadException $e) {
-                $fileMapper->rollBack();
-                throw $e;
+            $dateTime = new \DateTime("now");
+            $dateTime->add(new \DateInterval("P10D")); // 10 days
+            $errors = $uploadHelper->validateUpload($_FILES);
+            if(!$errors) {
+                $authCookie = FigRequestCookies::get($request, 'auth');
+                if($authCookie->getValue() == null) {
+                    $token = TokenGenerator::generateToken(45);
+                } else {
+                    $token = $authCookie->getValue();
+                }
+                $file->setName($_FILES['filename']['name']);
+                $file->setOriginalName($_FILES['filename']['tmp_name']);
+                $file->setUploader('Anonymous');
+                $file->setAuthToken($token);
+                $response = FigResponseCookies::set($response,
+                    SetCookie::create('auth')->withValue($file->getAuthToken())
+                    ->withExpires($dateTime->format(\DateTime::COOKIE))->withPath('/'));
+                $file = $fileHelper->createFile($file, false);
+                return $response->withHeader('Location', "/file/{$file->getId()}");
             }
-            if(move_uploaded_file($_FILES['filename']['tmp_name'], "storage/{$file->getFolder()}/{$fileHelper->getDiskName($file)}")) {
-                $fileMapper->commit();
-                $searchGateway->insertRtValue($file->getId(), $file->getName());
-                $previewHelper = new PreviewHelper($file);
-                $previewHelper->generatePreview();
-                $responseHeader = $response->withHeader('Location', "/file/{$file->getId()}");
-                return $responseHeader;
-            } else {
-                $fileMapper->rollBack();
-                throw new FileUploadException(UPLOAD_ERR_CANT_WRITE);
-            }
-        } else {
-            throw new FileUploadException($_FILES['filename']['error']);
         }
+        return $this->container->get('view')->render($response, 'upload.twig',
+            ['sizeLimit' => $this->container->get('config')->getValue('app', 'sizeLimit'),
+            'errors' => $errors]);
     }
 }

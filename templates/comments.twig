@@ -1,0 +1,18 @@
+{% macro display(comments) %}
+    {% for comment in comments %}
+        <div class="media" id="comment-{{ comment.getId|number_format }}" style="margin-top: 5px; margin-left: 0px;">
+            <p class="pull-right"><small>{{ comment.getDatePosted }}</small></p>
+            <div class="media-body">
+                <h4 class="media-heading user-name">{{ comment.getAuthor }}</h4>
+                <span class="comment-text">{{ comment.getCommentText }}</span>
+                <p><small><a id="reply-{{ comment.getId|number_format }}" class="comments-reply-button">Ответить</a></small></p>
+            </div>
+            <div class="children" style="margin-left: 25px;">
+                {% import _self as selfMacro %}
+                {% if comment.getChildren|length > 0 %}
+                    {{ selfMacro.display(comment.getChildren) }}
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% endmacro %}

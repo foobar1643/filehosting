@@ -34,6 +34,7 @@ class FileController
         $idHelper->analyzeFile($file);
         $rawComments = $commentGateway->getComments($file->getId());
         $treeComments = $commentHelper->makeTrees($rawComments);
+        $commentsCount = $commentHelper->getTreesSize($treeComments);
         return $this->container->get('view')->render($response, 'file.twig', [
             'file' => $file,
             'idHelper' => $idHelper,
@@ -43,7 +44,7 @@ class FileController
             'csrfValue' => $request->getAttribute('csrf_value'),
             'authCookie' => FigRequestCookies::get($request, 'auth'),
             'comments' => $treeComments,
-            'commentHelper' => $commentHelper]);
+            'commentsCount' => $commentsCount]);
     }
 
     public function deleteFile(Request $request, Response $response, $args)

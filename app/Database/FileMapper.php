@@ -90,6 +90,9 @@ class FileMapper
 
     public function getFilteredFiles($ids)
     {
+        if(empty($ids)) {
+            return false;
+        }
         $sql = "SELECT * FROM files WHERE id IN(";
         for($i = 0; $i < count($ids); $i++) {
             $sql .= "?" . (isset($ids[$i+1]) ? ", " : "");

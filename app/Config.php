@@ -6,7 +6,7 @@ class Config
 {
     /* Default settings */
     private $appSizeLimit = 10;
-    private $appThumbnailsFolder = "/var/www/filehosting/public/thumbnails";
+    private $appEnableXsendfile = 0;
 
     private $dbHost = "127.0.0.1";
     private $dbPort = "5432";
@@ -22,7 +22,11 @@ class Config
         $ini = parse_ini_file($file, true);
         foreach($ini as $section => $container) {
             foreach($container as $name => $value) {
-                $this->{$section . ucfirst($name)} = $value;
+                if(isset($this->{$section . ucfirst($name)})) {
+                    $this->{$section . ucfirst($name)} = $value;
+                } else {
+                    throw new \Exception("No such value in the config (Section: $section; Key: $name).");
+                }
             }
         }
     }

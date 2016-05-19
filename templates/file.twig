@@ -14,7 +14,7 @@
         <div class="panel-heading"><h3 class="panel-title">{{ file.name }}</h3></div>
         <div class="panel-body">
             <div class="btn-group btn-group" role="group">
-                <a href="/file/get/{{ file.id }}" type="button" class="btn btn-success">Скачать</a>
+                <a href="{{ fileHelper.getDownloadLink(file) }}" type="button" class="btn btn-success">Скачать</a>
                 {% if authCookie.value == file.getAuthToken %}
                     <button class="btn btn-danger"
                         onClick="if(confirm('Действительно удалить?'))
@@ -34,14 +34,14 @@
             {% if idHelper.isAudio %}
                 <br>
                 <audio controls>
-                    <source src="/file/get/{{ file.id }}?flag=nocount" type='audio/mpeg' preload="auto">
+                    <source src="{{ fileHelper.getDownloadLink(file) }}?flag=nocount" type='audio/mpeg' preload="auto">
                     Your browser does not support the audio element.
                 </audio>
             {% endif %}
             {% if idHelper.isVideo %}
                 <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360"
                     poster="/media/img/placeholder.png" data-setup="{}">
-                    <source src="/file/get/{{ file.id }}?flag=nocount" type='video/webm'>
+                    <source src="{{ fileHelper.getDownloadLink(file) }}?flag=nocount" type='video/webm'>
                     <p class="vjs-no-js">
                         To view this video please enable JavaScript, and consider upgrading to a web browser that
                         <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
@@ -59,7 +59,7 @@
     <div class="row" id="comments-section">
         <div class="col-md-12">
             <div class="page-header">
-                <h3><small class="pull-right">{{ comments|length }} комментариев</small> Комментарии </h3>
+                <h3><small class="pull-right">{{ commentsCount }} комментариев</small> Комментарии </h3>
             </div>
             {% if comments|length == 0 %}
                 <h4 id="no-comments-found">У этого файла еще нет комментариев. Вы можете оставить комментарий воспользовавшись формой ниже.</h4>

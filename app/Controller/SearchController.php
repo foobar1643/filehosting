@@ -32,14 +32,16 @@ class SearchController
                 $fileMapper = $this->container->get('FileMapper');
                 $searchHelper = $this->container->get('SearchHelper');
                 $query = $params["query"];
-                $searchCount = $searchGateway->countSearchResults($searchHelper->escapeString($query));
-                $pager = new PaginationHelper($searchCount, self::RESULTS_PER_PAGE, "/search?query={$query}");
+                $pager = new PaginationHelper(self::RESULTS_PER_PAGE, "/search?query={$query}");
                 if(isset($params["page"])) {
                     $page = $pager->checkPage($params["page"]);
                 }
                 $offset = $pager->getOffset($page);
                 $searchIds = $searchGateway->search($searchHelper->escapeString($query), self::RESULTS_PER_PAGE, $offset);
-                $searchResults = $fileMapper->getFilteredFiles($searchHelper->filterArray($searchIds));
+                $searchMeta = $searchGateway->showMeta(); // results count
+                $pager->setTotalRecords($searchMeta[0]['Value']);
+                $filteredResults = $fileMapper->getFilteredFiles($searchIds);
+                $searchResults = $searchHelper->showDeleted($searchIds, $filteredResults);
             } else {
                 $error = true;
             }

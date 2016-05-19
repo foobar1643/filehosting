@@ -2,7 +2,6 @@
 
 namespace Filehosting\Helper;
 
-use \Filehosting\TreeNode;
 use \Filehosting\Model\Comment;
 
 class CommentHelper
@@ -28,7 +27,7 @@ class CommentHelper
         return $newStr;
     }
 
-    function parseComments($comments)
+    public function parseComments($comments)
     {
         $result = [];
         foreach($comments as $comment) {
@@ -37,7 +36,7 @@ class CommentHelper
         return $result;
     }
 
-    function getParent($path, Comment $treeRoot)
+    public function getParent($path, Comment $treeRoot)
     {
         $split = $this->splitPath($path);
         if(count($split) <= 2) {
@@ -52,7 +51,7 @@ class CommentHelper
         return $arr[count($arr) - 1];
     }
 
-    function makeTrees($comments)
+    public function makeTrees($comments)
     {
         $trees = [];
         foreach($comments as $comment) {
@@ -65,5 +64,17 @@ class CommentHelper
             }
         }
         return $trees;
+    }
+
+    public function getTreesSize($trees)
+    {
+        $size = 0;
+        foreach($trees as $id => $tree) {
+            $size++;
+            if(count($tree->getChildren()) > 0) {
+                $size = $size + $this->getTreesSize($tree->getChildren());
+            }
+        }
+        return $size;
     }
 }

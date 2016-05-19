@@ -14,7 +14,6 @@ body { font-family: Tahoma, sans-serif, arial, times; }
 .comments-reply-button { cursor: pointer; }
 .container .panel .panel-default { margin: 7px; }
 #page-nav { background-color: #337ab7; }
-.navbar-default .navbar-brand, .navbar-default .navbar-nav>li>a { color: white; }
 .file-panel .panel-footer span.glyphicon, .file-panel .panel-footer .glyph-text  { font-size: 8pt; }
 .file-panel .panel-footer { background-color: white; }
 .file-panel .panel-footer .glyph-text { margin-left: 4px; }
@@ -25,7 +24,11 @@ body { font-family: Tahoma, sans-serif, arial, times; }
 .navbar-default .navbar-nav>li>a:focus,
 .navbar-default .navbar-nav>.active>a:focus,
 .navbar-default .navbar-nav>.active>a,
-.navbar-default .navbar-nav>.active>a:hover {
+.navbar-default .navbar-nav>.active>a:hover,
+.navbar-default .navbar-brand,
+.navbar-default .navbar-brand:active,
+.navbar-default .navbar-brand:focus,
+.navbar-default .navbar-nav>li>a {
     color: white;
 }
 
@@ -44,6 +47,7 @@ body { font-family: Tahoma, sans-serif, arial, times; }
 
 #fileUploadForm .fallback input {
     margin: auto;
+    margin-top: 20px;
 }
 
 #fileUploadForm .fallback {
@@ -51,7 +55,7 @@ body { font-family: Tahoma, sans-serif, arial, times; }
 }
 
 #fileUploadForm .fallback #upload-button {
-    margin-top: 20px;
+    margin: 20px 0px 20px 0px;
 }
 
 #page-footer {

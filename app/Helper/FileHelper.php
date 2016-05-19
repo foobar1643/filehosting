@@ -74,6 +74,12 @@ class FileHelper
         return "/thumbnails/thumb_{$this->getDiskName($file)}";
     }
 
+    public function getDownloadLink(File $file)
+    {
+        $encodedName = urlencode($file->getName());
+        return "/file/get/{$file->getId()}/{$encodedName}";
+    }
+
     public function canDelete($fileToken)
     {
         if(isset($_COOKIE['auth']) && $_COOKIE['auth'] == $fileToken) {
@@ -90,6 +96,17 @@ class FileHelper
     public function getPathToFileFolder(File $file)
     {
         return "{$this->getPathToStorage()}/{$file->getFolder()}/{$this->getDiskName($file)}";
+    }
+
+    public function getXsendfilePath(File $file)
+    {
+        $pathingHelper = $this->container->get("PathingHelper");
+        return $pathingHelper->getPathToBase() . "/storage/{$file->getFolder()}/{$this->getDiskName($file)}";
+    }
+
+    public function getXaccelPath(File $file)
+    {
+        return "/storage/{$file->getFolder()}/{$this->getDiskName($file)}";
     }
 
     public function getDiskName(File $file)

@@ -21,6 +21,13 @@ class SearchGateway
         return $query->fetchColumn();
     }
 
+    public function showMeta()
+    {
+        $query = $this->pdo->prepare("SHOW META");
+        $query->execute();
+        return $query->fetchAll();
+    }
+
     public function search($searchQuery, $limit, $offset)
     {
         $query = $this->pdo->prepare("SELECT id FROM index_files, rt_files WHERE MATCH(:match_bind) ORDER BY id DESC LIMIT :offset_bind, :limit_bind");
@@ -28,7 +35,7 @@ class SearchGateway
         $query->bindValue(":limit_bind", $limit, \PDO::PARAM_INT);
         $query->bindValue(":match_bind", $searchQuery, \PDO::PARAM_STR);
         $query->execute();
-        return $query->fetchAll();
+        return $query->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     public function insertRtValue($id, $name)

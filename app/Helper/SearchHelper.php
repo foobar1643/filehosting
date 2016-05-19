@@ -3,6 +3,7 @@
 namespace Filehosting\Helper;
 
 use \Filehosting\Database\FileMapper;
+use \Filehosting\Model\File;
 
 class SearchHelper
 {
@@ -13,15 +14,16 @@ class SearchHelper
         return str_replace($from, $to, $string);
     }
 
-    public function filterArray($array)
+    public function showDeleted($ids, $results)
     {
-        $files = [];
-        foreach($array as $searchId) {
-            array_push($files, $searchId['id']);
+        $newResults = $results;
+        if(count($ids) > count($results)) {
+            for($i = 0; $i < (count($ids) - count($results)); $i++) {
+                $deletedFile = new File();
+                $deletedFile->setDeleted(true);
+                array_push($newResults, $deletedFile);
+            }
         }
-        if(empty($array)) {
-            $files[0] = null;
-        }
-        return $files;
+        return $newResults;
     }
 }

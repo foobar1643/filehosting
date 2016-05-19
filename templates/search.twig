@@ -2,6 +2,7 @@
 {% block pageTitle %} Поиск {% endblock %}
 {% set navLink = 'search' %}
 {% block pageBody %}
+{% import "pagination.twig" as paginationMacro %}
 <div class="container-fuild">
     {% block error %}
         {% if error %}
@@ -30,11 +31,15 @@
                 <h4>Показаны результаты по запросу: <i>&laquo;{{ query }}&raquo;</i></h4>
                 <ol>
                     {% for file in files %}
-                        <li><a href="/file/{{ file.id }}">{{ file.name }}</a></li>
+                        {% if file.getDeleted == true %}
+                            <li>Файл удален</li>
+                        {% else %}
+                            <li><a href="/file/{{ file.id }}">{{ file.name }}</a></li>
+                        {% endif %}
                     {% endfor %}
                 </ol>
                 {% if pager.getPages > 1 %}
-                    {% include 'pagination.twig' %}
+                    {{ paginationMacro.displayPagination(page, pager) }}
                 {% endif %}
             {% elseif (query is not null) and (files|length == 0) %}
                 <h4>По запросу <i>&laquo;{{ query }}&raquo;</i> ничего не найдено.</h4>

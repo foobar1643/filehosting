@@ -1,6 +1,6 @@
 <?php
 
-require("../vendor/autoload.php");
+require(__DIR__ . "/../vendor/autoload.php");
 
 use \Filehosting\Database\FileMapper;
 use \Filehosting\Database\SearchGateway;
@@ -9,6 +9,7 @@ use \Filehosting\Config;
 use \Filehosting\Helper\FileHelper;
 use \Filehosting\Helper\CommentHelper;
 use \Filehosting\Helper\AuthHelper;
+use \Filehosting\Helper\PathingHelper;
 use \Filehosting\Helper\CsrfHelper;
 use \Filehosting\Helper\SearchHelper;
 use \Filehosting\Helper\PreviewHelper;
@@ -26,7 +27,7 @@ function getServices(\Slim\Container $container)
 {
     $container['config'] = function ($container) {
         $config = new Config();
-        $config->loadFromFile("../config.ini");
+        $config->loadFromFile(__DIR__ . "/../config.ini");
         return $config;
     };
 
@@ -72,6 +73,10 @@ function getServices(\Slim\Container $container)
         return new CommentHelper();
     };
 
+    $container['PathingHelper'] = function ($container) {
+        return new PathingHelper(__DIR__);
+    };
+
     $container['UploadHelper'] = function ($container) {
         $cfg = $container->get('config');
         return new UploadHelper($cfg->getValue('app', 'sizeLimit'));
@@ -79,7 +84,7 @@ function getServices(\Slim\Container $container)
 
     $container['PreviewHelper'] = function ($container) {
         $cfg = $container->get('config');
-        return new PreviewHelper($container->get('FileHelper'), $cfg->getValue('app', 'thumbnailsFolder'));
+        return new PreviewHelper($container);
     };
     return $container;
 }

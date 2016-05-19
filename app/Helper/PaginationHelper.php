@@ -4,17 +4,21 @@ namespace Filehosting\Helper;
 
 class PaginationHelper
 {
-    private $records;
     private $recordsPerPage;
-    private $totalPages;
     private $link;
+    private $totalRecords;
+    private $totalPages;
 
-    public function __construct($totalRecords, $recordsPerPage, $link)
+    public function __construct($recordsPerPage, $link)
     {
-        $this->records = $totalRecords;
         $this->recordsPerPage = $recordsPerPage;
-        $this->totalPages = $this->countPages();
         $this->link = $link;
+    }
+
+    public function setTotalRecords($records)
+    {
+        $this->totalRecords = $records;
+        $this->totalPages = $this->countPages();
     }
 
     public function getPages()
@@ -29,7 +33,7 @@ class PaginationHelper
 
     public function checkPage($page)
     {
-        if($page == null || $page > $this->totalPages) {
+        if($page == null || $page > 30) {
             return 1;
         }
         return $page;
@@ -42,6 +46,6 @@ class PaginationHelper
 
     private function countPages()
     {
-        return ceil($this->records / $this->recordsPerPage);
+        return ceil($this->totalRecords / $this->recordsPerPage);
     }
 }

@@ -6,22 +6,21 @@ use \Filehosting\Model\File;
 
 class PreviewHelper
 {
-    private $fileHelper;
-    private $thumbnailsFolder;
+    private $container;
     private $image;
     private $file;
 
     const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif"];
 
-    public function __construct(FileHelper $h, $thumbnailsFolder)
+    public function __construct(\Slim\Container $c)
     {
-        $this->fileHelper = $h;
-        $this->thumbnailsFolder = $thumbnailsFolder;
+        $this->container = $c;
     }
 
     private function loadImage(File $file)
     {
-        $filename = $this->fileHelper->getPathToFileFolder($file);
+        $fileHelper = $this->container->get("FileHelper");
+        $filename = $fileHelper->getPathToFileFolder($file);
         switch($file->getExtention()) {
             case "jpeg":
             case "jpg":
@@ -67,6 +66,8 @@ class PreviewHelper
         if(!in_array($file->getExtention(), self::ALLOWED_EXTENSIONS)) {
             return false;
         }
+        $pathingHelper = $this->container->get("PathingHelper");
+        $fileHelper = $this->container->get("FileHelper");
         $image = $this->loadImage($file);
         $imageWidth = imagesx($image);
         $imageHeight = imagesy($image);
@@ -75,7 +76,7 @@ class PreviewHelper
         $previewHeight = $previewSize["height"];
         $preview = imagecreatetruecolor($previewWidth, $previewHeight);
         imagecopyresampled($preview, $image, 0, 0, 0, 0, $previewWidth, $previewHeight, $imageWidth, $imageHeight);
-        imagejpeg($preview, "{$this->thumbnailsFolder}/thumb_{$this->fileHelper->getDiskName($file)}");
+        imagejpeg($preview, "{$pathingHelper->getPathToThumbnails()}/thumb_{$fileHelper->getDiskName($file)}");
         imagedestroy($preview);
         imagedestroy($image);
     }

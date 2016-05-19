@@ -8,13 +8,12 @@ class CLItools
 {
     private $container;
 
-    public function __construct()
+    public function __construct(\Slim\Container $c)
     {
-        $this->container = new \Slim\Container();
-        $this->container = getServices($this->container);
+        $this->container = $c;
     }
 
-    public function parseOpt($options)
+    public function runWithOptions($options)
     {
         switch(key($options)) {
             case "a":
@@ -90,6 +89,8 @@ class CLItools
     }
 }
 
-$cli = new CLItools();
+$container = new \Slim\Container();
+$container = getServices($container);
+$cli = new CLItools($container);
 $options = getopt("a:d:l:o:");
-$cli->parseOpt($options);
+$cli->runWithOptions($options);

@@ -11,6 +11,7 @@ class File
     private $upload_date;
     private $downloads;
     private $auth_token;
+    private $isDeleted;
 
     public function getId()
     {
@@ -82,6 +83,16 @@ class File
     public function setAuthToken($authToken)
     {
         $this->auth_token = $authToken;
+    }
+
+    public function getDeleted()
+    {
+        return $this->isDeleted;
+    }
+
+    public function setDeleted($deleted)
+    {
+        $this->isDeleted = $deleted;
     }
 
     public function getExtention()

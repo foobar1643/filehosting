@@ -22,6 +22,7 @@ class DownloadController
         $file = new File();
         $fileMapper = $this->container->get('FileMapper');
         $fileHelper = $this->container->get('FileHelper');
+        $config = $this->container->get('config');
         $params = $request->getQueryParams();
         $file = $fileMapper->getFile($args['id']);
         $filePath = $fileHelper->getPathToFileFolder($file);
@@ -30,13 +31,21 @@ class DownloadController
                 $file->setDownloads($file->getDownloads() + 1);
                 $fileMapper->updateFile($file);
             }
-            $responseHeader = $response->withHeader('Content-Description', "File Transfer")
+            $responseHeader = $response->withHeader('Content-Description', "File Transfer") // ->withHeader('Content-Disposition', "attachment; filename={$file->getName()}")
                 ->withHeader('Content-Type', "application/octet-stream")
-                ->withHeader('Content-Disposition', "attachment; filename={$file->getName()}")
                 ->withHeader('Cache-Control', "must-revalidate")
                 ->withHeader('Pragma', "public")
                 ->withHeader('Content-Length', filesize($filePath));
-            readfile($filePath);
+            if($config->getValue('app', 'enableXsendfile') == 1) {
+                if(strpos($_SERVER["SERVER_SOFTWARE"], "nginx") !== false) {
+                    $responseHeader = $responseHeader->withHeader('X-Accel-Redirect', $fileHelper->getXaccelPath($file))
+                    ->withHeader('X-Accel-Charset', "utf-8");
+                } else if(strpos($_SERVER["SERVER_SOFTWARE"], "apache") !== false && in_array("mod_xsendfile", apache_get_modules())) {
+                    $responseHeader = $responseHeader->withHeader('X-Sendfile', $fileHelper->getXsendfilePath($file));
+                }
+            } else {
+                readfile($filePath);
+            }
             return $responseHeader;
         } else {
             throw new \Slim\Exception\NotFoundException($request, $response);

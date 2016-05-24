@@ -4,7 +4,7 @@ namespace Filehosting\Controller;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use \Filehosting\Model\File;
+use \Filehosting\Entity\File;
 use \Filehosting\Helper\FileHelper;
 use \Filehosting\Exception\FileNotFoundException;
 
@@ -21,11 +21,11 @@ class DownloadController
     {
         $file = new File();
         $fileMapper = $this->container->get('FileMapper');
-        $fileHelper = $this->container->get('FileHelper');
+        $pathingHelper = $this->container->get('PathingHelper');
         $config = $this->container->get('config');
         $params = $request->getQueryParams();
         $file = $fileMapper->getFile($args['id']);
-        $filePath = $fileHelper->getPathToFileFolder($file);
+        $filePath = $pathingHelper->getPathToFile($file);
         if($file != null && file_exists($filePath)) {
             if(!isset($params['flag']) || $params['flag'] != 'nocount') {
                 $file->setDownloads($file->getDownloads() + 1);
@@ -38,10 +38,10 @@ class DownloadController
                 ->withHeader('Content-Length', filesize($filePath));
             if($config->getValue('app', 'enableXsendfile') == 1) {
                 if(strpos($_SERVER["SERVER_SOFTWARE"], "nginx") !== false) {
-                    $responseHeader = $responseHeader->withHeader('X-Accel-Redirect', $fileHelper->getXaccelPath($file))
+                    $responseHeader = $responseHeader->withHeader('X-Accel-Redirect', $pathingHelper->getXaccelPath($file))
                     ->withHeader('X-Accel-Charset', "utf-8");
                 } else if(strpos($_SERVER["SERVER_SOFTWARE"], "apache") !== false && in_array("mod_xsendfile", apache_get_modules())) {
-                    $responseHeader = $responseHeader->withHeader('X-Sendfile', $fileHelper->getXsendfilePath($file));
+                    $responseHeader = $responseHeader->withHeader('X-Sendfile', $pathingHelper->getPathToFile($file));
                 }
             } else {
                 readfile($filePath);

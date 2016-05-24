@@ -14,13 +14,14 @@
     {% endif %}
 {% endblock %}
 <div class="container">
-    <div class="vertical col-lg-6">
-        <form action="/upload" method="post" enctype="multipart/form-data" class="dropzone" id="fileUploadForm">
+    <div class="vertical col-lg-6" id="file-upload-container">
+        <form action="/upload" method="post" enctype="multipart/form-data" class="dropzone" id="file-upload-form">
             <div class="fallback">
-                <input id="file-upload-form" name="filename" type="file">
+                <input id="file-upload-input" name="filename" type="file">
                 <button id="upload-button" type="submit" class="btn btn-info">Загрузить</button>
             </div>
         </form>
+        <span>Максимальный размер загружаемого файла - {{ sizeLimit }} МБ.</span>
     </div>
 </div>
 {% endblock %}

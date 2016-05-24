@@ -3,7 +3,7 @@
 namespace Filehosting\Helper;
 
 use \Filehosting\Database\FileMapper;
-use \Filehosting\Model\File;
+use \Filehosting\Entity\File;
 
 class SearchHelper
 {

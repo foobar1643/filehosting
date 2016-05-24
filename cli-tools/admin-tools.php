@@ -54,7 +54,7 @@ class CLItools
             die("File $filepath does not exists." . PHP_EOL);
         }
         $fileHelper = $this->container->get('FileHelper');
-        $file = new \Filehosting\Model\File();
+        $file = new \Filehosting\Entity\File();
         $file->setName(pathinfo($filepath, PATHINFO_BASENAME));
         $file->setAuthToken(TokenGenerator::generateToken(45));
         $file->setOriginalName($filepath);

@@ -3,7 +3,7 @@
 namespace Filehosting\Helper;
 
 use \GetId3\GetId3Core as GetId3;
-use \Filehosting\Model\File;
+use \Filehosting\Entity\File;
 use \Filehosting\Helper\FileHelper;
 
 class IdHelper
@@ -13,13 +13,13 @@ class IdHelper
     const VIDEO_MIME_TYPES = ['video/webm'];
 
     private $getId3;
-    private $fileHelper;
+    private $pathingHelper;
     private $fileInfo;
 
-    public function __construct(GetId3 $id3, FileHelper $helper)
+    public function __construct(GetId3 $id3, PathingHelper $helper)
     {
         $this->getId3 = $id3;
-        $this->fileHelper = $helper;
+        $this->pathingHelper = $helper;
     }
 
     public function analyzeFile(File $file)
@@ -27,7 +27,7 @@ class IdHelper
         $this->fileInfo = $this->getId3->setOptionMD5Data(true)
             ->setOptionMD5DataSource(true)
             ->setEncoding('UTF-8')
-            ->analyze($this->fileHelper->getPathToFileFolder($file));
+            ->analyze($this->pathingHelper->getPathToFile($file));
         return true;
     }
 

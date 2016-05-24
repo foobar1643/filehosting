@@ -2,7 +2,7 @@
 
 namespace Filehosting\Database;
 
-use \Filehosting\Model\File;
+use \Filehosting\Entity\File;
 
 class FileMapper
 {
@@ -49,16 +49,16 @@ class FileMapper
     {
         $query = $this->pdo->prepare("SELECT * FROM files ORDER BY upload_date DESC LIMIT 10");
         $query->execute();
-        $query->setFetchMode(\PDO::FETCH_CLASS, '\Filehosting\Model\File');
-        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Model\File');
+        $query->setFetchMode(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
+        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
     }
 
     public function getPopularFiles($count)
     {
         $query = $this->pdo->prepare("SELECT * FROM files ORDER BY downloads DESC LIMIT 10");
         $query->execute();
-        $query->setFetchMode(\PDO::FETCH_CLASS, '\Filehosting\Model\File');
-        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Model\File');
+        $query->setFetchMode(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
+        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
     }
 
     public function createFile(File $file)
@@ -85,7 +85,7 @@ class FileMapper
         $query->bindValue(":limit_bind", $limit, \PDO::PARAM_INT);
         $query->bindValue(":offset_bind", $offset, \PDO::PARAM_INT);
         $query->execute();
-        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Model\File');
+        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
     }
 
     public function getFilteredFiles($ids)
@@ -100,7 +100,7 @@ class FileMapper
         $sql .= ")";
         $query = $this->pdo->prepare($sql);
         $query->execute($ids);
-        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Model\File');
+        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
     }
 
     public function getFile($id)
@@ -108,7 +108,7 @@ class FileMapper
         $query = $this->pdo->prepare("SELECT * FROM files WHERE id = :id_bind");
         $query->bindValue("id_bind", $id, \PDO::PARAM_INT);
         $query->execute();
-        $query->setFetchMode(\PDO::FETCH_CLASS, '\Filehosting\Model\File');
+        $query->setFetchMode(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
         return $query->fetch();
     }
 }

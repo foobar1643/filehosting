@@ -2,6 +2,7 @@
 
 require(__DIR__ . "/../vendor/autoload.php");
 
+use \GetId3\GetId3Core as GetId3;
 use \Filehosting\Database\FileMapper;
 use \Filehosting\Database\SearchGateway;
 use \Filehosting\Database\CommentMapper;
@@ -10,10 +11,10 @@ use \Filehosting\Helper\FileHelper;
 use \Filehosting\Helper\CommentHelper;
 use \Filehosting\Helper\AuthHelper;
 use \Filehosting\Helper\PathingHelper;
-use \Filehosting\Helper\CsrfHelper;
+use \Filehosting\Helper\IdHelper;
+use \Filehosting\Validation\Validation;
 use \Filehosting\Helper\SearchHelper;
 use \Filehosting\Helper\PreviewHelper;
-use \Filehosting\Helper\UploadHelper;
 
 set_error_handler(function ($errno, $errstr, $errfile, $errline)
 {
@@ -70,21 +71,29 @@ function getServices(\Slim\Container $container)
     };
 
     $container['CommentHelper'] = function ($container) {
-        return new CommentHelper();
+        return new CommentHelper($container);
     };
 
     $container['PathingHelper'] = function ($container) {
         return new PathingHelper(__DIR__);
     };
 
-    $container['UploadHelper'] = function ($container) {
-        $cfg = $container->get('config');
-        return new UploadHelper($cfg->getValue('app', 'sizeLimit'));
+    $container['AuthHelper'] = function ($container) {
+        return new AuthHelper();
+    };
+
+    $container['Validation'] = function ($container) {
+        return new Validation($container);
+    };
+
+    $container['IdHelper'] = function ($container) {
+        $getId3 = new GetId3();
+        return new IdHelper($getId3, $container->get('PathingHelper'));
     };
 
     $container['PreviewHelper'] = function ($container) {
         $cfg = $container->get('config');
-        return new PreviewHelper($container);
+        return new PreviewHelper($container->get('PathingHelper'));
     };
     return $container;
 }

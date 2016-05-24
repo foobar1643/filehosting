@@ -2,33 +2,32 @@
 
 namespace Filehosting\Helper;
 
-use \Filehosting\Model\File;
+use \Filehosting\Entity\File;
 
 class PreviewHelper
 {
-    private $container;
+    private $pathingHelper;
     private $image;
     private $file;
 
     const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif"];
 
-    public function __construct(\Slim\Container $c)
+    public function __construct(PathingHelper $h)
     {
-        $this->container = $c;
+        $this->pathingHelper = $h;
     }
 
     private function loadImage(File $file)
     {
-        $fileHelper = $this->container->get("FileHelper");
-        $filename = $fileHelper->getPathToFileFolder($file);
+        $pathToFile = $this->pathingHelper->getPathToFile($file);
         switch($file->getExtention()) {
             case "jpeg":
             case "jpg":
-                return imagecreatefromjpeg($filename);
+                return imagecreatefromjpeg($pathToFile);
             case "png":
-                return imagecreatefrompng($filename);
+                return imagecreatefrompng($pathToFile);
             case "gif":
-                return imagecreatefromgif($filename);
+                return imagecreatefromgif($pathToFile);
             default:
                 throw new \Exception("Can't load this filetype.");
         }
@@ -66,8 +65,6 @@ class PreviewHelper
         if(!in_array($file->getExtention(), self::ALLOWED_EXTENSIONS)) {
             return false;
         }
-        $pathingHelper = $this->container->get("PathingHelper");
-        $fileHelper = $this->container->get("FileHelper");
         $image = $this->loadImage($file);
         $imageWidth = imagesx($image);
         $imageHeight = imagesy($image);
@@ -76,7 +73,7 @@ class PreviewHelper
         $previewHeight = $previewSize["height"];
         $preview = imagecreatetruecolor($previewWidth, $previewHeight);
         imagecopyresampled($preview, $image, 0, 0, 0, 0, $previewWidth, $previewHeight, $imageWidth, $imageHeight);
-        imagejpeg($preview, "{$pathingHelper->getPathToThumbnails()}/thumb_{$fileHelper->getDiskName($file)}");
+        imagejpeg($preview, "{$this->pathingHelper->getPathToThumbnails()}/thumb_{$file->getDiskName()}");
         imagedestroy($preview);
         imagedestroy($image);
     }

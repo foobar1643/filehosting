@@ -1,5 +1,10 @@
 {% extends "skeleton.twig" %}
 {% import "comments.twig" as commentsMacro %}
+{% import "file_info.twig" as fileInfoMacro %}
+{% block pageJs %}
+    <script src="/media/js/comments.js"></script>
+    <script src="/media/js/videojs/video.min.js"></script>
+{% endblock %}
 {% block pageTitle %} Просмотр файла {% endblock %}
 {% block pageBody %}
 <div class="container-fluid">
@@ -13,42 +18,39 @@
     <div class="panel panel-info file-panel">
         <div class="panel-heading"><h3 class="panel-title">{{ file.name }}</h3></div>
         <div class="panel-body">
-            <div class="btn-group btn-group" role="group">
-                <a href="{{ fileHelper.getDownloadLink(file) }}" type="button" class="btn btn-success">Скачать</a>
-                {% if authCookie.value == file.getAuthToken %}
-                    <button class="btn btn-danger"
-                        onClick="if(confirm('Действительно удалить?'))
-                        post(window.location.href + '/delete',
-                        {'csrf_value': '{{ csrfValue }}', 'csrf_name': '{{ csrfName }}'});">
-                            Удалить
-                    </button>
-                {% endif %}
-            </div>
+            <a href="{{ file.getDownloadLink() }}" type="button" class="btn btn-success">Скачать</a>
+            {% if file.getAuthToken == authToken %}
+                <form onSubmit="return confirm('Действительно удалить?');" id="file-delete-form" method="post" action="/file/{{ file.id }}/delete">
+                    <input type="hidden" name="csrf_value" value="{{ csrf['value'] }}">
+                    <input type="hidden" name="csrf_name" value="{{ csrf['name'] }}">
+                    <button class="btn btn-danger" id="file-delete-button">Удалить</button>
+                </form>
+            {% endif %}
             {% if idHelper.isPreviewable %}
                 <div class="row">
                     <div class="col-xs-6 col-md-3">
-                        <img src="{{ fileHelper.getLinkToPreview(file) }}" alt="Preview">
+                        <img src="{{ file.getLinkToPreview(file) }}" alt="Preview">
                     </div>
                 </div>
             {% endif %}
             {% if idHelper.isAudio %}
                 <br>
                 <audio controls>
-                    <source src="{{ fileHelper.getDownloadLink(file) }}?flag=nocount" type='audio/mpeg' preload="auto">
+                    <source src="{{ file.getDownloadLink() }}?flag=nocount" type='audio/mpeg' preload="auto">
                     Your browser does not support the audio element.
                 </audio>
             {% endif %}
             {% if idHelper.isVideo %}
                 <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360"
                     poster="/media/img/placeholder.png" data-setup="{}">
-                    <source src="{{ fileHelper.getDownloadLink(file) }}?flag=nocount" type='video/webm'>
+                    <source src="{{ file.getDownloadLink() }}?flag=nocount" type='video/webm'>
                     <p class="vjs-no-js">
                         To view this video please enable JavaScript, and consider upgrading to a web browser that
                         <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
                     </p>
                 </video>
             {% endif %}
-            {% include "file_info.twig" %}
+            {{ fileInfoMacro.displayFileInfo(idHelper) }}
         </div>
         <div class="panel-footer">
             <span class="foot-text"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyph-text">{{ file.uploader }}</span></span>
@@ -59,13 +61,13 @@
     <div class="row" id="comments-section">
         <div class="col-md-12">
             <div class="page-header">
-                <h3><small class="pull-right">{{ commentsCount }} комментариев</small> Комментарии </h3>
+                <h3><small id="total-comments-count" class="pull-right">{{ comments['count'] }} комментариев</small> Комментарии </h3>
             </div>
-            {% if comments|length == 0 %}
+            {% if comments['count'] == 0 %}
                 <h4 id="no-comments-found">У этого файла еще нет комментариев. Вы можете оставить комментарий воспользовавшись формой ниже.</h4>
             {% endif %}
             <div class="comments-list" id="file-comments-list">
-                <div class="media" id="comment-dummy" style="display: none; margin-top: 5px; margin-left: 0px;">
+                <div class="media" id="comment-dummy" style="display: none;">
                     <p class="pull-right"><small>01/01/1970, 0:00 AM</small></p>
                     <div class="media-body">
                         <h4 class="media-heading user-name">Anonymous</h4>
@@ -73,18 +75,24 @@
                         <p><small><a id="reply-dummy" class="comments-reply-button">Ответить</a></small></p>
                     </div>
                 </div>
-                {{ commentsMacro.display(comments) }}
+                {{ commentsMacro.display(file, comments['comments'], commentErrors, replyTo) }}
             </div>
-            <form method="post" id="comment-form">
+            <form method="post" id="comment-form" action="/file/{{ file.id }}/comment">
                 <div class="page-header">
                     <h3>Оставить комментарий</h3>
                 </div>
-                <div class="form-group" id="comment-form-group">
+                <div class="form-group {% if commentErrors != null and replyTo == null %} has-error {% endif %}" id="comment-form-group">
                     <label for="comment">Комментарий:</label>
                     <textarea class="form-control" rows="5" id="comment-field" name="comment"></textarea>
+                    <label style="display: none;" id="error-label-dummy" class='control-label' for='comment'>Error label dummy</label>
+                    {% if commentErrors != null and replyTo == null %}
+                        {% for error in commentErrors %}
+                            <label style="display: block;" class='control-label' for='comment'>{{ error }}</label>
+                        {% endfor %}
+                    {% endif %}
                 </div>
                 <div class="form-group">
-                    <button type="button" id="comment-button" class="btn btn-default">Отправить</button>
+                    <button type="submit" id="comment-button" class="btn btn-default">Отправить</button>
                 </div>
             </form>
         </div>

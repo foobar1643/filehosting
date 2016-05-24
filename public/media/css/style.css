@@ -5,12 +5,14 @@ body { font-family: Tahoma, sans-serif, arial, times; }
 .navbar-default .navbar-nav>.active>a { background-color: #2C6C9E; }
 .navbar-default .navbar-nav>.active>a:hover, .navbar-default .navbar-nav>.active>a:focus { background-color: #2D74A3; }
 .navbar-default .navbar-toggle .icon-bar { background-color: white; }
-#upload-form { text-align: center; }
+#file-upload-container { text-align: center; }
 .footer-link { margin-left: 10px; }
 #popular-files { margin-right: 9px; }
 #comment-form .page-header, #reply-form .page-header { margin: 0; }
 #comments-section .page-header { margin: 0; }
 #file-info .table { margin-bottom: 0; }
+#file-delete-button { vertical-align: top; }
+#file-delete-form { display: inline; }
 .comments-reply-button { cursor: pointer; }
 .container .panel .panel-default { margin: 7px; }
 #page-nav { background-color: #337ab7; }
@@ -41,20 +43,21 @@ body { font-family: Tahoma, sans-serif, arial, times; }
     margin-left: 0;
 }
 
-#fileUploadForm {
+#file-upload-form {
     border: 2px dashed #337ab7;
+    margin-bottom: 20px;
 }
 
-#fileUploadForm .fallback input {
+#file-upload-form .fallback input {
     margin: auto;
     margin-top: 20px;
 }
 
-#fileUploadForm .fallback {
+#file-upload-form .fallback {
     text-align: center;
 }
 
-#fileUploadForm .fallback #upload-button {
+#file-upload-form .fallback #upload-button {
     margin: 20px 0px 20px 0px;
 }
 
@@ -90,7 +93,6 @@ body { font-family: Tahoma, sans-serif, arial, times; }
 }
 
 .file-panel .btn-success {
-  display: block;
   margin-bottom: 6px;
 }
 

@@ -2,7 +2,7 @@
 
 namespace Filehosting\Database;
 
-use \Filehosting\Model\File;
+use \Filehosting\Entity\File;
 
 class SearchGateway
 {

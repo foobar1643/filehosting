@@ -2,12 +2,9 @@
 
 namespace Filehosting\Controller;
 
-use \GetId3\GetId3Core as GetId3;
-use Dflydev\FigCookies\FigRequestCookies;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use \Filehosting\Model\File;
-use \Filehosting\Helper\IdHelper;
+use \Filehosting\Entity\File;
 
 class FileController
 {
@@ -21,30 +18,29 @@ class FileController
     public function viewFile(Request $request, Response $response, $args)
     {
         $fileMapper = $this->container->get('FileMapper');
-        $commentGateway = $this->container->get('CommentMapper');
         $commentHelper = $this->container->get('CommentHelper');
+        $authHelper = $this->container->get('AuthHelper');
+        $idHelper = $this->container->get('IdHelper');
         $file = $fileMapper->getFile($args['id']);
-        $getParams = $request->getQueryParams();
-        if($file == null) {
+        if($file == false) {
             throw new \Slim\Exception\NotFoundException($request, $response);
+        } else {
+            $idHelper->analyzeFile($file);
+            if(isset($args['replyTo'])) {
+                $replyTo = $args['replyTo'];
+            } else {
+                $params = $request->getQueryParams();
+                $replyTo = isset($params['reply']) ? strval($params['reply']) : NULL;
+            }
+            return $this->container->get('view')->render($response, 'file.twig', [
+                'file' => $file,
+                'idHelper' => $idHelper,
+                'replyTo' => $replyTo,
+                'commentErrors' => isset($args['commentErrors']) ? $args['commentErrors'] : NULL,
+                'csrf' => ["name" => $request->getAttribute('csrf_name'), "value" => $request->getAttribute('csrf_value')],
+                'authToken' => $authHelper->getUserToken($request),
+                'comments' => $commentHelper->getComments($file->getId())]);
         }
-        $fileHelper = $this->container->get('FileHelper');
-        $getId3 = new GetId3();
-        $idHelper = new IdHelper($getId3, $fileHelper);
-        $idHelper->analyzeFile($file);
-        $rawComments = $commentGateway->getComments($file->getId());
-        $treeComments = $commentHelper->makeTrees($rawComments);
-        $commentsCount = $commentHelper->getTreesSize($treeComments);
-        return $this->container->get('view')->render($response, 'file.twig', [
-            'file' => $file,
-            'idHelper' => $idHelper,
-            'fileInfo' => $idHelper->getFileInfo(),
-            'fileHelper' => $fileHelper,
-            'csrfName' => $request->getAttribute('csrf_name'),
-            'csrfValue' => $request->getAttribute('csrf_value'),
-            'authCookie' => FigRequestCookies::get($request, 'auth'),
-            'comments' => $treeComments,
-            'commentsCount' => $commentsCount]);
     }
 
     public function deleteFile(Request $request, Response $response, $args)
@@ -52,12 +48,11 @@ class FileController
         $formData = $request->getParsedBody();
         $fileMapper = $this->container->get('FileMapper');
         $fileHelper = $this->container->get('FileHelper');
+        $authHelper = $this->container->get('AuthHelper');
         $file = $fileMapper->getFile($args['id']);
-        if($file != null && $fileHelper->canDelete($file->getAuthToken())) {
+        if($file != null && $authHelper->canDeleteFile($request, $file)) {
             $fileHelper->deleteFile($file);
         }
-        $responseHeader = $response->withHeader('Location', "/");
-        return $responseHeader;
+        return $response->withHeader('Location', "/");
     }
-
 }

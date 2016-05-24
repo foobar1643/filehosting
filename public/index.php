@@ -73,8 +73,7 @@ $app->map(['GET', 'POST'], '/upload', '\Filehosting\Controller\UploadController'
 $app->get('/search', '\Filehosting\Controller\SearchController');
 $app->get('/file/{id:[0-9]+}', '\Filehosting\Controller\FileController:viewFile')->add($container->get('csrf'));
 $app->get('/file/get/{id:[0-9]+}[/{filename}]', '\Filehosting\Controller\DownloadController');
-$app->post('/file/{id:[0-9]+}/comment/post', '\Filehosting\Controller\CommentController:postComment');
-$app->post('/file/{id:[0-9]+}/comment/{commentId:[0-9]+}/post', '\Filehosting\Controller\CommentController:postReply');
+$app->post('/file/{id:[0-9]+}/comment', '\Filehosting\Controller\CommentController');
 $app->post('/file/{id:[0-9]+}/delete', '\Filehosting\Controller\FileController:deleteFile')->add($container->get('csrf'));
 
 $app->run();

@@ -4,27 +4,6 @@ namespace Filehosting\Helper;
 
 class UploadHelper
 {
-    private $maxFileSize;
-
-    public function __construct($maxFileSize)
-    {
-        $this->maxFileSize = $maxFileSize;
-    }
-
-    public function validateUpload($upload) {
-        $errors = null;
-        if(!isset($upload['filename'])) {
-            $errors['noFile'] = "Прикрепите файл и попробуйте еще раз.";
-        }
-        if(isset($upload['filename']) && $upload['filename']['size'] > $this->maxFileSize * 1000000) {
-            $errors['sizeLimit'] = "Размер файла превышает допустимый лимит.";
-        }
-        if(isset($upload['filename']) && $upload['filename']['error'] != UPLOAD_ERR_OK) {
-            $errors['form'] = $this::parseCode($upload['filename']['error']);
-        }
-        return $errors;
-    }
-
     public static function parseCode($code)
     {
         switch($code) {

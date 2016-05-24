@@ -2,8 +2,10 @@
 
 namespace Filehosting\Helper;
 
-class PathingHelper {
+use \Filehosting\Entity\File;
 
+class PathingHelper
+{
     private $basePath;
 
     public function __construct($initDir)
@@ -19,5 +21,25 @@ class PathingHelper {
     public function getPathToThumbnails()
     {
         return $this->basePath . "/public/thumbnails";
+    }
+
+    public function getPathToStorage()
+    {
+        return $this->basePath . "/storage";
+    }
+
+    public function getPathToFile(File $file)
+    {
+        return "{$this->getPathToStorage()}/{$file->getFolder()}/{$file->getDiskName()}";
+    }
+
+    public function getXsendfilePath(File $file)
+    {
+        return $pathingHelper->getPathToBase() . "/storage/{$file->getFolder()}/{$file->getDiskName()}";
+    }
+
+    public function getXaccelPath(File $file)
+    {
+        return "/storage/{$file->getFolder()}/{$file->getDiskName()}"; // /storage/ - as internal
     }
 }

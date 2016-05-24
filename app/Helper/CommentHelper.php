@@ -2,10 +2,40 @@
 
 namespace Filehosting\Helper;
 
-use \Filehosting\Model\Comment;
+use \Filehosting\Entity\Comment;
 
 class CommentHelper
 {
+    private $container;
+
+    public function __construct(\Slim\Container $c)
+    {
+        $this->container = $c;
+    }
+
+    public function addComment(Comment $comment)
+    {
+        $commentMapper = $this->container->get('CommentMapper');
+        $comment->setId($commentMapper->addComment($comment)); // adds comment to the database
+        if($comment->getParentId() != NULL) { // if there is a parent comment
+            $parentComment = $commentMapper->getComment($comment->getParentId());
+            $comment->setParentPath($this->normalizePath("{$parentComment->getParentPath()}.{$comment->getId()}"));
+        } else { // if there is no parent comment
+            $comment->setParentPath($this->normalizePath($comment->getId()));
+        }
+        $commentMapper->updatePath($comment); // updates materialized path in the database
+        return $comment;
+    }
+
+    public function getComments($fileId)
+    {
+        $commentMapper = $this->container->get('CommentMapper');
+        $rawComments = $commentMapper->getComments($fileId);
+        $comments = $this->makeTrees($rawComments);
+        $commentsCount = $this->countTotalComments($comments);
+        return ["count" => $commentsCount, "comments" => $comments];
+    }
+
     public function getMargin($path)
     {
         $split = preg_split("/[.]/", $path);
@@ -66,14 +96,11 @@ class CommentHelper
         return $trees;
     }
 
-    public function getTreesSize($trees)
+    public function countTotalComments($comments)
     {
         $size = 0;
-        foreach($trees as $id => $tree) {
-            $size++;
-            if(count($tree->getChildren()) > 0) {
-                $size = $size + $this->getTreesSize($tree->getChildren());
-            }
+        foreach($comments as $id => $comment) {
+            $size += $comment->countDescendants() + 1;
         }
         return $size;
     }

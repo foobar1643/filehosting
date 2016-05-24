@@ -1,16 +1,38 @@
-{% macro display(comments) %}
+{% macro display(file, comments, errors, replyTo) %}
     {% for comment in comments %}
-        <div class="media" id="comment-{{ comment.getId|number_format }}" style="margin-top: 5px; margin-left: 0px;">
+        <div class="media" id="comment-{{ comment.getId }}">
             <p class="pull-right"><small>{{ comment.getDatePosted }}</small></p>
             <div class="media-body">
                 <h4 class="media-heading user-name">{{ comment.getAuthor }}</h4>
                 <span class="comment-text">{{ comment.getCommentText }}</span>
-                <p><small><a id="reply-{{ comment.getId|number_format }}" class="comments-reply-button">Ответить</a></small></p>
+                {% if comment.getDepth < 5 %}
+                    <p><small><a id="reply-{{ comment.getId }}" href="/file/{{ file.id }}?reply={{ comment.getId }}" class="comments-reply-button">Ответить</a></small></p>
+                {% endif %}
+                {% if replyTo == comment.getId %}
+                    <form method="post" id="comment-form" action="/file/{{ file.id }}/comment">
+                        <input type="hidden" name="parentComment" value="{{ comment.getId }}">
+                        <div class="page-header">
+                            <h3>Ответить на комментарий</h3>
+                        </div>
+                        <div class="form-group {% if errors != null %} has-error {% endif %}" id="comment-form-group">
+                            <label for="comment">Комментарий:</label>
+                            <textarea class="form-control" rows="5" id="comment-field" name="comment"></textarea>
+                            {% if errors != null %}
+                                {% for error in errors %}
+                                    <label style="display: block;" class='control-label' for='comment'>{{ error }}</label>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" id="comment-button" class="btn btn-default">Отправить</button>
+                        </div>
+                    </form>
+                {% endif %}
             </div>
             <div class="children" style="margin-left: 25px;">
                 {% import _self as selfMacro %}
                 {% if comment.getChildren|length > 0 %}
-                    {{ selfMacro.display(comment.getChildren) }}
+                    {{ selfMacro.display(file, comment.getChildren, errors, replyTo) }}
                 {% endif %}
             </div>
         </div>

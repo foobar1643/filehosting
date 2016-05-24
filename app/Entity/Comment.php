@@ -1,8 +1,8 @@
 <?php
 
- namespace Filehosting\Model;
+ namespace Filehosting\Entity;
 
- class Comment
+ class Comment implements \JsonSerializable
  {
      private $id;
      private $file_id;
@@ -22,6 +22,7 @@
      public function setId($id)
      {
          $this->id = $id;
+         return $this;
      }
 
      public function getParentId()
@@ -32,6 +33,7 @@
      public function setParentId($parentId)
      {
          $this->parent_id = $parentId;
+         return $this;
      }
 
      public function getFileId()
@@ -42,6 +44,7 @@
      public function setFileId($fileId)
      {
          $this->file_id = $fileId;
+         return $this;
      }
 
      public function getAuthor()
@@ -52,6 +55,7 @@
      public function setAuthor($author)
      {
          $this->author = $author;
+         return $this;
      }
 
      public function getDatePosted()
@@ -64,6 +68,7 @@
      public function setDatePosted($datePosted)
      {
          $this->date_posted = $datePosted;
+         return $this;
      }
 
      public function getCommentText()
@@ -74,6 +79,7 @@
      public function setCommentText($commentText)
      {
          $this->comment_text = $commentText;
+         return $this;
      }
 
      public function getParentPath()
@@ -84,6 +90,7 @@
      public function setParentPath($parentPath)
      {
          $this->parent_path = $parentPath;
+         return $this;
      }
 
      public function addChildNode(Comment $child)
@@ -100,5 +107,35 @@
      public function countChildNodes()
      {
          return count($this->childNodes);
+     }
+
+     public function countDescendants()
+     {
+         $size = 0;
+         foreach($this->childNodes as $id => $comment) {
+             $size++;
+             if(count($comment->getChildren()) > 0) {
+                 $size = $size + $comment->countDescendants();
+             }
+         }
+         return $size;
+     }
+
+     public function getDepth()
+     {
+         $path = preg_split("/[.]/", $this->parent_path);
+         return count($path);
+     }
+
+     public function jsonSerialize()
+     {
+         return [
+             'id' => $this->id,
+             'parentId' => $this->parent_id,
+             'author' => $this->author,
+             'date' => $this->getDatePosted(),
+             'text' => $this->comment_text,
+             'path' => $this->parent_path
+         ];
      }
  }

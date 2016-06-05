@@ -24,3 +24,7 @@ CREATE TABLE comments (
 ) WITH (
   OIDS=FALSE
 );
+
+CREATE INDEX upload_date_index ON files (upload_date);
+CREATE INDEX downloads_index ON files (downloads);
+CREATE INDEX comments_matpath_index ON comments (parent_path);

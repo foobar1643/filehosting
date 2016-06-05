@@ -1,4 +1,4 @@
-{% macro display(file, comments, errors, replyTo) %}
+{% macro display(comments, errors, replyTo) %}
     {% for comment in comments %}
         <div class="media" id="comment-{{ comment.getId }}">
             <p class="pull-right"><small>{{ comment.getDatePosted }}</small></p>
@@ -6,10 +6,10 @@
                 <h4 class="media-heading user-name">{{ comment.getAuthor }}</h4>
                 <span class="comment-text">{{ comment.getCommentText }}</span>
                 {% if comment.getDepth < 5 %}
-                    <p><small><a id="reply-{{ comment.getId }}" href="/file/{{ file.id }}?reply={{ comment.getId }}" class="comments-reply-button">Ответить</a></small></p>
+                    <p><small><a id="reply-{{ comment.getId }}" href="/file/{{ comment.fileId }}?reply={{ comment.getId }}" class="comments-reply-button">Ответить</a></small></p>
                 {% endif %}
                 {% if replyTo == comment.getId %}
-                    <form method="post" id="comment-form" action="/file/{{ file.id }}/comment">
+                    <form method="post" id="comment-form" action="/file/{{ comment.fileId }}">
                         <input type="hidden" name="parentComment" value="{{ comment.getId }}">
                         <div class="page-header">
                             <h3>Ответить на комментарий</h3>
@@ -32,7 +32,7 @@
             <div class="children" style="margin-left: 25px;">
                 {% import _self as selfMacro %}
                 {% if comment.getChildren|length > 0 %}
-                    {{ selfMacro.display(file, comment.getChildren, errors, replyTo) }}
+                    {{ selfMacro.display(comment.getChildren, errors, replyTo) }}
                 {% endif %}
             </div>
         </div>

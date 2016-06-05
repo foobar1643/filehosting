@@ -12,6 +12,7 @@ class File
     private $uploader;
     private $upload_date;
     private $downloads;
+    private $uploadObject;
     private $auth_token;
     private $isDeleted;
 
@@ -45,6 +46,17 @@ class File
     public function setOriginalName($originalName)
     {
         $this->originalName = $originalName;
+        return $this;
+    }
+
+    public function getUploadObject()
+    {
+        return $this->uploadObject;
+    }
+
+    public function setUploadObject(\Slim\Http\UploadedFile $uploadObject)
+    {
+        $this->uploadObject = $uploadObject;
         return $this;
     }
 

@@ -28,6 +28,11 @@ class PathingHelper
         return $this->basePath . "/storage";
     }
 
+    public function getPathToFileFolder(File $file)
+    {
+        return "{$this->getPathToStorage()}/{$file->getFolder()}";
+    }
+
     public function getPathToFile(File $file)
     {
         return "{$this->getPathToStorage()}/{$file->getFolder()}/{$file->getDiskName()}";

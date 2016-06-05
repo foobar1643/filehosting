@@ -4,6 +4,7 @@ namespace Filehosting\Controller;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use \Slim\Http\Stream as Stream;
 use \Filehosting\Entity\File;
 use \Filehosting\Helper\FileHelper;
 use \Filehosting\Exception\FileNotFoundException;
@@ -11,42 +12,39 @@ use \Filehosting\Exception\FileNotFoundException;
 class DownloadController
 {
     private $container;
+    private $fileMapper;
+    private $pathingHelper;
+    private $fileHelper;
 
     public function __construct(\Slim\Container $c)
     {
-        $this->container = $c;
+        $this->fileMapper = $c->get('FileMapper');
+        $this->pathingHelper = $c->get('PathingHelper');
+        $this->fileHelper = $c->get('FileHelper');
     }
 
     public function __invoke(Request $request, Response $response, $args)
     {
-        $file = new File();
-        $fileMapper = $this->container->get('FileMapper');
-        $pathingHelper = $this->container->get('PathingHelper');
-        $config = $this->container->get('config');
         $params = $request->getQueryParams();
-        $file = $fileMapper->getFile($args['id']);
-        $filePath = $pathingHelper->getPathToFile($file);
-        if($file != null && file_exists($filePath)) {
+        if($this->fileHelper->fileExists($args['id'])) {
+            $file = $this->fileMapper->getFile($args['id']);
+            $filePath = $this->pathingHelper->getPathToFile($file);
             if(!isset($params['flag']) || $params['flag'] != 'nocount') {
                 $file->setDownloads($file->getDownloads() + 1);
-                $fileMapper->updateFile($file);
+                $this->fileMapper->updateFile($file);
             }
-            $responseHeader = $response->withHeader('Content-Description', "File Transfer") // ->withHeader('Content-Disposition', "attachment; filename={$file->getName()}")
+            $response = $response->withHeader('Content-Description', "File Transfer")
                 ->withHeader('Content-Type', "application/octet-stream")
                 ->withHeader('Cache-Control', "must-revalidate")
                 ->withHeader('Pragma', "public")
                 ->withHeader('Content-Length', filesize($filePath));
-            if($config->getValue('app', 'enableXsendfile') == 1) {
-                if(strpos($_SERVER["SERVER_SOFTWARE"], "nginx") !== false) {
-                    $responseHeader = $responseHeader->withHeader('X-Accel-Redirect', $pathingHelper->getXaccelPath($file))
-                    ->withHeader('X-Accel-Charset', "utf-8");
-                } else if(strpos($_SERVER["SERVER_SOFTWARE"], "apache") !== false && in_array("mod_xsendfile", apache_get_modules())) {
-                    $responseHeader = $responseHeader->withHeader('X-Sendfile', $pathingHelper->getPathToFile($file));
-                }
-            } else {
-                readfile($filePath);
+            try {
+                $response = $this->fileHelper->getXsendfileHeaders($request, $response, $file);
+            } catch(\Exception $e) {
+                $fileStream = new Stream(fopen($filePath, "r"));
+                $response = $response->write($fileStream->getContents());
             }
-            return $responseHeader;
+            return $response;
         } else {
             throw new \Slim\Exception\NotFoundException($request, $response);
         }

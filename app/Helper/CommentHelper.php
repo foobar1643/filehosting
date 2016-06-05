@@ -6,39 +6,51 @@ use \Filehosting\Entity\Comment;
 
 class CommentHelper
 {
-    private $container;
+    private $commentMapper;
 
-    public function __construct(\Slim\Container $c)
+    public function __construct(\Filehosting\Database\CommentMapper $mapper)
     {
-        $this->container = $c;
+        $this->commentMapper = $mapper;
     }
 
     public function addComment(Comment $comment)
     {
-        $commentMapper = $this->container->get('CommentMapper');
-        $comment->setId($commentMapper->addComment($comment)); // adds comment to the database
-        if($comment->getParentId() != NULL) { // if there is a parent comment
-            $parentComment = $commentMapper->getComment($comment->getParentId());
-            $comment->setParentPath($this->normalizePath("{$parentComment->getParentPath()}.{$comment->getId()}"));
-        } else { // if there is no parent comment
+        $comment->setId($this->commentMapper->addComment($comment));
+        if($comment->getParentId() != NULL) {
+            $parentComment = $this->commentMapper->getComment($comment->getParentId());
+            $comment->setParentPath($this->appendToPath($parentComment->getParentPath(), $comment->getId()));
+        } else {
             $comment->setParentPath($this->normalizePath($comment->getId()));
         }
-        $commentMapper->updatePath($comment); // updates materialized path in the database
+        $this->commentMapper->updatePath($comment);
         return $comment;
     }
 
     public function getComments($fileId)
     {
-        $commentMapper = $this->container->get('CommentMapper');
-        $rawComments = $commentMapper->getComments($fileId);
+        $rawComments = $this->commentMapper->getComments($fileId);
         $comments = $this->makeTrees($rawComments);
         $commentsCount = $this->countTotalComments($comments);
         return ["count" => $commentsCount, "comments" => $comments];
     }
 
+    public function commentExists($commentId)
+    {
+        $comment = $this->commentMapper->getComment($commentId);
+        if($comment) {
+            return true;
+        }
+        return false;
+    }
+
+    public function appendToPath($old, $new)
+    {
+        return $this->normalizePath($old) . "." . $this->normalizePath($new);
+    }
+
     public function getMargin($path)
     {
-        $split = preg_split("/[.]/", $path);
+        $split = $this->splitPath($path);
         return (count($split) - 1) * 25;
     }
 
@@ -49,7 +61,7 @@ class CommentHelper
 
     public function normalizePath($path)
     {
-        $split = preg_split("/[.]/", $path);
+        $split = $this->splitPath($path);
         $newStr = "";
         foreach($split as $elem) {
             $newStr .= ($newStr != "" ? "." : "") . str_pad($elem, 3, "0", STR_PAD_LEFT);

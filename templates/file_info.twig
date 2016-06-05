@@ -1,5 +1,4 @@
-{% macro displayFileInfo(idHelper) %}
-    {% set fileInfo = idHelper.getFileInfo %}
+{% macro displayFileInfo(fileInfo) %}
     {% if fileInfo['error'] is not defined %}
     <div class="table-responsive" id="file-info">
         <table class="table table-bordered">

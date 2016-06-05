@@ -14,7 +14,6 @@ class IdHelper
 
     private $getId3;
     private $pathingHelper;
-    private $fileInfo;
 
     public function __construct(GetId3 $id3, PathingHelper $helper)
     {
@@ -24,37 +23,31 @@ class IdHelper
 
     public function analyzeFile(File $file)
     {
-        $this->fileInfo = $this->getId3->setOptionMD5Data(true)
+        $fileInfo = $this->getId3->setOptionMD5Data(true)
             ->setOptionMD5DataSource(true)
             ->setEncoding('UTF-8')
             ->analyze($this->pathingHelper->getPathToFile($file));
-        return true;
+        return $fileInfo;
     }
-
-    public function getFileInfo()
+    public function isPreviewable(array $fileInfo)
     {
-        return $this->fileInfo;
-    }
-
-    public function isPreviewable()
-    {
-        if(isset($this->fileInfo['mime_type']) && in_array($this->fileInfo['mime_type'], self::IMAGES_MIME_TYPES)) {
+        if(isset($fileInfo['mime_type']) && in_array($fileInfo['mime_type'], self::IMAGES_MIME_TYPES)) {
             return true;
         }
         return false;
     }
 
-    public function isAudio()
+    public function isAudio(array $fileInfo)
     {
-        if(isset($this->fileInfo['mime_type']) && in_array($this->fileInfo['mime_type'], self::AUDIO_MIME_TYPES)) {
+        if(isset($fileInfo['mime_type']) && in_array($fileInfo['mime_type'], self::AUDIO_MIME_TYPES)) {
             return true;
         }
         return false;
     }
 
-    public function isVideo()
+    public function isVideo(array $fileInfo)
     {
-        if(isset($this->fileInfo['mime_type']) && in_array($this->fileInfo['mime_type'], self::VIDEO_MIME_TYPES)) {
+        if(isset($fileInfo['mime_type']) && in_array($fileInfo['mime_type'], self::VIDEO_MIME_TYPES)) {
             return true;
         }
         return false;

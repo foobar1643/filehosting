@@ -53,7 +53,15 @@ class CommentMapper
         return $query->fetch();
     }
 
-    public function deleteComments($fileId)
+    public function deleteComment($commentId)
+    {
+        $query = $this->pdo->prepare("DELETE FROM comments WHERE parent_path LIKE :comment_id");
+        $query->bindValue(":comment_id", "%" . $commentId . "%", \PDO::PARAM_STR);
+        $query->execute();
+        return $query->rowCount();
+    }
+
+    public function purgeComments($fileId)
     {
         $query = $this->pdo->prepare("DELETE FROM comments WHERE file_id = :file_id_bind");
         $query->bindValue(":file_id_bind", $fileId, \PDO::PARAM_INT);

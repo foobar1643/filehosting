@@ -19,28 +19,28 @@
         <div class="panel-heading"><h3 class="panel-title">{{ file.name }}</h3></div>
         <div class="panel-body">
             <a href="{{ file.getDownloadLink() }}" type="button" class="btn btn-success">Скачать</a>
-            {% if file.getAuthToken == authToken %}
+            {% if canManageFile == true %}
                 <form onSubmit="return confirm('Действительно удалить?');" id="file-delete-form" method="post" action="/file/{{ file.id }}/delete">
-                    <input type="hidden" name="csrf_value" value="{{ csrf['value'] }}">
-                    <input type="hidden" name="csrf_name" value="{{ csrf['name'] }}">
+                    <!--<input type="hidden" name="csrf_value" value="{{ csrf['value'] }}">
+                    <input type="hidden" name="csrf_name" value="{{ csrf['name'] }}"> !-->
                     <button class="btn btn-danger" id="file-delete-button">Удалить</button>
                 </form>
             {% endif %}
-            {% if idHelper.isPreviewable %}
+            {% if idHelper.isPreviewable(fileInfo) %}
                 <div class="row">
                     <div class="col-xs-6 col-md-3">
                         <img src="{{ file.getLinkToPreview(file) }}" alt="Preview">
                     </div>
                 </div>
             {% endif %}
-            {% if idHelper.isAudio %}
+            {% if idHelper.isAudio(fileInfo) %}
                 <br>
                 <audio controls>
                     <source src="{{ file.getDownloadLink() }}?flag=nocount" type='audio/mpeg' preload="auto">
                     Your browser does not support the audio element.
                 </audio>
             {% endif %}
-            {% if idHelper.isVideo %}
+            {% if idHelper.isVideo(fileInfo) %}
                 <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360"
                     poster="/media/img/placeholder.png" data-setup="{}">
                     <source src="{{ file.getDownloadLink() }}?flag=nocount" type='video/webm'>
@@ -50,7 +50,7 @@
                     </p>
                 </video>
             {% endif %}
-            {{ fileInfoMacro.displayFileInfo(idHelper) }}
+            {{ fileInfoMacro.displayFileInfo(fileInfo) }}
         </div>
         <div class="panel-footer">
             <span class="foot-text"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyph-text">{{ file.uploader }}</span></span>
@@ -67,24 +67,15 @@
                 <h4 id="no-comments-found">У этого файла еще нет комментариев. Вы можете оставить комментарий воспользовавшись формой ниже.</h4>
             {% endif %}
             <div class="comments-list" id="file-comments-list">
-                <div class="media" id="comment-dummy" style="display: none;">
-                    <p class="pull-right"><small>01/01/1970, 0:00 AM</small></p>
-                    <div class="media-body">
-                        <h4 class="media-heading user-name">Anonymous</h4>
-                        <span class="comment-text">Dummy text</span>
-                        <p><small><a id="reply-dummy" class="comments-reply-button">Ответить</a></small></p>
-                    </div>
-                </div>
-                {{ commentsMacro.display(file, comments['comments'], commentErrors, replyTo) }}
+                {{ commentsMacro.display(comments['comments'], commentErrors, replyTo) }}
             </div>
-            <form method="post" id="comment-form" action="/file/{{ file.id }}/comment">
+            <form method="post" id="comment-form" action="/file/{{ file.id }}">
                 <div class="page-header">
                     <h3>Оставить комментарий</h3>
                 </div>
                 <div class="form-group {% if commentErrors != null and replyTo == null %} has-error {% endif %}" id="comment-form-group">
                     <label for="comment">Комментарий:</label>
                     <textarea class="form-control" rows="5" id="comment-field" name="comment"></textarea>
-                    <label style="display: none;" id="error-label-dummy" class='control-label' for='comment'>Error label dummy</label>
                     {% if commentErrors != null and replyTo == null %}
                         {% for error in commentErrors %}
                             <label style="display: block;" class='control-label' for='comment'>{{ error }}</label>
@@ -97,5 +88,32 @@
             </form>
         </div>
     </div>
+    <!-- Reply form template !-->
+    <script type="text/x-template" id="reply-form-template">
+        <div class="page-header">
+            <h3>Ответить на комментарий</h3>
+        </div>
+        <div class="form-group" id="reply-form-group">
+            <label for="reply">Комментарий:</label>
+            <textarea class="form-control" rows="5" id="reply-field" name="reply"></textarea>
+        </div>
+        <div class="form-group">
+            <button type="button" id="reply-button" class="btn btn-default">Отправить</button>
+        </div>
+    </script>
+    <!-- Comment template !-->
+    <script type="text/x-template" id="new-comment-template">
+        <p class="pull-right"><small>%commentDate%</small></p>
+        <div class="media-body">
+            <h4 class="media-heading user-name">%commentAuthor%</h4>
+            <span class="comment-text">%commentText%</span>
+            <p><small><a id="reply-%commentId%" class="comments-reply-button">Ответить</a></small></p>
+        </div>
+        <div class='children' style='margin-left: 25px;'></div>
+    </script>
+    <!-- Error label template !-->
+    <script type="text/x-template" id="error-label-template">
+        <label style="display: block;" id="error-label-%errorId%" class='control-label real-label'>%errorText%</label>
+    </script>
 </div>
 {% endblock %}

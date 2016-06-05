@@ -28,7 +28,7 @@ class SearchGateway
         return $query->fetchAll();
     }
 
-    public function search($searchQuery, $limit, $offset)
+    public function searchQuery($searchQuery, $offset, $limit)
     {
         $query = $this->pdo->prepare("SELECT id FROM index_files, rt_files WHERE MATCH(:match_bind) ORDER BY id DESC LIMIT :offset_bind, :limit_bind");
         $query->bindValue(":offset_bind", $offset, \PDO::PARAM_INT);
@@ -38,18 +38,18 @@ class SearchGateway
         return $query->fetchAll(\PDO::FETCH_COLUMN);
     }
 
-    public function insertRtValue($id, $name)
+    public function indexNewFile(File $file)
     {
         $query = $this->pdo->prepare("INSERT INTO rt_files VALUES(:id_bind, :name_bind)");
-        $query->bindValue(":id_bind", $id, \PDO::PARAM_INT);
-        $query->bindValue(":name_bind", $name);
+        $query->bindValue(":id_bind", $file->getId(), \PDO::PARAM_INT);
+        $query->bindValue(":name_bind", $file->getName(), \PDO::PARAM_STR);
         $query->execute();
     }
 
-    public function deleteRtValue($id)
+    public function deleteIndexedFile(File $file)
     {
         $query = $this->pdo->prepare("DELETE FROM rt_files WHERE id = :id_bind");
-        $query->bindValue(":id_bind", $id, \PDO::PARAM_INT);
+        $query->bindValue(":id_bind", $file->getId(), \PDO::PARAM_INT);
         $query->execute();
     }
 }

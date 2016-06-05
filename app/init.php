@@ -24,76 +24,81 @@ set_error_handler(function ($errno, $errstr, $errfile, $errline)
     throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
 });
 
-function getServices(\Slim\Container $container)
-{
-    $container['config'] = function ($container) {
-        $config = new Config();
-        $config->loadFromFile(__DIR__ . "/../config.ini");
-        return $config;
-    };
+$configuration = [
+    'settings' => [
+        'displayErrorDetails' => ini_get("display_errors"),
+    ],
+];
 
-    $container['pdo'] = function ($container) {
-        $cfg = $container->get('config');
-        $dsn = sprintf("pgsql:host=%s;port=%s;dbname=%s",
-            $cfg->getValue('db', 'host'),
-            $cfg->getValue('db', 'port'),
-            $cfg->getValue('db', 'name'));
-        $pdo = new \PDO($dsn,
-            $cfg->getValue('db', 'username'), $cfg->getValue('db', 'password'));
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return $pdo;
-    };
+$container = new \Slim\Container($configuration);
 
-    $container['SearchGateway'] = function ($container) {
-        $cfg = $container->get('config');
-        $dsn = sprintf("mysql:host=%s;port=%s",
-            $cfg->getValue('sphinx', 'host'),
-            $cfg->getValue('sphinx', 'port'));
-        $pdo = new \PDO($dsn);
-        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        return new SearchGateway($pdo);
-    };
+$container['config'] = function ($container) {
+    $config = new Config();
+    $config->loadFromFile(__DIR__ . "/../config.ini");
+    return $config;
+};
 
-    $container['CommentMapper'] = function ($container) {
-        return new CommentMapper($container->get('pdo'));
-    };
+$container['pdo'] = function ($container) {
+    $cfg = $container->get('config');
+    $dsn = sprintf("pgsql:host=%s;port=%s;dbname=%s",
+        $cfg->getValue('db', 'host'),
+        $cfg->getValue('db', 'port'),
+        $cfg->getValue('db', 'name'));
+    $pdo = new \PDO($dsn,
+        $cfg->getValue('db', 'username'), $cfg->getValue('db', 'password'));
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    return $pdo;
+};
 
-    $container['FileMapper'] = function ($container) {
-        return new FileMapper($container->get('pdo'));
-    };
+$container['SearchGateway'] = function ($container) {
+    $cfg = $container->get('config');
+    $dsn = sprintf("mysql:host=%s;port=%s",
+        $cfg->getValue('sphinx', 'host'),
+        $cfg->getValue('sphinx', 'port'));
+    $pdo = new \PDO($dsn);
+    $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+    return new SearchGateway($pdo);
+};
 
-    $container['SearchHelper'] = function ($container) {
-        return new SearchHelper();
-    };
+$container['CommentMapper'] = function ($container) {
+    return new CommentMapper($container->get('pdo'));
+};
 
-    $container['FileHelper'] = function ($container) {
-        return new FileHelper($container);
-    };
+$container['FileMapper'] = function ($container) {
+    return new FileMapper($container->get('pdo'));
+};
 
-    $container['CommentHelper'] = function ($container) {
-        return new CommentHelper($container);
-    };
+$container['SearchHelper'] = function ($container) {
+    return new SearchHelper($container->get('SearchGateway'), $container->get('FileMapper'));
+};
 
-    $container['PathingHelper'] = function ($container) {
-        return new PathingHelper(__DIR__);
-    };
+$container['FileHelper'] = function ($container) {
+    return new FileHelper($container);
+};
 
-    $container['AuthHelper'] = function ($container) {
-        return new AuthHelper();
-    };
+$container['CommentHelper'] = function ($container) {
+    return new CommentHelper($container->get('CommentMapper'));
+};
 
-    $container['Validation'] = function ($container) {
-        return new Validation($container);
-    };
+$container['PathingHelper'] = function ($container) {
+    return new PathingHelper(__DIR__);
+};
 
-    $container['IdHelper'] = function ($container) {
-        $getId3 = new GetId3();
-        return new IdHelper($getId3, $container->get('PathingHelper'));
-    };
+$container['AuthHelper'] = function ($container) {
+    return new AuthHelper();
+};
 
-    $container['PreviewHelper'] = function ($container) {
-        $cfg = $container->get('config');
-        return new PreviewHelper($container->get('PathingHelper'));
-    };
-    return $container;
-}
+$container['Validation'] = function ($container) {
+    return new Validation($container);
+};
+
+$container['IdHelper'] = function ($container) {
+    $getId3 = new GetId3();
+    return new IdHelper($getId3, $container->get('PathingHelper'));
+};
+
+$container['PreviewHelper'] = function ($container) {
+    $cfg = $container->get('config');
+    return new PreviewHelper($container->get('PathingHelper'));
+};
+return $container;

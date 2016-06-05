@@ -8,36 +8,42 @@ use \Filehosting\Entity\File;
 
 class UploadController
 {
-    private $container;
+    private $view;
+    private $fileHelper;
+    private $config;
+    private $validator;
+    private $authHelper;
 
     public function __construct(\Slim\Container $c)
     {
-        $this->container = $c;
+        $this->view = $c->get('view');
+        $this->config = $c->get('config');
+        $this->fileHelper = $c->get('FileHelper');
+        $this->authHelper = $c->get('AuthHelper');
+        $this->validator = $c->get('Validation');
     }
 
     public function __invoke(Request $request, Response $response, $args)
     {
         $errors = null;
-        if($request->isPost() && isset($_FILES)) {
-            $fileHelper = $this->container->get('FileHelper');
-            $validator = $this->container->get('Validation');
-            $authHelper = $this->container->get('AuthHelper');
+        if($request->isPost()) {
+            $uploadedFiles = $request->getUploadedFiles();
             $file = new File();
-            $errors = $validator->validateUploadForm($_FILES);
+            $errors = $this->validator->validateUploadedFiles($uploadedFiles);
             if(!$errors) {
-                if(!$authHelper->isAuthorized($request)) { // user is not authorized
-                    $response = $authHelper->authorizeUser($response);
+                if(!$this->authHelper->isAuthorized($request)) {
+                    $response = $this->authHelper->authorizeUser($response);
                 }
-                $file->setName($_FILES['filename']['name'])
-                    ->setOriginalName($_FILES['filename']['tmp_name'])
+                $file->setName($uploadedFiles["uploaded-file"]->getClientFilename())
+                    ->setUploadObject($uploadedFiles["uploaded-file"])
                     ->setUploader('Anonymous')
-                    ->setAuthToken($authHelper->getUserToken($request));
-                $file = $fileHelper->createFile($file, false);
-                return $response->withHeader('Location', "/file/{$file->getId()}");
+                    ->setAuthToken($this->authHelper->getUserToken($request));
+                $file = $this->fileHelper->uploadFile($file, $uploadedFiles["uploaded-file"]);
+                return $response->withRedirect("/file/{$file->getId()}");
             }
         }
-        return $this->container->get('view')->render($response, 'upload.twig',
-            ['sizeLimit' => $this->container->get('config')->getValue('app', 'sizeLimit'),
+        return $this->view->render($response, 'upload.twig',
+            ['sizeLimit' => $this->config->getValue('app', 'sizeLimit'),
             'errors' => $errors]);
     }
 }

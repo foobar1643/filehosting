@@ -7,16 +7,9 @@ use \Psr\Http\Message\ResponseInterface as Response;
 
 session_start();
 
-$configuration = [
-    'settings' => [
-        'displayErrorDetails' => true,
-    ],
-];
-$c = new \Slim\Container($configuration);
-$app = new \Slim\App($c);
+$app = new \Slim\App($container);
 
 $container = $app->getContainer();
-$container = getServices($container);
 
 $container['view'] = function ($container) {
     $view = new \Slim\Views\Twig('../templates/', [
@@ -70,10 +63,9 @@ $app->get('/', function (Request $request, Response $response, $args)
     );
 });
 $app->map(['GET', 'POST'], '/upload', '\Filehosting\Controller\UploadController');
+$app->map(['GET', 'POST'], '/file/{id:[0-9]+}', '\Filehosting\Controller\FileController');
 $app->get('/search', '\Filehosting\Controller\SearchController');
-$app->get('/file/{id:[0-9]+}', '\Filehosting\Controller\FileController:viewFile')->add($container->get('csrf'));
 $app->get('/file/get/{id:[0-9]+}[/{filename}]', '\Filehosting\Controller\DownloadController');
-$app->post('/file/{id:[0-9]+}/comment', '\Filehosting\Controller\CommentController');
-$app->post('/file/{id:[0-9]+}/delete', '\Filehosting\Controller\FileController:deleteFile')->add($container->get('csrf'));
+$app->post('/file/{id:[0-9]+}/delete', '\Filehosting\Controller\FileController:deleteFile');
 
 $app->run();

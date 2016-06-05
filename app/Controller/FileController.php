@@ -9,50 +9,59 @@ use \Filehosting\Entity\File;
 class FileController
 {
     private $container;
+    private $view;
+    private $fileHelper;
+    private $fileMapper;
+    private $authHelper;
+    private $idHelper;
+    private $commentHelper;
 
     public function __construct(\Slim\Container $c)
     {
         $this->container = $c;
+        $this->view = $c->get('view');
+        $this->fileHelper = $c->get('FileHelper');
+        $this->fileMapper = $c->get('FileMapper');
+        $this->commentHelper = $c->get('CommentHelper');
+        $this->authHelper = $c->get('AuthHelper');
+        $this->idHelper = $c->get('IdHelper');
     }
 
-    public function viewFile(Request $request, Response $response, $args)
+    public function __invoke(Request $request, Response $response, $args)
     {
-        $fileMapper = $this->container->get('FileMapper');
-        $commentHelper = $this->container->get('CommentHelper');
-        $authHelper = $this->container->get('AuthHelper');
-        $idHelper = $this->container->get('IdHelper');
-        $file = $fileMapper->getFile($args['id']);
-        if($file == false) {
+        $commentErrors = null;
+        $params = $request->getQueryParams();
+        $replyTo = isset($params['reply']) ? strval($params['reply']) : NULL;
+        $file = $this->fileMapper->getFile($args['id']);
+        if(!$this->fileHelper->fileExists($args['id'])) {
             throw new \Slim\Exception\NotFoundException($request, $response);
-        } else {
-            $idHelper->analyzeFile($file);
-            if(isset($args['replyTo'])) {
-                $replyTo = $args['replyTo'];
-            } else {
-                $params = $request->getQueryParams();
-                $replyTo = isset($params['reply']) ? strval($params['reply']) : NULL;
-            }
-            return $this->container->get('view')->render($response, 'file.twig', [
-                'file' => $file,
-                'idHelper' => $idHelper,
-                'replyTo' => $replyTo,
-                'commentErrors' => isset($args['commentErrors']) ? $args['commentErrors'] : NULL,
-                'csrf' => ["name" => $request->getAttribute('csrf_name'), "value" => $request->getAttribute('csrf_value')],
-                'authToken' => $authHelper->getUserToken($request),
-                'comments' => $commentHelper->getComments($file->getId())]);
         }
+        if($request->isPost()) {
+            $commentController = new CommentController($this->container);
+            $postResult = $commentController->__invoke($request, $response, $args);
+            $commentErrors = $postResult["errors"];
+            $replyTo = isset($commentErrors) ? $postResult["comment"]->getParentId() : NULL;
+            if($request->isXhr()) {
+                return $response->withJson($postResult);
+            }
+        }
+        return $this->view->render($response, 'file.twig', [
+            'file' => $file,
+            'idHelper' => $this->idHelper,
+            'fileInfo' => $this->idHelper->analyzeFile($file),
+            'replyTo' => $replyTo,
+            'commentErrors' => $commentErrors,
+            'canManageFile' => $this->authHelper->canManageFile($request, $file),
+            'comments' => $this->commentHelper->getComments($file->getId())]);
     }
 
     public function deleteFile(Request $request, Response $response, $args)
     {
         $formData = $request->getParsedBody();
-        $fileMapper = $this->container->get('FileMapper');
-        $fileHelper = $this->container->get('FileHelper');
-        $authHelper = $this->container->get('AuthHelper');
-        $file = $fileMapper->getFile($args['id']);
-        if($file != null && $authHelper->canDeleteFile($request, $file)) {
-            $fileHelper->deleteFile($file);
+        $file = $this->fileMapper->getFile($args['id']);
+        if($this->fileHelper->fileExists($args['id']) && $this->authHelper->canManageFile($request, $file)) {
+            $this->fileHelper->deleteFile($file);
         }
-        return $response->withHeader('Location', "/");
+        return $response->withRedirect("/");
     }
 }

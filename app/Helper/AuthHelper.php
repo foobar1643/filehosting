@@ -24,10 +24,10 @@ class AuthHelper
 
     public function getUserToken(Request $request)
     {
-        return isset($this->authToken) ? $this->authToken : FigRequestCookies::get($request, 'auth')->getValue();
+        return !is_null($this->authToken) ? $this->authToken : FigRequestCookies::get($request, 'auth')->getValue();
     }
 
-    public function canDeleteFile(Request $request, File $file)
+    public function canManageFile(Request $request, File $file)
     {
         if(FigRequestCookies::get($request, 'auth')->getValue() == $file->getAuthToken()) {
             return true;

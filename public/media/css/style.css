@@ -20,6 +20,7 @@ body { font-family: Tahoma, sans-serif, arial, times; }
 .file-panel .panel-footer { background-color: white; }
 .file-panel .panel-footer .glyph-text { margin-left: 4px; }
 #search-panel { margin-top: 8px; }
+div .media:target { background-color: #F4F1DE; }
 
 .navbar-default .navbar-nav>li>a:active,
 .navbar-default .navbar-nav>li>a:hover,

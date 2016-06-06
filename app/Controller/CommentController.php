@@ -12,8 +12,6 @@ class CommentController
     private $validator;
     private $container;
     private $commentHelper;
-    private $comment;
-    private $errors;
 
     public function __construct(\Slim\Container $c)
     {
@@ -26,12 +24,12 @@ class CommentController
     {
         $getVars = $request->getQueryParams();
         $postVars = $request->getParsedBody();
-        $this->comment = $this->parsePostRequest($postVars, $args['id']);
-        $this->errors = $this->validator->validateComment($this->comment);
-        if(!$this->errors) {
-            $this->comment = $this->commentHelper->addComment($this->comment);
+        $comment = $this->parsePostRequest($postVars, $args['id']);
+        $errors = $this->validator->validateComment($comment);
+        if(!$errors) {
+            $comment = $this->commentHelper->addComment($comment);
         }
-        return ["errors" => $this->errors, "comment" => $this->comment];
+        return ["errors" => $errors, "comment" => $comment];
     }
 
     public function parsePostRequest($postVars, $fileId)

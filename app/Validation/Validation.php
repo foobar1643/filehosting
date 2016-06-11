@@ -21,10 +21,10 @@ class Validation
         $errors = null;
         $uploadedFile = array_key_exists("uploaded-file", $uploadedFiles) ? $uploadedFiles["uploaded-file"] : NULL;
         if(is_null($uploadedFile)) {
-            $errors['noFile'] = "Заполните все поля и попробуйте еще раз.";
+            $errors['noFile'] = _("Attach a file and try again.");
         }
         if(!is_null($uploadedFile) && $uploadedFile->getSize() > $config->getValue('app', 'sizeLimit') * 1000000) {
-            $errors['sizeLimit'] = "Размер файла превышает максимально допустимый.";
+            $errors['sizeLimit'] = _("File size is exceeding the maximum.");
         }
         if(!is_null($uploadedFile) && $uploadedFile->getError() != UPLOAD_ERR_OK) {
             $errors['form'] = UploadHelper::parseCode($uploadedFile->getError());
@@ -42,19 +42,19 @@ class Validation
             $parentComment = $commentMapper->getComment($comment->getParentId());
         }
         if($fileMapper->getFile($comment->getFileId()) == false) {
-            $errors["noFile"] = "Файла с таким ID не существует.";
+            $errors["noFile"] = _("File does not exists.");
         }
         if(trim($comment->getCommentText()) == "") {
-            $errors["noComment"] = "Вы не заполнили поле комментария.";
+            $errors["noComment"] = _("The comment field is empty.");
         }
         if(strlen(trim($comment->getCommentText())) > 300) {
-            $errors["commentTooBig"] = "Комментарий должен быть не длиннее 300 символов.";
+            $errors["commentTooBig"] = _("Comment mustn't be longer than 300 symbols.");
         }
         if($comment->getParentId() != null && !isset($parentComment)) {
-            $errors["noParent"] = "Родительского комментария не существует.";
+            $errors["noParent"] = _("Parent comment does not exists.");
         }
         if($comment->getParentId() != null && isset($parentComment) && $parentComment->getDepth() >= 5) {
-            $errors["maxDepthReached"] = "Превышена максимальная глубина комментария.";
+            $errors["maxDepthReached"] = _("Maximum comment depth reached.");
         }
         return $errors;
     }

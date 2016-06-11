@@ -20,7 +20,7 @@
     <body>
         <h1>{{ title }}</h1>
         <p>{{ messageTitle }}</p>
-        <p>{{ messageHelp }} или вернитесь на <a href="/">главную страницу</a>.</p>
+        <p>{{ messageHelp }} {% trans %}or return to the{% endtrans %} <a href="/">{% trans %}main page{% endtrans %}</a>.</p>
         {% if displayErrors == 1 %}
             <p>{{ debugInfo }}</p>
         {% endif %}

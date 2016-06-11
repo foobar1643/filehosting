@@ -22,16 +22,25 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/" id="bar-title">Filehosting</a>
+                    <a class="navbar-brand" href="/{{ lang }}/" id="bar-title">Filehosting</a>
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right">
-                        <li {% if navLink == "search" %} class="active" {% endif %}><a href="/search">Поиск</a></li>
-                        <li {% if navLink == "upload" %} class="active" {% endif %}><a href="/upload">Загрузить файл</a></li>
+                        <li {% if navLink == "search" %} class="active" {% endif %}><a href="/{{ lang }}/search/">{% trans %}Search{% endtrans %}</a></li>
+                        <li {% if navLink == "upload" %} class="active" {% endif %}><a href="/{{ lang }}/upload/">{% trans %}Upload file{% endtrans %}</a></li>
+                        <li {% if navLink == "settings" %} class="active" {% endif %}><a href="/{{ lang }}/settings/">{% trans %}Settings{% endtrans %}</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
+        {% if showLangMessage %}
+            <div class="container-fluid">
+                <div class="alert alert-warning col-xs-8 col-xs-offset-2" role="alert">
+                    {% trans %} This website is available in your native language. If you want to change language, you can do so on the{% endtrans %}
+                    <a href="/{{ lang }}/settings/">{% trans %}settings page{% endtrans %}</a>
+                </div>
+            </div>
+        {% endif %}
     {% endblock %}
     {% block pageBody %}{% endblock %}
     {% block javascript %}

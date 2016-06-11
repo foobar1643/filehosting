@@ -13,12 +13,14 @@ class UploadController
     private $config;
     private $validator;
     private $authHelper;
+    private $langHelper;
 
     public function __construct(\Slim\Container $c)
     {
         $this->view = $c->get('view');
         $this->config = $c->get('config');
         $this->fileHelper = $c->get('FileHelper');
+        $this->langHelper = $c->get('LanguageHelper');
         $this->authHelper = $c->get('AuthHelper');
         $this->validator = $c->get('Validation');
     }
@@ -39,11 +41,12 @@ class UploadController
                     ->setUploader('Anonymous')
                     ->setAuthToken($this->authHelper->getUserToken($request));
                 $file = $this->fileHelper->uploadFile($file, $uploadedFiles["uploaded-file"]);
-                return $response->withRedirect("/file/{$file->getId()}");
+                return $response->withRedirect("/{$args['lang']}/file/{$file->getId()}/");
             }
         }
         return $this->view->render($response, 'upload.twig',
             ['sizeLimit' => $this->config->getValue('app', 'sizeLimit'),
-            'errors' => $errors]);
+            'errors' => $errors, 'lang' => $args['lang'],
+            'showLangMessage' => $this->langHelper->canShowLangMsg($request)]);
     }
 }

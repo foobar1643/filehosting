@@ -1,4 +1,4 @@
-{% macro display(comments, errors, replyTo) %}
+{% macro display(comments, errors, replyTo, lang, csrfToken) %}
     {% for comment in comments %}
         <div class="media" id="comment-{{ comment.getId }}">
             <p class="pull-right"><small>{{ comment.getDatePosted }}</small></p>
@@ -6,16 +6,19 @@
                 <h4 class="media-heading user-name">{{ comment.getAuthor }}</h4>
                 <span class="comment-text">{{ comment.getCommentText }}</span>
                 {% if comment.getDepth < 5 %}
-                    <p><small><a id="reply-{{ comment.getId }}" href="/file/{{ comment.fileId }}?reply={{ comment.getId }}" class="comments-reply-button">Ответить</a></small></p>
+                    <p><small>
+                        <a id="reply-{{ comment.getId }}" href="/{{ lang }}/file/{{ comment.fileId }}/?reply={{ comment.getId }}" class="comments-reply-button">{% trans %}Reply{% endtrans %}</a>
+                    </small></p>
                 {% endif %}
                 {% if replyTo == comment.getId %}
-                    <form method="post" id="comment-form" action="/file/{{ comment.fileId }}">
+                    <form method="post" id="comment-form" action="/{{ lang }}/file/{{ comment.fileId }}/">
+                        <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
                         <input type="hidden" name="parentComment" value="{{ comment.getId }}">
                         <div class="page-header">
-                            <h3>Ответить на комментарий</h3>
+                            <h3>{% trans %}Reply to the comment{% endtrans %}</h3>
                         </div>
                         <div class="form-group {% if errors != null %} has-error {% endif %}" id="comment-form-group">
-                            <label for="comment">Комментарий:</label>
+                            <label for="comment">{% trans %}Comment:{% endtrans %}</label>
                             <textarea class="form-control" rows="5" id="comment-field" name="comment"></textarea>
                             {% if errors != null %}
                                 {% for error in errors %}
@@ -24,7 +27,7 @@
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            <button type="submit" id="comment-button" class="btn btn-default">Отправить</button>
+                            <button type="submit" id="comment-button" class="btn btn-default">{% trans %}Send{% endtrans %}</button>
                         </div>
                     </form>
                 {% endif %}
@@ -32,7 +35,7 @@
             <div class="children" style="margin-left: 25px;">
                 {% import _self as selfMacro %}
                 {% if comment.getChildren|length > 0 %}
-                    {{ selfMacro.display(comment.getChildren, errors, replyTo) }}
+                    {{ selfMacro.display(comment.getChildren, errors, replyTo, lang, csrfToken) }}
                 {% endif %}
             </div>
         </div>

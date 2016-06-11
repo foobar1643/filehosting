@@ -8,13 +8,12 @@ $("#comment-button").click(function() {
 });
 
 function postComment(comment, parentId) {
-    if(parentId == null) {
-        var data = {"comment": comment};
-    } else {
-        var data = {
-            "comment": comment,
-            "parentComment": parentId
-        };
+    var data = {
+        "comment": comment,
+        "csrf_token": $("#csrf-token-input").val()
+    };
+    if(parentId != null) {
+        data.parentComment = parentId;
     }
     $.ajax({
         type: "POST",
@@ -100,7 +99,7 @@ function removeErrorElements(formType) {
 
 function incrementCommentsCount() {
     var commentsCount = parseInt($("#total-comments-count").html().replace(/\D+/gi, ''));
-    $("#total-comments-count").html((commentsCount + 1) + " комментариев");
+    $("#total-comments-count").html((commentsCount + 1));
 }
 
 function getCommentDepth(matPath) {

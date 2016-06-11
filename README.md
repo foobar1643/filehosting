@@ -1,53 +1,68 @@
 # Filehosting - light and easy filesharing app
 
-### Возможности
-* Анонимная загрузка файлов на сервер
-* Счетчик общего количества скачиваний для файла
-* Страница отображения популярных и последних файлов
-* Для загрузившего файл пользователя - возможность удаления файла
-* Вывод уменьшеной копии изображений на странице скачивания
-* Плеер для аудио и видео файлов на странице скачивания
-* Для изображений, видео и аудио файлов вывод дополнительной информации
-* Возможность оставлять комментарии к файлам без перезагрузки страницы
-* Древовидные комментарии к файлам без перезагрузки страницы
-* Полнотекстовый поиск по именам файлов
-* Настройка максимального размера загружаемых файлов в конфигурации приложения
-* Простой интерфейс для добавления/удаления файлов из консоли администратора
+### Features
+* Anonymous file upload
+* Downloads counter for each file
+* For uploader - ability to delete a file from the app
+* Thumbnails for images on the download page
+* Support for multiple languages
+* Player for audio and video files on the download page
+* Additional info for images, audio and video files on the download page
+* Ability to leave comments for files without reloading the page
+* Tree-like comments for files
+* Fulltext search in files names
+* Ability to set maximum file size for uploaded files through configuration file
+* Simple command line interface for administrators, that allows to add/delete files and comments
 
-### Используемые технологии
+### Used technologies
 1. [Twitter Bootstrap]
-2. Микрофреймворк [Slim]
-3. Шаблонизатор [Twig]
-4. Плеер для видео [video.js]
-5. Совместимая с Composer [GetId3]
+2. [Slim] micro framework
+3. [Twig] template engine
+4. [jQuery] javascript library
+5. [video.js] video player
+6. Composer compatible [GetId3]
 
-### Требования
-1. Веб-сервер с поддержкой [PHP] *5.5* и выше.
-2. База данных [PostgreSQL].
-3. Поисковый движок [Sphinx].
-4. Пакетный менеджер [Composer].
+### Requirements
+1. Web server with [PHP] *5.6* support.
+2. [PostgreSQL] database.
+3. [Sphinx] search engine.
+4. [Composer] packet manager.
 5. Cron
 
-### Установка
-1. Загрузите файлы приложения на ваш веб-сервер.
-2. Настройте ваш веб-сервер таким образом, чтобы корневой директорией являлась папка `public`
-3. Установите зависимости приложения с помощью команды `composer install`
-4. Настройте конфигурацию путей на своем веб-сервере [как описано здесь].
-5. Отредактируйте необходимые параметры для подключения к БД и поисковому движку в файлах `config.ini` и `sphinx.conf`
-6. Импортируйте файл `filehosting.sql` в вашу базу данных.
-7. Измените права доступа к папкам `storage` и `thumbnails` с помощью команд `chmod 0777 ./storage` и `chmod 0777 public/thumbnails`
-8. Отредактируйте файл конфигурации поискового движка Sphinx, или замените его готовым файлом `sphinx.conf`.
-9. Инициализируйте поисковые индексы используя команду `indexer --all`
-10. Добавьте в свой `crontab` запись для автоматического запуска файла переиндексации `cli-tools/reindex.reindex.sh`.
-11. Для использования в режиме &laquo;продакшен&raquo; измените `dispaly_errors` на **0** в файле `php.ini`  
+### Install
+1. Clone the repository using `git clone https://github.com/foobar1643/filehosting.git` command.
+2. On your web server set `public` directory as a document root.
+3. Install application dependencies using `composer install` command.
+4. Configure pathing on your web server [as described here].
+5. Set your database credentials in `config.ini` and `sphinx.conf`.
+6. Import `filehosting.sql` into your database.
+7. Edit your Sphinx configuration file or replace it with already configured `sphinx.conf` file.
+8. Initialize search indexes with the `indexer --all` command.
+9. In order to enable automatic reindexing add `cli-tools/reindex/reindex.sh` to your crontab.
+10. For production usage, change `dispaly_errors` option to **0** in your `php.ini`
+
+### Additional configuration
+##### Configuring X-Sendfile
+If your server has X-Sendfile module installed and configured, you can enable file downloading with the use of X-Sendfile.
+To do that you'll need to set `enableXsendfile` option in `config.ini` to `1`. If you're using Nginx don't forget to set `storage` folder [as internal] in your `nginx.conf`.
+Proper file downloading with the use of X-Sendfile guaranteed only for Apache and Nginx servers.
+##### Configuring sphinx storage directories
+If you want Sphinx to store its logs and indices in a different directory, you can specify the path using
+`SPHINX_ROOT` environment variable. Default value is `/var/sphinx/`.
+
+### Contributing
+If you want to contribute a translation, please refer to [CONTRIBUTING.md].
 
 [PHP]: <https://secure.php.net/>
 [Sphinx]: <http://sphinxsearch.com/>
 [PostgreSQL]: <http://www.postgresql.org/>
 [Composer]: <https://getcomposer.org/>
 [GetId3]: <https://github.com/phansys/GetId3>
+[jQuery]: <https://jquery.org/>
 [video.js]: <http://videojs.com/>
 [Twig]: <http://twig.sensiolabs.org/>
 [Slim]: <http://www.slimframework.com/>
 [Twitter Bootstrap]: <http://getbootstrap.com/>
-[как описано здесь]: <http://www.slimframework.com/docs/start/web-servers.html>
+[as described here]: <http://www.slimframework.com/docs/start/web-servers.html>
+[as internal]: <https://nginx.org/en/docs/http/ngx_http_core_module.html#internal>
+[CONTRIBUTING.md]: <https://github.com/foobar1643/filehosting/blob/master/CONTRIBUTING.md>

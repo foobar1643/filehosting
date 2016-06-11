@@ -1,5 +1,5 @@
 {% extends "skeleton.twig" %}
-{% block pageTitle %} Загрузить файл {% endblock %}
+{% block pageTitle %} {% trans %}Upload a file{% endtrans %} {% endblock %}
 {% set navLink = 'upload' %}
 {% block pageBody %}
 {% block error %}
@@ -7,7 +7,7 @@
         {% for error in errors %}
             <div id="error-report" class="alert alert-danger" role="alert">
                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                <span class="sr-only">Ошибка:</span>
+                <span class="sr-only">Error:</span>
                 {{ error }}
             </div>
         {% endfor %}
@@ -15,13 +15,13 @@
 {% endblock %}
 <div class="container">
     <div class="vertical col-lg-6" id="file-upload-container">
-        <form action="/upload" method="post" enctype="multipart/form-data" class="dropzone" id="file-upload-form">
+        <form action="/{{ lang }}/upload/" method="post" enctype="multipart/form-data" class="dropzone" id="file-upload-form">
             <div class="fallback">
                 <input id="file-upload-input" name="uploaded-file" type="file">
-                <button id="upload-button" type="submit" class="btn btn-info">Загрузить</button>
+                <button id="upload-button" type="submit" class="btn btn-info">{% trans %}Upload{% endtrans %}</button>
             </div>
         </form>
-        <span>Максимальный размер загружаемого файла - {{ sizeLimit }} МБ.</span>
+        <span>{% trans %}Maximum file sie is {{ sizeLimit }} MB.{% endtrans %}</span>
     </div>
 </div>
 {% endblock %}

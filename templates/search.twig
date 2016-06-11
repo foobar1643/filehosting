@@ -1,5 +1,5 @@
 {% extends "skeleton.twig" %}
-{% block pageTitle %} Поиск {% endblock %}
+{% block pageTitle %} {% trans %}Search{% endtrans %} {% endblock %}
 {% set navLink = 'search' %}
 {% block pageBody %}
 {% import "pagination.twig" as paginationMacro %}
@@ -8,8 +8,8 @@
         {% if error %}
             <div id="search-error-report" class="alert alert-danger" role="alert">
                 <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                <span class="sr-only">Ошибка:</span>
-                Вы не заполнили поле поиска
+                <span class="sr-only">{% trans %}Error:{% endtrans %}</span>
+                {% trans %}The search field is empty{% endtrans %}
             </div>
         {% endif %}
     {% endblock %}
@@ -18,9 +18,9 @@
             <div class="col-lg-6 col-lg-offset-3">
                 <div class="input-group">
                     <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">Поиск</button>
+                        <button class="btn btn-default" type="submit">{% trans %}Search{% endtrans %}</button>
                     </span>
-                    <input type="text" name="query" class="form-control" value="{{ query }}" placeholder="Введите часть имени файла" required>
+                    <input type="text" name="query" class="form-control" value="{{ query }}" placeholder="{% trans %}Enter a part of file's name{% endtrans %}" required>
                 </div><!-- /input-group -->
             </div><!-- /.col-lg-6 -->
         </div>
@@ -28,13 +28,13 @@
     <div class="panel panel-default col-md-6 col-md-offset-3" id="search-panel">
         <div class="panel-body">
             {% if (query is not null) and (files|length != 0) %}
-                <h4>Показаны результаты по запросу: <i>&laquo;{{ query }}&raquo;</i></h4>
+                <h4>{% trans %}Search results for {% endtrans %} <i>&laquo;{{ query }}&raquo;</i></h4>
                 <ol>
                     {% for file in files %}
                         {% if file.getDeleted == true %}
-                            <li>Файл удален</li>
+                            <li>{% trans %}File is deleted{% endtrans %}</li>
                         {% else %}
-                            <li><a href="/file/{{ file.id }}">{{ file.name }}</a></li>
+                            <li><a href="/{{ lang }}/file/{{ file.id }}/">{{ file.name }}</a></li>
                         {% endif %}
                     {% endfor %}
                 </ol>
@@ -42,10 +42,10 @@
                     {{ paginationMacro.displayPagination(page, pager) }}
                 {% endif %}
             {% elseif (query is not null) and (files|length == 0) %}
-                <h4>По запросу <i>&laquo;{{ query }}&raquo;</i> ничего не найдено.</h4>
+                <h4>{% trans %}Nothing is found for <i>&laquo;{{ query }}&raquo;</i> query.{% endtrans %}</h4>
             {% elseif query is null %}
-                <h4>Результаты поиска</h4>
-                Здесь будут отображаться результаты поиска. Введите запрос и нажмите кнопку Поиск чтобы начать.
+                <h4>{% trans %}Search results{% endtrans %}</h4>
+                {% trans %}Here you will see the search results. Enter your query and press the Search button to begin.{% endtrans %}
             {% endif %}
         </div>
     </div>

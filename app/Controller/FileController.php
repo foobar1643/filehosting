@@ -4,6 +4,7 @@ namespace Filehosting\Controller;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use Dflydev\FigCookies\FigRequestCookies;
 use \Filehosting\Entity\File;
 
 class FileController
@@ -12,6 +13,7 @@ class FileController
     private $view;
     private $fileHelper;
     private $fileMapper;
+    private $langHelper;
     private $authHelper;
     private $idHelper;
     private $commentHelper;
@@ -20,6 +22,7 @@ class FileController
     {
         $this->container = $c;
         $this->view = $c->get('view');
+        $this->langHelper = $c->get('LanguageHelper');
         $this->fileHelper = $c->get('FileHelper');
         $this->fileMapper = $c->get('FileMapper');
         $this->commentHelper = $c->get('CommentHelper');
@@ -52,7 +55,11 @@ class FileController
             'replyTo' => $replyTo,
             'commentErrors' => $commentErrors,
             'canManageFile' => $this->authHelper->canManageFile($request, $file),
-            'comments' => $this->commentHelper->getComments($file->getId())]);
+            'comments' => $this->commentHelper->getComments($file->getId()),
+            'messageFormatter' => new \MessageFormatter(\Locale::getDefault(), _("{0, plural, =0{No downloads} one{# download} other{# downloads}}")),
+            'lang' => $args['lang'],
+            'showLangMessage' => $this->langHelper->canShowLangMsg($request),
+            'csrf_token' => FigRequestCookies::get($request, "csrf_token")->getValue()]);
     }
 
     public function deleteFile(Request $request, Response $response, $args)
@@ -62,6 +69,6 @@ class FileController
         if($this->fileHelper->fileExists($args['id']) && $this->authHelper->canManageFile($request, $file)) {
             $this->fileHelper->deleteFile($file);
         }
-        return $response->withRedirect("/");
+        return $response->withRedirect("/{$args['lang']}/");
     }
 }

@@ -3,22 +3,22 @@
     <div class="table-responsive" id="file-info">
         <table class="table table-bordered">
             <tr>
-                <th>Тип файла</th>
+                <th>{% trans %}File type{% endtrans %}</th>
                 <td>{{ fileInfo['mime_type'] }}</td>
             </tr>
             <tr>
-                <th>Формат файла</th>
+                <th>{% trans %}File format{% endtrans %}</th>
                 <td>{{ fileInfo['fileformat'] }}</td>
             </tr>
             {% if 'image' in fileInfo['mime_type'] %}
                 {% block imageInfo %}
                     <tr>
-                        <th>Расширение</th>
+                        <th>{% trans %}Resolution{% endtrans %}</th>
                         <td>{{ fileInfo['video']['resolution_x'] }} x {{ fileInfo['video']['resolution_y'] }} px</td>
                     </tr>
                         {% if fileInfo['video']['bits_per_sample'] %}
                             <tr>
-                                <th>Глубина цвета</th>
+                                <th>{% trans %}Color depth{% endtrans %}</th>
                                 <td>{{ fileInfo['video']['bits_per_sample'] }} bit</td>
                             </tr>
                         {% endif %}
@@ -28,17 +28,17 @@
             {% if 'video' in fileInfo['mime_type'] %}
                 {% block videoInfo %}
                     <tr>
-                        <th>Расширение</th>
+                        <th>{% trans %}Resolution{% endtrans %}</th>
                         <td>{{ fileInfo['video']['resolution_x'] }} x {{ fileInfo['video']['resolution_y'] }} px</td>
                     </tr>
                     {% if fileInfo['video']['frame_rate'] %}
                         <tr>
-                            <th>Кадров в секунду</th>
+                            <th>{% trans %}Frame rate{% endtrans %}</th>
                             <td>{{ fileInfo['video']['frame_rate'] }}</td>
                         </tr>
                     {% endif %}
                     <tr>
-                        <th>Длительность</th>
+                        <th>{% trans %}Duration{% endtrans %}</th>
                         <td>{{ fileInfo['playtime_string'] }}</td>
                     </tr>
                 {% endblock %}
@@ -48,43 +48,43 @@
                 {% block audioInfo %}
                     {% if fileInfo['audio']['channels'] %}
                         <tr>
-                            <th>Каналы</th>
+                            <th>{% trans %}Channels{% endtrans %}</th>
                             <td>{{ fileInfo['audio']['channels'] }}</td>
                         </tr>
                     {% endif %}
                     {% if fileInfo['bitrate'] %}
                         <tr>
-                            <th>Битрейт</th>
+                            <th>{% trans %}Bitrate{% endtrans %}</th>
                             <td>{{ fileInfo['bitrate'] }}</td>
                         </tr>
                     {% endif %}
                     {% if fileInfo['audio']['bitrate_mode'] %}
                         <tr>
-                            <th>Тип битрейта</th>
+                            <th>{% trans %}Bitrate type{% endtrans %}</th>
                             <td>{{ fileInfo['audio']['bitrate_mode'] }}</td>
                         </tr>
                     {% endif %}
                     {% if fileInfo['audio']['codec'] %}
                         <tr>
-                            <th>Кодек</th>
+                            <th>{% trans %}Codec{% endtrans %}</th>
                             <td>{{ fileInfo['audio']['codec'] }}</td>
                         </tr>
                     {% endif %}
                     {% if fileInfo['audio']['sample_rate'] %}
                         <tr>
-                            <th>Частота</th>
+                            <th>{% trans %}Sample rate{% endtrans %}</th>
                             <td>{{ fileInfo['audio']['sample_rate'] }}</td>
                         </tr>
                     {% endif %}
                     <tr>
-                        <th>Длительность</th>
+                        <th>{% trans %}Duration{% endtrans %}</th>
                         <td>{{ fileInfo['playtime_string'] }}</td>
                     </tr>
                 {% endblock %}
             {% endif %}
             {% if fileInfo['md5_data'] %}
                 <tr>
-                    <th>Хэш-сумма</th>
+                    <th>{% trans %}Hash sum{% endtrans %}</th>
                     <td>{{ fileInfo['md5_data'] }}</td>
                 </tr>
             {% endif %}

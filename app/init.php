@@ -12,6 +12,7 @@ use \Filehosting\Helper\CommentHelper;
 use \Filehosting\Helper\AuthHelper;
 use \Filehosting\Helper\PathingHelper;
 use \Filehosting\Helper\IdHelper;
+use \Filehosting\Helper\LanguageHelper;
 use \Filehosting\Validation\Validation;
 use \Filehosting\Helper\SearchHelper;
 use \Filehosting\Helper\PreviewHelper;
@@ -100,5 +101,9 @@ $container['IdHelper'] = function ($container) {
 $container['PreviewHelper'] = function ($container) {
     $cfg = $container->get('config');
     return new PreviewHelper($container->get('PathingHelper'));
+};
+
+$container['LanguageHelper'] = function ($container) {
+    return new LanguageHelper();
 };
 return $container;

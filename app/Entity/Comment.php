@@ -62,7 +62,8 @@
      {
          $dateTime = new \DateTime();
          $dateTime->setTimestamp(strtotime($this->date_posted));
-         return $dateTime->format("m/d/Y, g:i A");
+         $dateFormater = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::SHORT, \IntlDateFormatter::MEDIUM);
+         return $dateFormater->format($dateTime);
      }
 
      public function setDatePosted($datePosted)

@@ -5,25 +5,24 @@
     <script src="/media/js/comments.js"></script>
     <script src="/media/js/videojs/video.min.js"></script>
 {% endblock %}
-{% block pageTitle %} Просмотр файла {% endblock %}
+{% block pageTitle %}{% trans %} View file {% endtrans %}{% endblock %}
 {% block pageBody %}
 <div class="container-fluid">
     {% if error %}
         <div id="error-report" class="alert alert-danger" role="alert">
             <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-            <span class="sr-only">Ошибка:</span>
-            Вы не заполнили поле комментария.
+            <span class="sr-only">{% trans %}Error:{% endtrans %}</span>
+            {% trans %}The comment field is empty.{% endtrans %}
         </div>
     {% endif %}
     <div class="panel panel-info file-panel">
         <div class="panel-heading"><h3 class="panel-title">{{ file.name }}</h3></div>
         <div class="panel-body">
-            <a href="{{ file.getDownloadLink() }}" type="button" class="btn btn-success">Скачать</a>
+            <a href="{{ file.getDownloadLink() }}" type="button" class="btn btn-success">{% trans %}Download{% endtrans %}</a>
             {% if canManageFile == true %}
-                <form onSubmit="return confirm('Действительно удалить?');" id="file-delete-form" method="post" action="/file/{{ file.id }}/delete">
-                    <!--<input type="hidden" name="csrf_value" value="{{ csrf['value'] }}">
-                    <input type="hidden" name="csrf_name" value="{{ csrf['name'] }}"> !-->
-                    <button class="btn btn-danger" id="file-delete-button">Удалить</button>
+                <form onSubmit="return confirm('{% trans %}Confirm deletion?{% endtrans %}');" id="file-delete-form" method="post" action="/{{ lang }}/file/{{ file.id }}/delete">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                    <button class="btn btn-danger" id="file-delete-button">{% trans %}Delete{% endtrans %}</button>
                 </form>
             {% endif %}
             {% if idHelper.isPreviewable(fileInfo) %}
@@ -37,7 +36,7 @@
                 <br>
                 <audio controls>
                     <source src="{{ file.getDownloadLink() }}?flag=nocount" type='audio/mpeg' preload="auto">
-                    Your browser does not support the audio element.
+                        {% trans %}Your browser does not support the audio element.{% endtrans %}
                 </audio>
             {% endif %}
             {% if idHelper.isVideo(fileInfo) %}
@@ -45,8 +44,8 @@
                     poster="/media/img/placeholder.png" data-setup="{}">
                     <source src="{{ file.getDownloadLink() }}?flag=nocount" type='video/webm'>
                     <p class="vjs-no-js">
-                        To view this video please enable JavaScript, and consider upgrading to a web browser that
-                        <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                        {% trans %}To view this video please enable JavaScript, and consider upgrading to a web browser that{% endtrans %}
+                        <a href="http://videojs.com/html5-video-support/" target="_blank">{% trans %}supports HTML5 video{% endtrans %}</a>
                     </p>
                 </video>
             {% endif %}
@@ -55,26 +54,30 @@
         <div class="panel-footer">
             <span class="foot-text"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyph-text">{{ file.uploader }}</span></span>
             <span class="foot-text"><span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span><span class="glyph-text">{{ file.getUploadDate }}</span></span>
-            <span class="foot-text"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span><span class="glyph-text">{{ file.downloads }} скачиваний</span></span>
+            <span class="foot-text"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                <span class="glyph-text">
+                    {{ messageFormatter.format([file.downloads]) }}
+            </span></span>
         </div>
     </div>
     <div class="row" id="comments-section">
         <div class="col-md-12">
             <div class="page-header">
-                <h3><small id="total-comments-count" class="pull-right">{{ comments['count'] }} комментариев</small> Комментарии </h3>
+                <h3><small class="pull-right"><span id="total-comments-count">{{ comments['count'] }}</span> {% trans %}comments{% endtrans %}</small> {% trans %}Comments{% endtrans %} </h3>
             </div>
             {% if comments['count'] == 0 %}
-                <h4 id="no-comments-found">У этого файла еще нет комментариев. Вы можете оставить комментарий воспользовавшись формой ниже.</h4>
+                <h4 id="no-comments-found">{% trans %}This file does not have any comments yet. You can leave a comment using the form below.{% endtrans %}</h4>
             {% endif %}
             <div class="comments-list" id="file-comments-list">
-                {{ commentsMacro.display(comments['comments'], commentErrors, replyTo) }}
+                {{ commentsMacro.display(comments['comments'], commentErrors, replyTo, lang, csrf_token) }}
             </div>
-            <form method="post" id="comment-form" action="/file/{{ file.id }}">
+            <form method="post" id="comment-form" action="/{{ lang }}/file/{{ file.id }}/">
+                <input type="hidden" id="csrf-token-input" name="csrf_token" value="{{ csrf_token }}">
                 <div class="page-header">
-                    <h3>Оставить комментарий</h3>
+                    <h3>{% trans %}Leave a comment{% endtrans %}</h3>
                 </div>
                 <div class="form-group {% if commentErrors != null and replyTo == null %} has-error {% endif %}" id="comment-form-group">
-                    <label for="comment">Комментарий:</label>
+                    <label for="comment">{% trans %}Comment:{% endtrans %}</label>
                     <textarea class="form-control" rows="5" id="comment-field" name="comment"></textarea>
                     {% if commentErrors != null and replyTo == null %}
                         {% for error in commentErrors %}
@@ -83,7 +86,7 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    <button type="submit" id="comment-button" class="btn btn-default">Отправить</button>
+                    <button type="submit" id="comment-button" class="btn btn-default">{% trans %}Send{% endtrans %}</button>
                 </div>
             </form>
         </div>
@@ -91,14 +94,14 @@
     <!-- Reply form template !-->
     <script type="text/x-template" id="reply-form-template">
         <div class="page-header">
-            <h3>Ответить на комментарий</h3>
+            <h3>{% trans %}Reply to the comment{% endtrans %}</h3>
         </div>
         <div class="form-group" id="reply-form-group">
-            <label for="reply">Комментарий:</label>
+            <label for="reply">{% trans %}Comment:{% endtrans %}</label>
             <textarea class="form-control" rows="5" id="reply-field" name="reply"></textarea>
         </div>
         <div class="form-group">
-            <button type="button" id="reply-button" class="btn btn-default">Отправить</button>
+            <button type="button" id="reply-button" class="btn btn-default">{% trans %}Send{% endtrans %}</button>
         </div>
     </script>
     <!-- Comment template !-->
@@ -107,7 +110,7 @@
         <div class="media-body">
             <h4 class="media-heading user-name">%commentAuthor%</h4>
             <span class="comment-text">%commentText%</span>
-            <p><small><a id="reply-%commentId%" class="comments-reply-button">Ответить</a></small></p>
+            <p><small><a id="reply-%commentId%" class="comments-reply-button">{% trans %}Reply{% endtrans %}</a></small></p>
         </div>
         <div class='children' style='margin-left: 25px;'></div>
     </script>

@@ -12,11 +12,13 @@ class SearchController
 
     private $view;
     private $searchHelper;
+    private $langHelper;
 
     public function __construct(\Slim\Container $c)
     {
         $this->view = $c->get('view');
         $this->searchHelper = $c->get('SearchHelper');
+        $this->langHelper = $c->get('LanguageHelper');
     }
 
     public function __invoke(Request $request, Response $response, $args)
@@ -32,7 +34,7 @@ class SearchController
                 $error = true;
             } else {
                 $query = $params["query"];
-                $pager = new PaginationHelper(self::RESULTS_PER_PAGE, "/search?query={$query}");
+                $pager = new PaginationHelper(self::RESULTS_PER_PAGE, "/{$args['lang']}/search/?query={$query}");
                 if(isset($params["page"])) {
                     $page = $pager->checkPage($params["page"]);
                 }
@@ -43,10 +45,12 @@ class SearchController
         }
         return $this->view->render($response, 'search.twig', [
             'error' => $error,
-            "query" => $query,
-            "page" => intval($page),
-            "pager" => $pager,
-            "files" => $searchResults["results"]]
+            'query' => $query,
+            'page' => intval($page),
+            'pager' => $pager,
+            'files' => $searchResults["results"],
+            'lang' => $args['lang'],
+            'showLangMessage' => $this->langHelper->canShowLangMsg($request)]
         );
     }
 }

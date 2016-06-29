@@ -4,10 +4,7 @@ namespace Filehosting\Middleware;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use Dflydev\FigCookies\SetCookie;
-use Dflydev\FigCookies\FigResponseCookies;
-use Dflydev\FigCookies\FigRequestCookies;
-use \Filehosting\Helper\LanguageHelper;
+use \Filehosting\Helper\CookieHelper;
 use \Filehosting\Helper\TokenGenerator;
 
 class CsrfMiddleware
@@ -23,38 +20,25 @@ class CsrfMiddleware
 
     public function __invoke(Request $request, Response $response, callable $next)
     {
+        $cookieHelper = new CookieHelper($request, $response);
         if($request->isPost()) {
             $postVars = $request->getParsedBody();
             $formToken = isset($postVars["csrf_token"]) ? $postVars["csrf_token"] : NULL;
-            $cookieToken = FigRequestCookies::get($request, "csrf_token")->getValue();
-            if(!isset($formToken) || !isset($cookieToken) || !$this->validateCsrfToken($formToken, $cookieToken)) {
+            $cookieToken = $cookieHelper->getRequestCookie('csrf_token');
+            if(!$this->validateCsrfToken($formToken, $cookieToken)) {
                 $failure = $this->getFailureCallable();
                 return $failure($request, $response, $next);
             }
         }
-        if(!$this->tokenExists($request)) {
-            $response = $this->setCsrfToken($response, TokenGenerator::generateToken($this->tokenLength));
+        if(!$cookieHelper->requestCookieExists('csrf_token')) {
+            $tokenGenerator = new TokenGenerator();
+            $csrfToken = $tokenGenerator->generateToken($this->tokenLength);
+            $request = $cookieHelper->setRequestCookie('csrf_token', $csrfToken);
+        } else {
+            $csrfToken = $cookieHelper->getRequestCookie('csrf_token');
         }
+        $response = $cookieHelper->setResponseCookie('csrf_token', $csrfToken, new \DateInterval($this->cookieLifetime), '/');
         return $next($request, $response);
-    }
-
-    private function tokenExists(Request $request)
-    {
-        $token = FigRequestCookies::get($request, "csrf_token")->getValue();
-        if($token) {
-            return true;
-        }
-        return false;
-    }
-
-    private function setCsrfToken(Response $response, $csrfToken)
-    {
-        $dateTime = new \DateTime("now");
-        $dateTime->add(new \DateInterval($this->cookieLifetime));
-        $response = FigResponseCookies::set($response,
-            SetCookie::create("csrf_token")->withValue($csrfToken)
-            ->withExpires($dateTime->format(\DateTime::COOKIE))->withPath('/'));
-        return $response;
     }
 
     private function validateCsrfToken($formToken, $cookieToken)

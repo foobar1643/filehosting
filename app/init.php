@@ -8,11 +8,10 @@ use \Filehosting\Database\SearchGateway;
 use \Filehosting\Database\CommentMapper;
 use \Filehosting\Config;
 use \Filehosting\Helper\FileHelper;
+use \Filehosting\Helper\TokenGenerator;
 use \Filehosting\Helper\CommentHelper;
-use \Filehosting\Helper\AuthHelper;
 use \Filehosting\Helper\PathingHelper;
 use \Filehosting\Helper\IdHelper;
-use \Filehosting\Helper\LanguageHelper;
 use \Filehosting\Validation\Validation;
 use \Filehosting\Helper\SearchHelper;
 use \Filehosting\Helper\PreviewHelper;
@@ -85,10 +84,6 @@ $container['PathingHelper'] = function ($container) {
     return new PathingHelper(__DIR__);
 };
 
-$container['AuthHelper'] = function ($container) {
-    return new AuthHelper();
-};
-
 $container['Validation'] = function ($container) {
     return new Validation($container);
 };
@@ -102,8 +97,3 @@ $container['PreviewHelper'] = function ($container) {
     $cfg = $container->get('config');
     return new PreviewHelper($container->get('PathingHelper'));
 };
-
-$container['LanguageHelper'] = function ($container) {
-    return new LanguageHelper();
-};
-return $container;

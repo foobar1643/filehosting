@@ -37,28 +37,29 @@ class FileHelper
         $file->setId($this->fileMapper->createFile($file));
         try {
             $this->isFileFolderAvailable($this->pathingHelper->getPathToFileFolder($file)); // throws FileUploadException
-            $file->getUploadObject()->moveTo($this->pathingHelper->getPathToFile($file)); //  throws \InvalidArgumentException and \RuntimeException
+            $file->moveTo($this->pathingHelper->getPathToFile($file)); //  throws \InvalidArgumentException and \RuntimeException
         } catch(\Exception $e) {
             $this->fileMapper->rollBack();
             throw new $e;
         }
-        $this->fileMapper->commit();
         $this->searchGateway->indexNewFile($file);
         $fileInfo = $this->idHelper->analyzeFile($file);
         if($this->idHelper->isPreviewable($fileInfo)) {
             $this->previewHelper->generatePreview($file);
         }
+        $this->fileMapper->commit();
         return $file;
     }
 
     public function deleteFile(File $file)
     {
         if(!unlink($this->pathingHelper->getPathToFile($file))) {
-            throw new \Exception('Произошла системная ошибка. Попробуйте позже или обратитесь к администратору.');
+            throw new \Exception(_("Can't unlink file. Try again or contact server administrators."));
         }
-        $this->commentMapper->purgeComments($file->getId());
         $this->fileMapper->deleteFile($file);
         $this->searchGateway->deleteIndexedFile($file);
+        $this->commentMapper->purgeComments($file->getId());
+        $this->previewHelper->deletePreview($file);
         return true;
     }
 
@@ -82,7 +83,7 @@ class FileHelper
                 return $response->withHeader('X-Sendfile', $this->pathingHelper->getPathToFile($file));
             }
         }
-        throw new \Exception("X-Sendfile either is not enabled or not supported by the server.");
+        throw new \Exception(_("X-Sendfile either is not enabled or not supported by the server."));
     }
 
     private function isFileFolderAvailable($fileFolder)

@@ -22,6 +22,7 @@
      public function setId($id)
      {
          $this->id = $id;
+         $this->addToPath(str_pad($id, 3, "0", STR_PAD_LEFT));
          return $this;
      }
 
@@ -58,6 +59,13 @@
          return $this;
      }
 
+     public function getDatabaseDate()
+     {
+         $dateTime = new \DateTime();
+         $dateTime->setTimestamp(strtotime($this->date_posted));
+         return $dateTime->format(\DateTime::ATOM);
+     }
+
      public function getDatePosted()
      {
          $dateTime = new \DateTime();
@@ -88,6 +96,12 @@
          return $this->parent_path;
      }
 
+     public function addToPath($addition)
+     {
+         $this->parent_path = !is_null($this->parent_path) ?  substr_replace($this->parent_path, "{$addition}.", 0, 0) : $addition;
+         return $this->parent_path;
+     }
+
      public function setParentPath($parentPath)
      {
          $this->parent_path = $parentPath;
@@ -96,6 +110,8 @@
 
      public function addChildNode(Comment $child)
      {
+         $child->setParentId($this->id);
+         $child->addToPath($this->parent_path);
          $this->childNodes[$child->id] = $child;
          return $child;
      }

@@ -62,8 +62,8 @@ function showComment(comment) {
     $(commentElement).attr('id', "comment-" + comment.id);
     $(commentElement).css('display', "none");
     commentTemplate = commentTemplate.replace("%commentDate%", comment.date);
-    commentTemplate = commentTemplate.replace("%commentAuthor%", comment.author);
-    commentTemplate = commentTemplate.replace("%commentText%", encodeURIComponent(comment.text));
+    commentTemplate = commentTemplate.replace("%commentAuthor%", htmlspecialchars(comment.author));
+    commentTemplate = commentTemplate.replace("%commentText%", htmlspecialchars(comment.text));
     commentTemplate = commentTemplate.replace("%commentId%", comment.id);
     $(commentElement).html(commentTemplate);
     var replyButton = $(commentElement).find("#reply-" + comment.id);
@@ -89,6 +89,7 @@ function showComment(comment) {
 
 function removeCommentsFallback() { // removes fallback elements for non-javascript users
     $(".comments-reply-button").removeAttr("href");
+    $("#fallback-reply-form").remove();
     $("#comment-button").attr("type", "button");
 }
 
@@ -107,6 +108,17 @@ function getCommentDepth(matPath) {
     return path.length;
 }
 
+function htmlspecialchars(text) {
+    var specialChars = {
+        "<": "&lt;",
+        ">": "&gt;",
+        "'": "&#39;",
+        '"': "&quot;",
+        "&": "&amp;"
+    };
+    return text.replace(/[<>'"&]/g, function(s) { return specialChars[s] });
+}
+
 function getCommentType(parentId) {
     if(parentId != null) {
         return "reply";
@@ -116,6 +128,7 @@ function getCommentType(parentId) {
 }
 
 function handleJsonResponse(response) {
+    console.log(response);
     if(response.errors != null) {
         showErrors(response);
     } else {

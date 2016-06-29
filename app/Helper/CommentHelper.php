@@ -18,9 +18,8 @@ class CommentHelper
         $comment->setId($this->commentMapper->addComment($comment));
         if($comment->getParentId() != NULL) {
             $parentComment = $this->commentMapper->getComment($comment->getParentId());
-            $comment->setParentPath($this->appendToPath($parentComment->getParentPath(), $comment->getId()));
-        } else {
-            $comment->setParentPath($this->normalizePath($comment->getId()));
+            $comment->addToPath($parentComment->getParentPath());
+            //$comment->setParentPath($this->appendToPath($parentComment->getParentPath(), $comment->getId()));
         }
         $this->commentMapper->updatePath($comment);
         return $comment;

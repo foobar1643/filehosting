@@ -4,7 +4,11 @@ namespace Filehosting\Controller;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use \Slim\Http\UploadedFile;
 use \Filehosting\Entity\File;
+use \Filehosting\Helper\LanguageHelper;
+use \Filehosting\Helper\CookieHelper;
+use \Filehosting\Helper\AuthHelper;
 
 class UploadController
 {
@@ -12,16 +16,12 @@ class UploadController
     private $fileHelper;
     private $config;
     private $validator;
-    private $authHelper;
-    private $langHelper;
 
     public function __construct(\Slim\Container $c)
     {
         $this->view = $c->get('view');
         $this->config = $c->get('config');
         $this->fileHelper = $c->get('FileHelper');
-        $this->langHelper = $c->get('LanguageHelper');
-        $this->authHelper = $c->get('AuthHelper');
         $this->validator = $c->get('Validation');
     }
 
@@ -29,24 +29,33 @@ class UploadController
     {
         $errors = null;
         if($request->isPost()) {
-            $uploadedFiles = $request->getUploadedFiles();
-            $file = new File();
-            $errors = $this->validator->validateUploadedFiles($uploadedFiles);
+            $authHelper = new AuthHelper(new CookieHelper($request, $response));
+            $file = $this->createFromRequest($request);
+            $errors = $this->validator->validateFile($file);
             if(!$errors) {
-                if(!$this->authHelper->isAuthorized($request)) {
-                    $response = $this->authHelper->authorizeUser($response);
+                if(!$authHelper->isAuthorized()) {
+                    $response = $authHelper->authorizeUser();
                 }
-                $file->setName($uploadedFiles["uploaded-file"]->getClientFilename())
-                    ->setUploadObject($uploadedFiles["uploaded-file"])
-                    ->setUploader('Anonymous')
-                    ->setAuthToken($this->authHelper->getUserToken($request));
-                $file = $this->fileHelper->uploadFile($file, $uploadedFiles["uploaded-file"]);
+                $file->setAuthToken($authHelper->getUserToken());
+                $file = $this->fileHelper->uploadFile($file);
                 return $response->withRedirect("/{$args['lang']}/file/{$file->getId()}/");
             }
         }
         return $this->view->render($response, 'upload.twig',
             ['sizeLimit' => $this->config->getValue('app', 'sizeLimit'),
             'errors' => $errors, 'lang' => $args['lang'],
-            'showLangMessage' => $this->langHelper->canShowLangMsg($request)]);
+            'langHelper' => new LanguageHelper($request)]);
+    }
+
+    private function createFromRequest(Request $request)
+    {
+        $uploadedFiles = $request->getUploadedFiles();
+        if(array_key_exists("uploaded-file", $uploadedFiles)) {
+            $file = new File();
+            $file->fromUploadedFile($uploadedFiles['uploaded-file']);
+            $file->setUploader('Anonymous');
+            return $file;
+        }
+        return new File();
     }
 }

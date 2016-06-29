@@ -40,7 +40,7 @@ class FileMapper
         $query = $this->pdo->prepare("UPDATE files SET name = :name_bind,"
         ." downloads = :downloads_bind WHERE id = :id_bind");
         $query->bindValue(":id_bind", $file->getId(), \PDO::PARAM_INT);
-        $query->bindValue(":name_bind", $file->getName(), \PDO::PARAM_STR);
+        $query->bindValue(":name_bind", $file->getClientFilename(), \PDO::PARAM_STR);
         $query->bindValue(":downloads_bind", $file->getDownloads(), \PDO::PARAM_INT);
         $query->execute();
     }
@@ -63,10 +63,11 @@ class FileMapper
 
     public function createFile(File $file)
     {
-        $query = $this->pdo->prepare("INSERT INTO files (name, uploader, auth_token)"
-            ."VALUES (:name_bind, :uploader_bind, :token_bind) RETURNING id");
-        $query->bindValue(":name_bind", $file->getName(), \PDO::PARAM_STR);
+        $query = $this->pdo->prepare("INSERT INTO files (name, uploader, size, auth_token)"
+            ."VALUES (:name_bind, :uploader_bind, :filesize_bind, :token_bind) RETURNING id");
+        $query->bindValue(":name_bind", $file->getClientFilename(), \PDO::PARAM_STR);
         $query->bindValue(":uploader_bind", $file->getUploader(), \PDO::PARAM_STR);
+        $query->bindValue(":filesize_bind", $file->getSize(), \PDO::PARAM_INT);
         $query->bindValue(":token_bind", $file->getAuthToken(), \PDO::PARAM_STR);
         $query->execute();
         return $query->fetchColumn();

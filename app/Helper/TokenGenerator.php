@@ -4,7 +4,7 @@ namespace Filehosting\Helper;
 
 class TokenGenerator
 {
-    public static function generateToken($length)
+    public function generateToken($length)
     {
         $result = null;
         $source = str_split('abcdefghijklmnopqrstuvwxyz'

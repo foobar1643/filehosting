@@ -21,7 +21,7 @@ class CommentMapper
         $query->bindValue(":file_id_bind", $comment->getFileId(), \PDO::PARAM_INT);
         $query->bindValue(":author_bind", $comment->getAuthor(), \PDO::PARAM_STR);
         $query->bindValue(":text_bind", $comment->getCommentText(), \PDO::PARAM_STR);
-        $query->bindValue(":date_bind", $comment->getDatePosted(), \PDO::PARAM_STR);
+        $query->bindValue(":date_bind", $comment->getDatabaseDate(), \PDO::PARAM_STR);
         $query->bindValue(":parent_bind", $comment->getParentPath(), \PDO::PARAM_STR);
         $query->execute();
         return $query->fetchColumn();

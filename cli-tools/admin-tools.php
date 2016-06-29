@@ -1,15 +1,13 @@
 #!/usr/bin/php
 <?php
 
-require("../app/init.php");
+require(__DIR__ . "/../app/init.php");
 
 use \Filehosting\Helper\TokenGenerator;
 use \Filehosting\Entity\Comment;
 
 class CLItools
 {
-    const TEMP_FILENAME = "/tmp/filehosting_cli_uploaded_file";
-
     private $container;
     private $commentHelper;
     private $fileHelper;
@@ -25,12 +23,12 @@ class CLItools
     {
         switch(key($options)) {
             case "add-file":
-                $this->checkRequiredOptions(['f'], $options);
-                $this->addFile($options['f']);
+                $this->checkRequiredOptions(['add-file'], $options);
+                $this->addFile($options['add-file']);
                 break;
             case "delete-file": // requires option -i - used as file id
-                $this->checkRequiredOptions(['i'], $options);
-                $this->deleteFile($options['i']);
+                $this->checkRequiredOptions(['delete-file'], $options);
+                $this->deleteFile($options['delete-file']);
                 break;
             case "list-files": // requires options -o and -l - they're used as offset and limit respectively
                 $this->checkRequiredOptions(['o', 'l'], $options);
@@ -42,16 +40,16 @@ class CLItools
                 $this->addComment($options['i'], $options['t'], $options['p']);
                 break;
             case "delete-comment": // requires option -i - used as comment id
-                $this->checkRequiredOptions(['i'], $options);
-                $this->deleteComment($options['i']);
+                $this->checkRequiredOptions(['delete-comment'], $options);
+                $this->deleteComment($options['delete-comment']);
                 break;
             case "purge-comments": // requires option -i - used as file id
-                $this->checkRequiredOptions(['i'], $options);
-                $this->purgeComments($options['i']);
+                $this->checkRequiredOptions(['purge-comments'], $options);
+                $this->purgeComments($options['purge-comments']);
                 break;
             case "list-comments": // requires option -i - used as file id
-                $this->checkRequiredOptions(['i'], $options);
-                $this->listComments($options['i']);
+                $this->checkRequiredOptions(['list-comments'], $options);
+                $this->listComments($options['list-comments']);
                 break;
             default:
                 die($this->outputHelpMessage());
@@ -62,7 +60,7 @@ class CLItools
     private function checkRequiredOptions(array $required, $options)
     {
         foreach($required as $key => $value) {
-            if(!isset($options[$value])) {
+            if(!isset($options[$value]) || $options[$value] == false) {
                 die($this->outputHelpMessage());
             }
         }
@@ -73,9 +71,9 @@ class CLItools
     {
         $argv = $_SERVER['argv'];
         print("This is a command line PHP script for administrators. The script can accept following options:" . PHP_EOL . PHP_EOL
-        . "Option --add-file. Usage: {$argv[0]} --add-file -f <option>" . PHP_EOL
+        . "Option --add-file. Usage: {$argv[0]} --add-file <option>" . PHP_EOL
         . "<option> must be a valid path to file you want to add to the app." . PHP_EOL . PHP_EOL
-        . "Option --delete-file. Usage: {$argv[0]} --delete-file -i <option>" . PHP_EOL
+        . "Option --delete-file. Usage: {$argv[0]} --delete-file <option>" . PHP_EOL
         . "<option> must be a valid id of the file you want to delete from the app." . PHP_EOL . PHP_EOL
         . "Option --list-files. Usage: {$argv[0]} --list-files -o <offset> -l <limit>" . PHP_EOL
         . "<offset> must be a positive numeric value that will be used as an offset in file selection." . PHP_EOL
@@ -84,11 +82,11 @@ class CLItools
         . "<file-id> must be a positive numeric value that will be used as a file id." . PHP_EOL
         . "<text> must be a quoted string that will be used as a comment text." . PHP_EOL
         . "Additionally, you can add an optional parameter -p, it must be a positive numeric value that will be used as a parrent comment id." . PHP_EOL . PHP_EOL
-        . "Option --delete-comment. Usage: {$argv[0]} --delete-comment -i <option>" . PHP_EOL
+        . "Option --delete-comment. Usage: {$argv[0]} --delete-comment <option>" . PHP_EOL
         . "<option> must be a positive numeric value that will be used as a comment id." . PHP_EOL . PHP_EOL
-        . "Option --purge-comments. Usage: {$argv[0]} --purge-comments -i <option>" . PHP_EOL
+        . "Option --purge-comments. Usage: {$argv[0]} --purge-comments <option>" . PHP_EOL
         . "<option> must be a positive numeric value that will be used as a file id." . PHP_EOL . PHP_EOL
-        . "Option --list-comments. Usage: {$argv[0]} --list-comments -i <option>" . PHP_EOL
+        . "Option --list-comments. Usage: {$argv[0]} --list-comments <option>" . PHP_EOL
         . "<option> must be a positive numeric value that will be used as file id." . PHP_EOL . PHP_EOL
         . "Additionally, with the -h option you can get this help." . PHP_EOL);
     }
@@ -98,11 +96,13 @@ class CLItools
         if(!file_exists($filepath)) {
             die("File $filepath does not exists." . PHP_EOL);
         }
-        copy($filepath, self::TEMP_FILENAME);
-        $uploadedFile = new Slim\Http\UploadedFile(self::TEMP_FILENAME, pathinfo($filepath, PATHINFO_BASENAME));
+        $tempname = tempnam("/tmp", "filehosting");
+        copy($filepath, $tempname);
+        $uploadedFile = new Slim\Http\UploadedFile($tempname, pathinfo($filepath, PATHINFO_BASENAME));
+        $tokenGenerator = new TokenGenerator();
         $file = new \Filehosting\Entity\File();
         $file->setName(pathinfo($filepath, PATHINFO_BASENAME))
-            ->setAuthToken(TokenGenerator::generateToken(45))
+            ->setAuthToken($tokenGenerator->generateToken(45))
             ->setUploadObject($uploadedFile)
             ->setUploader('Administrator');
         $file = $this->fileHelper->uploadFile($file);
@@ -128,7 +128,7 @@ class CLItools
             die("There is no files in specified range." . PHP_EOL);
         } else {
             foreach($files as $file) {
-                print("{$file->getName()} (ID: {$file->getId()})" . PHP_EOL);
+                print("{$file->getClientFilename()} (ID: {$file->getId()})" . PHP_EOL);
             }
         }
     }
@@ -197,6 +197,6 @@ class CLItools
 
 $cli = new CLItools($container);
 $options = getopt("f:i:l:o:p:t:",
-    ["add-file", "delete-file", "list-files",
-    "add-comment", "delete-comment", "purge-comments", "list-comments"]);
+    ["add-file:", "delete-file:", "list-files",
+    "add-comment", "delete-comment:", "purge-comments:", "list-comments:"]);
 $cli->runWithOptions($options);

@@ -41,7 +41,12 @@ class PaginationHelper
 
     public function getLink($page)
     {
-        return $this->link . "&" . http_build_query(["page" => $page]);
+        $parsedUrl = parse_url($this->link);
+        $pageQuery = http_build_query(["page" => $page]);
+        if(isset($parsedUrl['query'])) {
+            return "{$this->link}&{$pageQuery}";
+        }
+        return "{$this->link}?{$pageQuery}";
     }
 
     private function countPages()

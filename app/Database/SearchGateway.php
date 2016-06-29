@@ -30,7 +30,7 @@ class SearchGateway
 
     public function searchQuery($searchQuery, $offset, $limit)
     {
-        $query = $this->pdo->prepare("SELECT id FROM index_files, rt_files WHERE MATCH(:match_bind) ORDER BY id DESC LIMIT :offset_bind, :limit_bind");
+        $query = $this->pdo->prepare("SELECT id FROM index_files, rt_files WHERE MATCH(:match_bind) ORDER BY id ASC LIMIT :offset_bind, :limit_bind");
         $query->bindValue(":offset_bind", $offset, \PDO::PARAM_INT);
         $query->bindValue(":limit_bind", $limit, \PDO::PARAM_INT);
         $query->bindValue(":match_bind", $searchQuery, \PDO::PARAM_STR);
@@ -42,7 +42,7 @@ class SearchGateway
     {
         $query = $this->pdo->prepare("INSERT INTO rt_files VALUES(:id_bind, :name_bind)");
         $query->bindValue(":id_bind", $file->getId(), \PDO::PARAM_INT);
-        $query->bindValue(":name_bind", $file->getName(), \PDO::PARAM_STR);
+        $query->bindValue(":name_bind", $file->getClientFilename(), \PDO::PARAM_STR);
         $query->execute();
     }
 

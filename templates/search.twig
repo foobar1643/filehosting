@@ -4,23 +4,14 @@
 {% block pageBody %}
 {% import "pagination.twig" as paginationMacro %}
 <div class="container-fuild">
-    {% block error %}
-        {% if error %}
-            <div id="search-error-report" class="alert alert-danger" role="alert">
-                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                <span class="sr-only">{% trans %}Error:{% endtrans %}</span>
-                {% trans %}The search field is empty{% endtrans %}
-            </div>
-        {% endif %}
-    {% endblock %}
     <form method="get">
         <div class="row" id="search-box">
             <div class="col-lg-6 col-lg-offset-3">
                 <div class="input-group">
                     <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">{% trans %}Search{% endtrans %}</button>
+                        <button class="btn btn-default" type="submit">{% trans %}Search {% notes %} Search button text.{% endtrans %}</button>
                     </span>
-                    <input type="text" name="query" class="form-control" value="{{ query }}" placeholder="{% trans %}Enter a part of file's name{% endtrans %}" required>
+                    <input type="text" name="query" class="form-control" value="{{ query }}" placeholder="{% trans %}Enter a part of file's name {% notes %} A hint in the search field{% endtrans %}" required>
                 </div><!-- /input-group -->
             </div><!-- /.col-lg-6 -->
         </div>
@@ -34,7 +25,7 @@
                         {% if file.getDeleted == true %}
                             <li>{% trans %}File is deleted{% endtrans %}</li>
                         {% else %}
-                            <li><a href="/{{ lang }}/file/{{ file.id }}/">{{ file.name }}</a></li>
+                            <li><a href="/{{ lang }}/file/{{ file.id }}/">{{ file.getClientFilename }}</a></li>
                         {% endif %}
                     {% endfor %}
                 </ol>
@@ -45,7 +36,7 @@
                 <h4>{% trans %}Nothing is found for <i>&laquo;{{ query }}&raquo;</i> query.{% endtrans %}</h4>
             {% elseif query is null %}
                 <h4>{% trans %}Search results{% endtrans %}</h4>
-                {% trans %}Here you will see the search results. Enter your query and press the Search button to begin.{% endtrans %}
+                {% trans %}On this page, you will see the search results. Enter your query and press the Search button to begin.{% endtrans %}
             {% endif %}
         </div>
     </div>

@@ -1,8 +1,14 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
-"POT-Creation-Date: 2016-06-11 15:11+0300\n"
-"PO-Revision-Date: 2016-06-11 15:48+0300\n"
+"Project-Id-Version: Filehosting ru_RU\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-06-29 11:50+0300\n"
+"PO-Revision-Date: 2016-06-29 12:16+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ru_RU\n"
@@ -10,40 +16,76 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.8.8\n"
-"X-Poedit-Basepath: ../../..\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Poedit-SearchPath-0: app\n"
-"X-Poedit-SearchPath-1: translation-cache\n"
-"X-Poedit-SearchPath-2: public/index.php\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11) ? 0 : ((n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20)) ? 1 : 2);\n"
 
-#: app/Controller/FileController.php:59
-msgid "{0, plural, =0{No downloads} one{# download} other{# downloads}}"
+#: /var/www/filehosting/cli-tools/extractor/../../public/index.php:39
+msgid "404 Page not found"
+msgstr "404 Страница не найдена"
+
+#: /var/www/filehosting/cli-tools/extractor/../../public/index.php:40
+msgid "Page you were looking for is not found on this server."
+msgstr "Страница которую вы искали не найдена на этом сервере."
+
+#: /var/www/filehosting/cli-tools/extractor/../../public/index.php:41
+msgid "Check for errors in the URL."
+msgstr "Проверьте правильность введенного вами адреса."
+
+#: /var/www/filehosting/cli-tools/extractor/../../public/index.php:53
+msgid "503 Service temporarily unavailable"
+msgstr "503 Сервис временно недоступен"
+
+#: /var/www/filehosting/cli-tools/extractor/../../public/index.php:54
+msgid "Something went wrong."
+msgstr "Что-то пошло не так."
+
+#: /var/www/filehosting/cli-tools/extractor/../../public/index.php:55
+msgid "Refresh the page after some time or contact the server administrator."
 msgstr ""
-"{0, plural, =0{Нет загрузок} one{# загрузка} few{# загрузки} other{# "
-"загрузок}}"
+"Обновите страницу через некоторое время или свяжитесь с администратором."
 
-#: app/Helper/UploadHelper.php:11 app/Helper/UploadHelper.php:14
-#: app/Validation/Validation.php:27
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/FileHelper.php:57
+msgid "Can't unlink file. Try again or contact server administrators."
+msgstr ""
+"Невозможно удалить файл. Попробуйте еще раз или свяжитесь с администратором."
+
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/FileHelper.php:86
+msgid "X-Sendfile either is not enabled or not supported by the server."
+msgstr "X-Sendfile не включен или не поддерживается сервером."
+
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/PreviewHelper.php:32
+msgid "Can't load this filetype."
+msgstr "Невозможно загрузить файл этого типа."
+
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/PreviewHelper.php:84
+msgid "Can't unlink thumbnail. Try again or contact server administrators."
+msgstr ""
+"Невозможно удалить превью. Попробуйте еще раз или свяжитесь с "
+"администратором."
+
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/UploadHelper.php:11
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/UploadHelper.php:14
+#: /var/www/filehosting/cli-tools/extractor/../../app/Validation/Validation.php:30
 msgid "File size is exceeding the maximum."
 msgstr "Размер файла превышает максимально допустимый."
 
-#: app/Helper/UploadHelper.php:17
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/UploadHelper.php:17
 msgid "Error while uploading file."
 msgstr "Ошибка при загрузке файла."
 
-#: app/Helper/UploadHelper.php:20 app/Validation/Validation.php:24
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/UploadHelper.php:20
+#: /var/www/filehosting/cli-tools/extractor/../../app/Validation/Validation.php:27
 msgid "Attach a file and try again."
 msgstr "Прикрепите файл и попробуйте еще раз."
 
-#: app/Helper/UploadHelper.php:23
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/UploadHelper.php:23
 msgid ""
 "Can't access temporary folder. Contact the server administrator or try again."
 msgstr ""
 "Нет доступа к папке с временными файлами. Свяжитесь с администрацией или "
 "попробуйте еще раз."
 
-#: app/Helper/UploadHelper.php:26
+#: /var/www/filehosting/cli-tools/extractor/../../app/Helper/UploadHelper.php:26
 msgid ""
 "An error occurred while writing the file. Contact the server administrator "
 "or try again."
@@ -51,160 +93,106 @@ msgstr ""
 "При записи файла произошла ошибка. Свяжитесь с администрацией или попробуйте "
 "еще раз."
 
-#: app/Validation/Validation.php:45
+#: /var/www/filehosting/cli-tools/extractor/../../app/Validation/Validation.php:46
 msgid "File does not exists."
 msgstr "Файла не существует."
 
-#: app/Validation/Validation.php:48
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:66
+#: /var/www/filehosting/cli-tools/extractor/../../app/Validation/Validation.php:49
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:66
 msgid "The comment field is empty."
 msgstr "Вы не заполнили поле комментария."
 
-#: app/Validation/Validation.php:51
+#: /var/www/filehosting/cli-tools/extractor/../../app/Validation/Validation.php:52
 msgid "Comment mustn't be longer than 300 symbols."
-msgstr "Комментарий не должен быть длиннее 300 символов."
+msgstr "Комментарий должен быть не длиннее 300 символов."
 
-#: app/Validation/Validation.php:54
+#: /var/www/filehosting/cli-tools/extractor/../../app/Validation/Validation.php:55
 msgid "Parent comment does not exists."
 msgstr "Родительского комментария не существует."
 
-#: app/Validation/Validation.php:57
+#: /var/www/filehosting/cli-tools/extractor/../../app/Validation/Validation.php:58
 msgid "Maximum comment depth reached."
 msgstr "Достигнута максимальная глубина комментария."
 
-#: public/index.php:38
-msgid "404 Page not found"
-msgstr "404 Страница не найдена"
+#. notes: A link under every comment, when clicked - reply form shows up.
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/74/74d64a37c2d2a63343fd2476ad4891808c048378f9058f7e404a2dd017773da5.php:73
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:347
+msgid "Reply"
+msgstr "Ответить"
 
-#: public/index.php:39
-msgid "Page you were looking for is not found on this server."
-msgstr "Страница которую вы искали не найдена."
+#. notes: Header of the post reply form
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/74/74d64a37c2d2a63343fd2476ad4891808c048378f9058f7e404a2dd017773da5.php:98
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:316
+msgid "Reply to the comment"
+msgstr "Ответить на комментарий"
 
-#: public/index.php:40
-msgid "Check for errors in the URL,"
-msgstr "Проверьте правильность введенного URL,"
+#. notes: Label for comment textarea
+#. notes: Label for comment reply textarea
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/74/74d64a37c2d2a63343fd2476ad4891808c048378f9058f7e404a2dd017773da5.php:109
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:273
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:323
+msgid "Comment:"
+msgstr "Комментарий:"
 
-#: public/index.php:52
-msgid "503 Service temporarily unavailable"
-msgstr "503 Сервис временно недоступен"
+#. notes: Submit button for comment form.
+#. notes: Submit button for reply form
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/74/74d64a37c2d2a63343fd2476ad4891808c048378f9058f7e404a2dd017773da5.php:137
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:303
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:332
+msgid "Send"
+msgstr "Отправить"
 
-#: public/index.php:53
-msgid "Something went wrong."
-msgstr "Что-то пошло не так."
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/17/1711b09c630e9283936c7ae5066d6336a6ea55501b585f89d2af9e18312a34fc.php:56
+msgid "You can also return to the main page."
+msgstr "Так же, вы можете вернуться на главную страницу."
 
-#: public/index.php:54
-msgid "Refresh the page after some time, contact the server administrator or,"
-msgstr ""
-"Обновите страницу через некоторое время, свяжитесь с администрацией, или"
-
-#: translation-cache/01/0172afc87863450214b0795f34967ff96d7205b56c77757f37e079f386f2f354.php:34
-#: translation-cache/01/0172afc87863450214b0795f34967ff96d7205b56c77757f37e079f386f2f354.php:47
-msgid "Application settings"
-msgstr "Настройки"
-
-#: translation-cache/01/0172afc87863450214b0795f34967ff96d7205b56c77757f37e079f386f2f354.php:56
-msgid "Language"
-msgstr "Язык"
-
-#: translation-cache/01/0172afc87863450214b0795f34967ff96d7205b56c77757f37e079f386f2f354.php:85
-msgid "Save"
-msgstr "Сохранить"
-
-#: translation-cache/16/160992788a2246ed7b9dda2f6437517f502c5e2f5c0b04a90a30fd2effa130b6.php:32
-msgid "Home page"
-msgstr "Главная страница"
-
-#: translation-cache/16/160992788a2246ed7b9dda2f6437517f502c5e2f5c0b04a90a30fd2effa130b6.php:46
-msgid "The file list is empty."
-msgstr "Список файлов пуст."
-
-#: translation-cache/16/160992788a2246ed7b9dda2f6437517f502c5e2f5c0b04a90a30fd2effa130b6.php:55
-msgid "Popular files"
-msgstr "Популярные файлы"
-
-#: translation-cache/16/160992788a2246ed7b9dda2f6437517f502c5e2f5c0b04a90a30fd2effa130b6.php:84
-msgid "Last files"
-msgstr "Последние файлы"
-
-#: translation-cache/17/1711b09c630e9283936c7ae5066d6336a6ea55501b585f89d2af9e18312a34fc.php:54
-msgid "or return to the"
-msgstr "или вернитесь на"
-
-#: translation-cache/17/1711b09c630e9283936c7ae5066d6336a6ea55501b585f89d2af9e18312a34fc.php:56
-msgid "main page"
-msgstr "главную страницу"
-
-#: translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:91
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:36
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:58
-msgid "Search"
-msgstr "Поиск"
-
-#: translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:101
-msgid "Upload file"
-msgstr "Загрузить файл"
-
-#: translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:111
-msgid "Settings"
-msgstr "Настройки"
-
-#: translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:125
-msgid ""
-"This website is available in your native language. If you want to change "
-"language, you can do so on the"
-msgstr ""
-"Этот веб-сайт доступен на вашем родном языке. Вы можете сменить язык на"
-
-#: translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:130
-msgid "settings page"
-msgstr "странице настроек"
-
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:46
-msgid "View file"
-msgstr "Просмотр файла"
-
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:62
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:162
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:62
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/c1/c17cc35c567184878b6f93f239a47e9eff2d2b076d2cdf2cc3784029bd9d03b8.php:87
 msgid "Error:"
 msgstr "Ошибка:"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:82
+#. notes: File download button text.
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:85
 msgid "Download"
-msgstr "Скачать"
+msgstr "Загрузить"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:89
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:93
 msgid "Confirm deletion?"
 msgstr "Подтвердить удаление?"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:101
+#. notes: File deletion button text.
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:106
 msgid "Delete"
 msgstr "Удалить"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:132
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:137
 msgid "Your browser does not support the audio element."
 msgstr "Ваш браузер не поддерживает аудио-элемент."
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:150
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:157
 msgid ""
 "To view this video please enable JavaScript, and consider upgrading to a web "
-"browser that"
+"browser that supports HTML5 video"
 msgstr ""
 "Чтобы просмотреть это видео, включите JavaScript, и подумайте об установке "
-"веб-браузера который"
+"веб-браузера который поддерживает HTML5 видео"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:153
-msgid "supports HTML5 video"
-msgstr "поддерживает HTML5 видео"
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:188
+msgid "{0, plural, =0{downloads} one{downloads} other{downloads}}"
+msgstr "{0, plural, =0{загрузок} one{загрузка} few{загрузки} other{загрузок}}"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:189
-msgid "comments"
-msgstr "комментариев"
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:215
+msgid "{0, plural, =0{comments} one{comment} other{comments}}"
+msgstr ""
+"{0, plural, =0{комментариев} one{комментарий} few{комментария} "
+"other{комментариев}}"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:191
+#. notes: Header text for the comments section
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:227
 msgid "Comments"
 msgstr "Комментарии"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:199
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:236
 msgid ""
 "This file does not have any comments yet. You can leave a comment using the "
 "form below."
@@ -212,125 +200,172 @@ msgstr ""
 "У этого файла еще нет комментариев. Вы можете оставить комментарий используя "
 "форму ниже."
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:223
+#. notes: Header of the post comment form
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:261
 msgid "Leave a comment"
 msgstr "Оставить комментарий"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:234
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:279
-#: translation-cache/74/74d64a37c2d2a63343fd2476ad4891808c048378f9058f7e404a2dd017773da5.php:109
-msgid "Comment:"
-msgstr "Комментарий:"
+#. notes: Navbar menu button
+#. notes: Search button text.
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:92
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:35
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:54
+msgid "Search"
+msgstr "Поиск"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:262
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:286
-#: translation-cache/74/74d64a37c2d2a63343fd2476ad4891808c048378f9058f7e404a2dd017773da5.php:137
-msgid "Send"
-msgstr "Отправить"
+#. notes: Navbar menu button
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:103
+msgid "Upload file"
+msgstr "Загрузить файл"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:273
-#: translation-cache/74/74d64a37c2d2a63343fd2476ad4891808c048378f9058f7e404a2dd017773da5.php:98
-msgid "Reply to the comment"
-msgstr "Ответить на комментарий"
+#. notes: Navbar menu button
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:114
+msgid "Settings"
+msgstr "Настройки"
 
-#: translation-cache/67/67972432985528b62ea9ee805b26a36c50b56b6cc1c5efa9676d82a06c773933.php:298
-#: translation-cache/74/74d64a37c2d2a63343fd2476ad4891808c048378f9058f7e404a2dd017773da5.php:73
-msgid "Reply"
-msgstr "Ответить"
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/1d/1dc05b47adb18784e9c82e7c6e6a38d02ca1f8a548a029f8b8b2294fca97b577.php:128
+msgid ""
+"This website is available in your native language. If you want to change "
+"language, you can do so on the <a href=\"/%lang%/settings/\">settings page</"
+"a>"
+msgstr ""
+"Этот веб-сайт доступен на вашем родном языке. Вы можете сменить язык на <a "
+"href=\"/%lang%/settings/\">странице настроек</a>"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:30
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:66
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:30
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:66
 msgid "Resolution"
 msgstr "Разрешение"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:46
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:46
 msgid "Color depth"
 msgstr "Глубина цвета"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:82
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:82
 msgid "Frame rate"
 msgstr "Кадров в секунду"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:95
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:192
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:95
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:192
 msgid "Duration"
 msgstr "Длительность"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:115
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:115
 msgid "Channels"
 msgstr "Кол-во каналов"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:131
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:131
 msgid "Bitrate"
 msgstr "Битрейт"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:147
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:147
 msgid "Bitrate type"
 msgstr "Тип битрейта"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:163
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:163
 msgid "Codec"
 msgstr "Кодек"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:179
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:179
 msgid "Sample rate"
 msgstr "Частота"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:223
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:223
 msgid "File type"
 msgstr "Тип файла"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:233
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:233
 msgid "File format"
 msgstr "Формат файла"
 
-#: translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:278
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/84/84e58ec9b3b019c4420efe09ee4b12eb7f3bc6bdc07f6ddfbda362fbcdb8d766.php:278
 msgid "Hash sum"
 msgstr "Хэш сумма"
 
-#: translation-cache/c1/c17cc35c567184878b6f93f239a47e9eff2d2b076d2cdf2cc3784029bd9d03b8.php:36
-msgid "Upload a file"
-msgstr "Загрузить файл"
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/16/160992788a2246ed7b9dda2f6437517f502c5e2f5c0b04a90a30fd2effa130b6.php:32
+msgid "Home page"
+msgstr "Главная страница"
 
-#: translation-cache/c1/c17cc35c567184878b6f93f239a47e9eff2d2b076d2cdf2cc3784029bd9d03b8.php:56
-msgid "Upload"
-msgstr "Загрузить"
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/16/160992788a2246ed7b9dda2f6437517f502c5e2f5c0b04a90a30fd2effa130b6.php:46
+msgid "The file list is empty."
+msgstr "Список файлов пуст."
 
-#: translation-cache/c1/c17cc35c567184878b6f93f239a47e9eff2d2b076d2cdf2cc3784029bd9d03b8.php:62
-msgid "Maximum file sie is %sizeLimit% MB."
-msgstr "Максимальный размер файла - %sizeLimit% MB."
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/16/160992788a2246ed7b9dda2f6437517f502c5e2f5c0b04a90a30fd2effa130b6.php:56
+msgid "Popular files"
+msgstr "Популярные файлы"
 
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:65
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/16/160992788a2246ed7b9dda2f6437517f502c5e2f5c0b04a90a30fd2effa130b6.php:85
+msgid "Last files"
+msgstr "Последние файлы"
+
+#. notes: A hint in the search field
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:62
 msgid "Enter a part of file's name"
 msgstr "Введите часть имени файла"
 
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:78
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:75
 msgid "Search results for"
 msgstr "Показаны результаты по запросу"
 
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:93
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:90
 msgid "File is deleted"
-msgstr "Файл удален"
+msgstr "Файл удален."
 
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:129
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:126
 msgid "Nothing is found for <i>&laquo;%query%&raquo;</i> query."
 msgstr "По запросу <i>&laquo;%query%&raquo;</i> ничего не найдено."
 
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:136
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:133
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:140
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:137
 msgid ""
-"Here you will see the search results. Enter your query and press the Search "
-"button to begin."
+"On this page, you will see the search results. Enter your query and press "
+"the Search button to begin."
 msgstr ""
 "Здесь будут отображаться результаты поиска. Введите запрос и нажмите кнопку "
 "Поиск чтобы начать."
 
-#: translation-cache/e8/e8c20c8c4d02d59fe90222152a957c88bcdad82c38fb5b8dd41646b33d8d12d3.php:166
-msgid "The search field is empty"
-msgstr "Вы не заполнили поле поиска"
+#. notes: Upload page title
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/c1/c17cc35c567184878b6f93f239a47e9eff2d2b076d2cdf2cc3784029bd9d03b8.php:37
+msgid "Upload a file"
+msgstr "Загрузить файл"
 
-#~ msgid "downloads"
-#~ msgstr "скачиваний"
+#. notes: Button that submits file upload form
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/c1/c17cc35c567184878b6f93f239a47e9eff2d2b076d2cdf2cc3784029bd9d03b8.php:58
+msgid "Upload"
+msgstr "Загрузить"
+
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/c1/c17cc35c567184878b6f93f239a47e9eff2d2b076d2cdf2cc3784029bd9d03b8.php:64
+msgid "Maximum file sie is %sizeLimit% MB."
+msgstr "Максимальный размер файла - %sizeLimit% MB."
+
+#. notes: Settings page title
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/01/0172afc87863450214b0795f34967ff96d7205b56c77757f37e079f386f2f354.php:34
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/01/0172afc87863450214b0795f34967ff96d7205b56c77757f37e079f386f2f354.php:48
+msgid "Application settings"
+msgstr "Настройки"
+
+#. notes: Label for language selector on settings page
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/01/0172afc87863450214b0795f34967ff96d7205b56c77757f37e079f386f2f354.php:58
+msgid "Language"
+msgstr "Язык"
+
+#. notes: Save settings button text
+#: /var/www/filehosting/cli-tools/extractor/../../translation-cache/01/0172afc87863450214b0795f34967ff96d7205b56c77757f37e079f386f2f354.php:88
+msgid "Save"
+msgstr "Сохранить"
+
+#~ msgid "download"
+#~ msgid_plural "downloads"
+#~ msgstr[0] "загрузка"
+#~ msgstr[1] "загрузки"
+#~ msgstr[2] "загрузок"
+
+#~ msgid "{0, plural, =0{downloads} one{download} other{downloads}}"
+#~ msgstr ""
+#~ "{0, plural, =0{загрузок} one{загрузка} few{загрузки} other{загрузок}}"
+
+#~ msgid "The search field is empty"
+#~ msgstr "Вы не заполнили поле поиска"

@@ -4,36 +4,40 @@ namespace Filehosting\Middleware;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use \Filehosting\Helper\CookieHelper;
+use \Filehosting\Helper\PathingHelper;
 use \Filehosting\Helper\LanguageHelper;
 
 class LocaleMiddleware
 {
-    private $languageHelper;
+    private $pathingHelper;
 
-    public function __construct(LanguageHelper $h)
+    public function __construct(PathingHelper $h)
     {
-        $this->languageHelper = $h;
+        $this->pathingHelper = $h;
     }
 
     public function __invoke(Request $request, Response $response, callable $next)
     {
-        $appLocale = $this->languageHelper->getAppLocale($request);
-        if(isset($appLocale) && $this->languageHelper->languageAvailable($appLocale)) {
+        \Locale::setDefault('en_US');
+        $cookieHelper = new CookieHelper($request, $response);
+        $languageHelper = new LanguageHelper($request);
+        $appLocale = $languageHelper->getAppLocale();
+        if(isset($appLocale) && $languageHelper->languageAvailable($appLocale)) {
             $this->setTextDomain($appLocale);
-            if($this->languageHelper->canShowLangMsg($request) == true) {
-                $msgViews = $this->languageHelper->getLangMsgViews($request) + 1;
-                $response = $this->languageHelper->setLangMsgViews($msgViews, $request, $response);
+            if($languageHelper->canShowLangMsg() == true) {
+                $msgViews = intval($cookieHelper->getRequestCookie('langChangeShown')) + 1;
+                $response = $cookieHelper->setResponseCookie('langChangeShown', $msgViews, new \DateInterval("PT3H"), '/');
             }
         }
-        $response = $next($request, $response);
-        return $response;
+        return $next($request, $response);
     }
 
     private function setTextDomain($locale)
     {
         putenv("LC_ALL=$locale");
         setlocale(LC_ALL, $locale);
-        bindtextdomain($locale, LanguageHelper::PATH_TO_LOCALES);
+        bindtextdomain($locale, $this->pathingHelper->getPathToLocales());
         bind_textdomain_codeset($locale, 'UTF-8');
         textdomain($locale);
         \Locale::setDefault($locale);

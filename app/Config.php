@@ -25,7 +25,7 @@ class Config
                 if(isset($this->{$section . ucfirst($name)})) {
                     $this->{$section . ucfirst($name)} = $value;
                 } else {
-                    throw new \Exception("No such value in the config (Section: $section; Key: $name).");
+                    throw new \Exception(_("Can't set value, no such value in the config (Section: $section; Key: $name)"));
                 }
             }
         }
@@ -36,7 +36,7 @@ class Config
         if(isset($this->{$section . ucfirst($key)})) {
             return $this->{$section . ucfirst($key)};
         } else {
-            throw new \Exception("No such value in the config (Section: $section; Key: $key).");
+            throw new \InvalidArgumentException(_("Can't get value, no such value in the config (Section: $section; Key: $key)"));
         }
     }
 }

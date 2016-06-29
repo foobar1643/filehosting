@@ -1,11 +1,12 @@
 CREATE TABLE files (
     id serial NOT NULL,
-    name character varying(255) NOT NULL,
+    name character varying(256) NOT NULL,
     uploader character varying(35),
     upload_date timestamp DEFAULT CURRENT_TIMESTAMP,
+    filesize integer NOT NULL,
     downloads integer DEFAULT 0,
     auth_token character varying(45),
-    CONSTRAINT primary_key PRIMARY KEY (id)
+    CONSTRAINT files_pkey PRIMARY KEY (id)
 ) WITH (
   OIDS=FALSE
 );
@@ -18,7 +19,7 @@ CREATE TABLE comments (
     date_posted timestamp NOT NULL,
     comment_text text NOT NULL,
     parent_path character varying(255),
-    CONSTRAINT table_pkey PRIMARY KEY (id),
+    CONSTRAINT comments_pkey PRIMARY KEY (id),
     FOREIGN KEY (parent_id) REFERENCES comments (id),
     FOREIGN KEY (file_id) REFERENCES files (id)
 ) WITH (

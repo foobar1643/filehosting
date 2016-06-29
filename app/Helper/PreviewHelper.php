@@ -29,7 +29,7 @@ class PreviewHelper
             case "gif":
                 return imagecreatefromgif($pathToFile);
             default:
-                throw new \Exception("Can't load this filetype.");
+                throw new \Exception(_("Can't load this filetype."));
         }
     }
 
@@ -73,8 +73,16 @@ class PreviewHelper
         $previewHeight = $previewSize["height"];
         $preview = imagecreatetruecolor($previewWidth, $previewHeight);
         imagecopyresampled($preview, $image, 0, 0, 0, 0, $previewWidth, $previewHeight, $imageWidth, $imageHeight);
-        imagejpeg($preview, "{$this->pathingHelper->getPathToThumbnails()}/thumb_{$file->getDiskName()}");
+        imagejpeg($preview, "{$this->pathingHelper->getPathToThumbnails()}/{$file->getThumbnailName()}");
         imagedestroy($preview);
         imagedestroy($image);
+    }
+
+    public function deletePreview(File $file)
+    {
+        if(!unlink("{$this->pathingHelper->getPathToThumbnails()}/{$file->getThumbnailName()}")) {
+            throw new \Exception(_("Can't unlink thumbnail. Try again or contact server administrators."));
+        }
+        return true;
     }
 }

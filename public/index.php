@@ -6,6 +6,7 @@ use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Filehosting\Middleware\LocaleMiddleware;
 use \Filehosting\Middleware\CsrfMiddleware;
+use \Filehosting\Helper\LanguageHelper;
 
 $app = new \Slim\App($container);
 
@@ -24,7 +25,7 @@ $container['view'] = function ($container) {
 };
 
 $container['LocaleMiddleware'] = function ($container) {
-    return new LocaleMiddleware($container->get('LanguageHelper'));
+    return new LocaleMiddleware($container->get('PathingHelper'));
 };
 
 $container['CsrfMiddleware'] = function ($container) {
@@ -37,7 +38,7 @@ $container['notFoundHandler'] = function ($container) {
         return $container['view']->render($response, 'error.twig',
             ['title' => _("404 Page not found"),
             'messageTitle' => _("Page you were looking for is not found on this server."),
-            'messageHelp' => _('Check for errors in the URL,'),
+            'messageHelp' => _('Check for errors in the URL.'),
             'displayErrors' => false,
             'debugInfo' => null]
         );
@@ -51,7 +52,7 @@ $container['errorHandler'] = function ($container) {
         return $container['view']->render($response, 'error.twig',
             ['title' => _("503 Service temporarily unavailable"),
             'messageTitle' => _("Something went wrong."),
-            'messageHelp' => _('Refresh the page after some time, contact the server administrator or,'),
+            'messageHelp' => _('Refresh the page after some time or contact the server administrator.'),
             'displayErrors' => ini_get("display_errors"),
             'debugInfo' => $exception->__toString()]);
     };
@@ -61,38 +62,40 @@ $app->add($container->get('LocaleMiddleware'));
 
 $app->get('/', function (Request $request, Response $response, $args)
 {
-    $defaultLocale = \Locale::getDefault();
-    $parsedLocale = \Locale::parseLocale($defaultLocale);
-    return $response->withRedirect("/{$parsedLocale['language']}/");
+    $redirectLocale = \Locale::getDefault();
+    $langHelper = new LanguageHelper($request);
+    $userLocale = $langHelper->getUserLocale();
+    if(!is_null($userLocale) && $langHelper->languageAvailable($userLocale)) {
+        $redirectLocale = $userLocale;
+    }
+    $redirectLang = \Locale::parseLocale($redirectLocale);
+    return $response->withRedirect("/{$redirectLang['language']}/");
 });
 
 $app->get('/{lang}/', function (Request $request, Response $response, $args)
 {
     $fileMapper = $this->get("FileMapper");
-    $langHelper = $this->get('LanguageHelper');
     $lastFiles = $fileMapper->getLastFiles(10);
     $popularFiles = $fileMapper->getPopularFiles(10);
     return $this->get('view')->render($response, 'index.twig', [
         'lastFiles' => $lastFiles,
         'popularFiles' => $popularFiles,
         'lang' => $args['lang'],
-        'showLangMessage' => $langHelper->canShowLangMsg($request)]);
+        'langHelper' => new LanguageHelper($request)]);
 });
 
 $app->map(['GET', 'POST'], '/{lang}/settings/', function (Request $request, Response $response, $args)
 {
-    $langHelper = $this->get('LanguageHelper');
+    $langHelper = new LanguageHelper($request);
     if($request->isPost()) {
         $postVars = $request->getParsedBody();
         $selectedLocale = isset($postVars['language']) ? strval($postVars['language']) : NULL;
         if($langHelper->languageAvailable($selectedLocale)) {
-            $response = $langHelper->setLangMsgViews(0, $request, $response);
             return $response->withRedirect("/{$selectedLocale}/settings/");
         }
     }
     return $this->get('view')->render($response, 'settings.twig',
-        ['lang' => $args['lang'], 'locales' => $langHelper,
-        'showLangMessage' => $langHelper->canShowLangMsg($request)]);
+        ['lang' => $args['lang'], 'langHelper' => $langHelper]);
 });
 $app->map(['GET', 'POST'], '/{lang}/upload/', '\Filehosting\Controller\UploadController');
 $app->map(['GET', 'POST'], '/{lang}/file/{id:[0-9]+}/', '\Filehosting\Controller\FileController')->add($container->get('CsrfMiddleware'));

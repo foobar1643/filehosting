@@ -26,18 +26,19 @@
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right">
-                        <li {% if navLink == "search" %} class="active" {% endif %}><a href="/{{ lang }}/search/">{% trans %}Search{% endtrans %}</a></li>
-                        <li {% if navLink == "upload" %} class="active" {% endif %}><a href="/{{ lang }}/upload/">{% trans %}Upload file{% endtrans %}</a></li>
-                        <li {% if navLink == "settings" %} class="active" {% endif %}><a href="/{{ lang }}/settings/">{% trans %}Settings{% endtrans %}</a></li>
+                        <li {% if navLink == "search" %} class="active" {% endif %}><a href="/{{ lang }}/search/">{% trans %}Search {% notes %} Navbar menu button {% endtrans %}</a></li>
+                        <li {% if navLink == "upload" %} class="active" {% endif %}><a href="/{{ lang }}/upload/">{% trans %}Upload file {% notes %} Navbar menu button {% endtrans %}</a></li>
+                        <li {% if navLink == "settings" %} class="active" {% endif %}><a href="/{{ lang }}/settings/">{% trans %}Settings {% notes %} Navbar menu button {% endtrans %}</a></li>
                     </ul>
                 </div>
             </div>
         </nav>
-        {% if showLangMessage %}
+        {% if langHelper.canShowLangMsg %}
             <div class="container-fluid">
                 <div class="alert alert-warning col-xs-8 col-xs-offset-2" role="alert">
-                    {% trans %} This website is available in your native language. If you want to change language, you can do so on the{% endtrans %}
-                    <a href="/{{ lang }}/settings/">{% trans %}settings page{% endtrans %}</a>
+                    {% trans %}
+                    This website is available in your native language. If you want to change language, you can do so on the <a href="/{{ lang }}/settings/">settings page</a>
+                    {% endtrans %}
                 </div>
             </div>
         {% endif %}

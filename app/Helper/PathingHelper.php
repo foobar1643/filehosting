@@ -28,6 +28,11 @@ class PathingHelper
         return $this->basePath . "/storage";
     }
 
+    public function getPathToLocales()
+    {
+        return $this->basePath . "/locale";
+    }
+
     public function getPathToFileFolder(File $file)
     {
         return "{$this->getPathToStorage()}/{$file->getFolder()}";

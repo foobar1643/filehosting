@@ -11,7 +11,7 @@
                     </small></p>
                 {% endif %}
                 {% if replyTo == comment.getId %}
-                    <form method="post" id="comment-form" action="/{{ lang }}/file/{{ comment.fileId }}/">
+                    <form method="post" id="fallback-reply-form" action="/{{ lang }}/file/{{ comment.fileId }}/">
                         <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
                         <input type="hidden" name="parentComment" value="{{ comment.getId }}">
                         <div class="page-header">

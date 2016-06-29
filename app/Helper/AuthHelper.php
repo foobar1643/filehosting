@@ -4,45 +4,37 @@ namespace Filehosting\Helper;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use Dflydev\FigCookies\SetCookie;
-use Dflydev\FigCookies\FigResponseCookies;
-use Dflydev\FigCookies\FigRequestCookies;
 use \Filehosting\Entity\File;
 
 class AuthHelper
 {
     private $authToken;
+    private $cookieHelper;
 
-    public function isAuthorized(Request $request)
+    public function __construct(CookieHelper $c)
     {
-        $cookie = FigRequestCookies::get($request, 'auth');
-        if($cookie->getValue() != null) {
-            return true;
-        }
-        return false;
+        $this->cookieHelper = $c;
     }
 
-    public function getUserToken(Request $request)
+    public function isAuthorized()
     {
-        return !is_null($this->authToken) ? $this->authToken : FigRequestCookies::get($request, 'auth')->getValue();
+        return $this->cookieHelper->requestCookieExists('auth');
     }
 
-    public function canManageFile(Request $request, File $file)
+    public function getUserToken()
     {
-        if(FigRequestCookies::get($request, 'auth')->getValue() == $file->getAuthToken()) {
-            return true;
-        }
-        return false;
+        return !is_null($this->authToken) ? $this->authToken : $this->cookieHelper->getRequestCookie('auth');
     }
 
-    public function authorizeUser(Response $response)
+    public function canManageFile(File $file)
     {
-        $dateTime = new \DateTime("now");
-        $dateTime->add(new \DateInterval("P30D")); // 30 days
-        $this->authToken = TokenGenerator::generateToken(45);
-        $response = FigResponseCookies::set($response,
-            SetCookie::create('auth')->withValue($this->authToken)
-            ->withExpires($dateTime->format(\DateTime::COOKIE))->withPath('/'));
-        return $response;
+        return ($this->cookieHelper->getRequestCookie('auth') == $file->getAuthToken());
+    }
+
+    public function authorizeUser()
+    {
+        $tokenGenerator = new TokenGenerator();
+        $this->authToken = $tokenGenerator->generateToken(45);
+        return $this->cookieHelper->setResponseCookie('auth', $this->authToken, new \DateInterval('P30D'), '/');
     }
 }

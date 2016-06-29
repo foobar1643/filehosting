@@ -4,13 +4,12 @@ namespace Filehosting\Helper;
 
 use \GetId3\GetId3Core as GetId3;
 use \Filehosting\Entity\File;
-use \Filehosting\Helper\FileHelper;
 
 class IdHelper
 {
     const IMAGES_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
     const AUDIO_MIME_TYPES = ['audio/mpeg'];
-    const VIDEO_MIME_TYPES = ['video/webm'];
+    const VIDEO_MIME_TYPES = ['video/webm', 'video/x-flv', 'video/quicktime'];
 
     private $getId3;
     private $pathingHelper;

@@ -5,7 +5,7 @@
     <script src="/media/js/comments.js"></script>
     <script src="/media/js/videojs/video.min.js"></script>
 {% endblock %}
-{% block pageTitle %}{% trans %} View file {% endtrans %}{% endblock %}
+{% block pageTitle %}{{ file.getClientFilename }}{% endblock %}
 {% block pageBody %}
 <div class="container-fluid">
     {% if error %}
@@ -16,13 +16,15 @@
         </div>
     {% endif %}
     <div class="panel panel-info file-panel">
-        <div class="panel-heading"><h3 class="panel-title">{{ file.name }}</h3></div>
+        <div class="panel-heading"><h3 class="panel-title">{{ file.getClientFilename }}</h3></div>
         <div class="panel-body">
-            <a href="{{ file.getDownloadLink() }}" type="button" class="btn btn-success">{% trans %}Download{% endtrans %}</a>
+            <a href="{{ file.getDownloadLink() }}" type="button" class="btn btn-success">
+                {% trans %}Download{% notes %} File download button text.{% endtrans %}
+            </a>
             {% if canManageFile == true %}
                 <form onSubmit="return confirm('{% trans %}Confirm deletion?{% endtrans %}');" id="file-delete-form" method="post" action="/{{ lang }}/file/{{ file.id }}/delete">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-                    <button class="btn btn-danger" id="file-delete-button">{% trans %}Delete{% endtrans %}</button>
+                    <button class="btn btn-danger" id="file-delete-button">{% trans %}Delete{% notes %} File deletion button text.{% endtrans %}</button>
                 </form>
             {% endif %}
             {% if idHelper.isPreviewable(fileInfo) %}
@@ -40,12 +42,13 @@
                 </audio>
             {% endif %}
             {% if idHelper.isVideo(fileInfo) %}
-                <video id="my-video" class="video-js vjs-big-play-centered" controls preload="auto" width="640" height="360"
-                    poster="/media/img/placeholder.png" data-setup="{}">
-                    <source src="{{ file.getDownloadLink() }}?flag=nocount" type='video/webm'>
+                <video id="my-video" class="video-js vjs-big-play-centered"
+                    controls preload="auto" width="640" height="360" data-setup="{}">
+                    <source src="{{ file.getDownloadLink() }}?flag=nocount" type='{{ fileInfo['mime_type'] }}'>
                     <p class="vjs-no-js">
-                        {% trans %}To view this video please enable JavaScript, and consider upgrading to a web browser that{% endtrans %}
-                        <a href="http://videojs.com/html5-video-support/" target="_blank">{% trans %}supports HTML5 video{% endtrans %}</a>
+                        {% trans %}
+                            To view this video please enable JavaScript, and consider upgrading to a web browser that supports HTML5 video
+                        {% endtrans %}
                     </p>
                 </video>
             {% endif %}
@@ -53,17 +56,34 @@
         </div>
         <div class="panel-footer">
             <span class="foot-text"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><span class="glyph-text">{{ file.uploader }}</span></span>
+            <span class="foot-text"><span class="glyphicon glyphicon-hdd" aria-hidden="true"></span><span class="glyph-text">{{ file.getFormattedSize }}</span></span>
             <span class="foot-text"><span class="glyphicon glyphicon-hourglass" aria-hidden="true"></span><span class="glyph-text">{{ file.getUploadDate }}</span></span>
             <span class="foot-text"><span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
                 <span class="glyph-text">
-                    {{ messageFormatter.format([file.downloads]) }}
+                    {% set downloadsPlural %}
+                        {% trans %}
+                            {0, plural, =0{downloads} one{downloads} other{downloads}}
+                        {% endtrans %}
+                    {% endset %}
+                    {{ file.downloads }} {{ translator.translatePlural(downloadsPlural, file.downloads) }}
             </span></span>
         </div>
     </div>
     <div class="row" id="comments-section">
         <div class="col-md-12">
             <div class="page-header">
-                <h3><small class="pull-right"><span id="total-comments-count">{{ comments['count'] }}</span> {% trans %}comments{% endtrans %}</small> {% trans %}Comments{% endtrans %} </h3>
+                <h3>
+                    <small class="pull-right">
+                        <span id="total-comments-count">{{ comments['count'] }}</span>
+                        {% set commentsPlural %}
+                            {% trans %}
+                                {0, plural, =0{comments} one{comment} other{comments}}
+                            {% endtrans %}
+                        {% endset %}
+                        {{ translator.translatePlural(commentsPlural, comments['count']) }}
+                        </small>
+                        {% trans %}Comments {% notes %} Header text for the comments section{% endtrans %}
+                </h3>
             </div>
             {% if comments['count'] == 0 %}
                 <h4 id="no-comments-found">{% trans %}This file does not have any comments yet. You can leave a comment using the form below.{% endtrans %}</h4>
@@ -74,10 +94,10 @@
             <form method="post" id="comment-form" action="/{{ lang }}/file/{{ file.id }}/">
                 <input type="hidden" id="csrf-token-input" name="csrf_token" value="{{ csrf_token }}">
                 <div class="page-header">
-                    <h3>{% trans %}Leave a comment{% endtrans %}</h3>
+                    <h3>{% trans %}Leave a comment {% notes %} Header of the post comment form{% endtrans %}</h3>
                 </div>
                 <div class="form-group {% if commentErrors != null and replyTo == null %} has-error {% endif %}" id="comment-form-group">
-                    <label for="comment">{% trans %}Comment:{% endtrans %}</label>
+                    <label for="comment">{% trans %}Comment: {% notes %} Label for comment textarea{% endtrans %}</label>
                     <textarea class="form-control" rows="5" id="comment-field" name="comment"></textarea>
                     {% if commentErrors != null and replyTo == null %}
                         {% for error in commentErrors %}
@@ -86,7 +106,9 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    <button type="submit" id="comment-button" class="btn btn-default">{% trans %}Send{% endtrans %}</button>
+                    <button type="submit" id="comment-button" class="btn btn-default">
+                        {% trans %}Send{% notes %} Submit button for comment form.{% endtrans %}
+                    </button>
                 </div>
             </form>
         </div>
@@ -94,14 +116,16 @@
     <!-- Reply form template !-->
     <script type="text/x-template" id="reply-form-template">
         <div class="page-header">
-            <h3>{% trans %}Reply to the comment{% endtrans %}</h3>
+            <h3>{% trans %}Reply to the comment {% notes %} Header of the post reply form{% endtrans %}</h3>
         </div>
         <div class="form-group" id="reply-form-group">
-            <label for="reply">{% trans %}Comment:{% endtrans %}</label>
+            <label for="reply">{% trans %}Comment: {% notes %} Label for comment reply textarea{% endtrans %}</label>
             <textarea class="form-control" rows="5" id="reply-field" name="reply"></textarea>
         </div>
         <div class="form-group">
-            <button type="button" id="reply-button" class="btn btn-default">{% trans %}Send{% endtrans %}</button>
+            <button type="button" id="reply-button" class="btn btn-default">
+                {% trans %}Send {% notes %} Submit button for reply form{% endtrans %}
+            </button>
         </div>
     </script>
     <!-- Comment template !-->
@@ -110,7 +134,9 @@
         <div class="media-body">
             <h4 class="media-heading user-name">%commentAuthor%</h4>
             <span class="comment-text">%commentText%</span>
-            <p><small><a id="reply-%commentId%" class="comments-reply-button">{% trans %}Reply{% endtrans %}</a></small></p>
+            <p><small><a id="reply-%commentId%" class="comments-reply-button">
+                {% trans %}Reply{% notes %} A link under every comment, when clicked - reply form shows up.{% endtrans %}
+            </a></small></p>
         </div>
         <div class='children' style='margin-left: 25px;'></div>
     </script>

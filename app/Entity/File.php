@@ -1,20 +1,33 @@
 <?php
 
 namespace Filehosting\Entity;
+use Slim\Http\UploadedFile;
 
-class File
+class File extends UploadedFile
 {
     const WHITELISTED_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webm", "mp3", "mp4"];
 
-    private $id;
-    private $name;
-    private $originalName;
-    private $uploader;
-    private $upload_date;
-    private $downloads;
-    private $uploadObject;
-    private $auth_token;
-    private $isDeleted;
+    protected $id;
+    /* $name - extends from parent */
+    /* $type - extends from parent */
+    /* $size - extends from parent */
+    /* $error - extends from parent */
+    protected $uploader;
+    protected $upload_date;
+    protected $downloads;
+    protected $auth_token;
+    protected $isDeleted;
+
+    public function __construct() { }
+
+    public function fromUploadedFile(UploadedFile $uploaded)
+    {
+        $this->file = $uploaded->file;
+        $this->name = $uploaded->getClientFilename();
+        $this->type = $uploaded->getClientMediaType();
+        $this->size = $uploaded->getSize();
+        $this->error = $uploaded->getError();
+    }
 
     public function getId()
     {
@@ -27,36 +40,14 @@ class File
         return $this;
     }
 
-    public function getName()
+    public function __set($name, $val)
     {
-        return $this->name;
+        print("set is called for $name with val $val<br>");
     }
 
     public function setName($name)
     {
         $this->name = $name;
-        return $this;
-    }
-
-    public function getOriginalName()
-    {
-        return $this->originalName;
-    }
-
-    public function setOriginalName($originalName)
-    {
-        $this->originalName = $originalName;
-        return $this;
-    }
-
-    public function getUploadObject()
-    {
-        return $this->uploadObject;
-    }
-
-    public function setUploadObject(\Slim\Http\UploadedFile $uploadObject)
-    {
-        $this->uploadObject = $uploadObject;
         return $this;
     }
 
@@ -69,6 +60,19 @@ class File
     {
         $this->uploader = $uploader;
         return $this;
+    }
+
+    public function setSize($size)
+    {
+        $this->size = $size;
+        return $this;
+    }
+
+    public function getDatabaseDate()
+    {
+        $dateTime = new \DateTime();
+        $dateTime->setTimestamp(strtotime($this->upload_date));
+        return $dateTime->format(\DateTime::ATOM);
     }
 
     public function getUploadDate()
@@ -118,6 +122,18 @@ class File
         return $this;
     }
 
+    public function getFormattedSize()
+    {
+        // 1000000000 - GB, 1000000 - MB, 1000 - KB
+        if(($this->size / 1000000) > 1000000) {
+            return round($this->size / 1000000000, 1, PHP_ROUND_HALF_DOWN) . " GB";
+        }
+       if(($this->size / 1000) > 1000) {
+           return round($this->size / 1000000, 1, PHP_ROUND_HALF_DOWN) . " MB";
+       }
+       return round($this->size / 1000, 0, PHP_ROUND_HALF_UP) . " KB";
+    }
+
     public function getExtention()
     {
         return pathinfo($this->name, PATHINFO_EXTENSION);
@@ -131,8 +147,8 @@ class File
     public function getFolder()
     {
         $div = floor($this->id / 100);
-    	if($div) return $div * 100;
-    	return 100;
+        if($div) return $div * 100;
+        return 100;
     }
 
     public function getDownloadLink()
@@ -141,9 +157,14 @@ class File
         return "/file/get/{$this->id}/{$encodedName}";
     }
 
+    public function getThumbnailName()
+    {
+        return "thumb_{$this->getDiskName()}";
+    }
+
     public function getLinkToPreview()
     {
-        return "/thumbnails/thumb_{$this->getDiskName()}";
+        return "/thumbnails/{$this->getThumbnailName()}";
     }
 
     public function getDiskName()
@@ -161,4 +182,5 @@ class File
         $normalized = substr_replace($normalized, "{$this->id}_", 0, 0);
         return $normalized;
     }
+
 }

@@ -33,11 +33,8 @@ class DownloadController
                 $file->setDownloads($file->getDownloads() + 1);
                 $this->fileMapper->updateFile($file);
             }
-            $response = $response->withHeader('Content-Description', "File Transfer")
-                ->withHeader('Content-Type', "application/octet-stream")
-                ->withHeader('Cache-Control', "must-revalidate")
-                ->withHeader('Pragma', "public")
-                ->withHeader('Content-Length', filesize($filePath));
+            $response = $this->getDownloadHeaders($response);
+            $response = $response->withHeader('Content-Length', filesize($filePath));
             try {
                 $response = $this->fileHelper->getXsendfileHeaders($request, $response, $file);
             } catch(\Exception $e) {
@@ -48,5 +45,13 @@ class DownloadController
         } else {
             throw new \Slim\Exception\NotFoundException($request, $response);
         }
+    }
+
+    private function getDownloadHeaders(Response $response)
+    {
+        return $response->withHeader('Content-Description', "File Transfer")
+            ->withHeader('Content-Type', "application/octet-stream")
+            ->withHeader('Cache-Control', "must-revalidate")
+            ->withHeader('Pragma', "public");
     }
 }

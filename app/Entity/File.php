@@ -40,11 +40,6 @@ class File extends UploadedFile
         return $this;
     }
 
-    public function __set($name, $val)
-    {
-        print("set is called for $name with val $val<br>");
-    }
-
     public function setName($name)
     {
         $this->name = $name;

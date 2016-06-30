@@ -5,7 +5,6 @@ namespace Testsuite\Helper;
 use PHPUnit\Framework\TestCase;
 use Filehosting\Helper\IdHelper;
 use Filehosting\Helper\PathingHelper;
-use GetId3\GetId3Core as GetId3;
 
 class IdHelperTest extends TestCase
 {
@@ -13,7 +12,7 @@ class IdHelperTest extends TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$idHelper = new IdHelper(new GetId3(), new PathingHelper(__DIR__));
+        self::$idHelper = new IdHelper(new \getID3(), new PathingHelper(__DIR__));
     }
 
     public function testPreviewableType()

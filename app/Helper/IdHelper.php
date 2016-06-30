@@ -2,7 +2,6 @@
 
 namespace Filehosting\Helper;
 
-use \GetId3\GetId3Core as GetId3;
 use \Filehosting\Entity\File;
 
 class IdHelper
@@ -14,18 +13,18 @@ class IdHelper
     private $getId3;
     private $pathingHelper;
 
-    public function __construct(GetId3 $id3, PathingHelper $helper)
+    public function __construct($id3, PathingHelper $helper)
     {
         $this->getId3 = $id3;
+        $this->getId3->option_md5_data = true;
+		$this->getId3->option_md5_data_source = true;
+		$this->getId3->encoding = 'UTF-8';
         $this->pathingHelper = $helper;
     }
 
     public function analyzeFile(File $file)
     {
-        $fileInfo = $this->getId3->setOptionMD5Data(true)
-            ->setOptionMD5DataSource(true)
-            ->setEncoding('UTF-8')
-            ->analyze($this->pathingHelper->getPathToFile($file));
+        $fileInfo = $this->getId3->analyze($this->pathingHelper->getPathToFile($file));
         return $fileInfo;
     }
     public function isPreviewable(array $fileInfo)

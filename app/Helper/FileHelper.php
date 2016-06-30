@@ -2,7 +2,6 @@
 
 namespace Filehosting\Helper;
 
-use \GetId3\GetId3Core as GetId3;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Filehosting\Entity\File;
@@ -53,13 +52,16 @@ class FileHelper
 
     public function deleteFile(File $file)
     {
+        $fileInfo = $this->idHelper->analyzeFile($file);
+        $this->commentMapper->purgeComments($file->getId());
+        $this->searchGateway->deleteIndexedFile($file);
+        if($this->idHelper->isPreviewable($fileInfo)) {
+            $this->previewHelper->deletePreview($file);
+        }
+        $this->fileMapper->deleteFile($file);
         if(!unlink($this->pathingHelper->getPathToFile($file))) {
             throw new \Exception(_("Can't unlink file. Try again or contact server administrators."));
         }
-        $this->fileMapper->deleteFile($file);
-        $this->searchGateway->deleteIndexedFile($file);
-        $this->commentMapper->purgeComments($file->getId());
-        $this->previewHelper->deletePreview($file);
         return true;
     }
 

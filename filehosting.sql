@@ -3,7 +3,7 @@ CREATE TABLE files (
     name character varying(256) NOT NULL,
     uploader character varying(35),
     upload_date timestamp DEFAULT CURRENT_TIMESTAMP,
-    filesize integer NOT NULL,
+    size integer NOT NULL,
     downloads integer DEFAULT 0,
     auth_token character varying(45),
     CONSTRAINT files_pkey PRIMARY KEY (id)

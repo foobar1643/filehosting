@@ -98,13 +98,11 @@ class CLItools
         }
         $tempname = tempnam("/tmp", "filehosting");
         copy($filepath, $tempname);
-        $uploadedFile = new Slim\Http\UploadedFile($tempname, pathinfo($filepath, PATHINFO_BASENAME));
+        $uploadedFile = new Slim\Http\UploadedFile($tempname, pathinfo($filepath, PATHINFO_BASENAME), mime_content_type($filepath), filesize($filepath), UPLOAD_ERR_OK);
         $tokenGenerator = new TokenGenerator();
         $file = new \Filehosting\Entity\File();
-        $file->setName(pathinfo($filepath, PATHINFO_BASENAME))
-            ->setAuthToken($tokenGenerator->generateToken(45))
-            ->setUploadObject($uploadedFile)
-            ->setUploader('Administrator');
+        $file->fromUploadedFile($uploadedFile);
+        $file->setAuthToken($tokenGenerator->generateToken(45))->setUploader('Administrator');
         $file = $this->fileHelper->uploadFile($file);
         print("File sucsessfuly added. ID: {$file->getId()}" . PHP_EOL);
     }

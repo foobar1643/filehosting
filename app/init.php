@@ -1,8 +1,8 @@
 <?php
 
 require(__DIR__ . "/../vendor/autoload.php");
+require(__DIR__ . '/../vendor/james-heinrich/getid3/getid3/getid3.php');
 
-use \GetId3\GetId3Core as GetId3;
 use \Filehosting\Database\FileMapper;
 use \Filehosting\Database\SearchGateway;
 use \Filehosting\Database\CommentMapper;
@@ -89,7 +89,7 @@ $container['Validation'] = function ($container) {
 };
 
 $container['IdHelper'] = function ($container) {
-    $getId3 = new GetId3();
+    $getId3 = new getID3();
     return new IdHelper($getId3, $container->get('PathingHelper'));
 };
 

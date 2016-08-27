@@ -11,18 +11,22 @@
         <testsuite name="Filehosting testsuite">
             <file>tests/Entity/FileEntityTest.php</file>
             <file>tests/Entity/CommentEntityTest.php</file>
+            <file>tests/Entity/TreeNodeTest.php</file>
             <file>tests/Validation/ValidationTest.php</file>
             <file>tests/Helper/AuthHelperTest.php</file>
-            <file>tests/Helper/CommentAdditionTest.php</file>
             <file>tests/Helper/CookieHelperTest.php</file>
             <file>tests/Helper/IdHelperTest.php</file>
             <file>tests/Helper/LanguageHelperTest.php</file>
+            <file>tests/Helper/LinkHelperTest.php</file>
             <file>tests/Helper/PaginationHelperTest.php</file>
-            <file>tests/Helper/TokenGeneratorTest.php</file>
+            <file>tests/Helper/UtilsTest.php</file>
             <file>tests/Middleware/CsrfMiddlewareTest.php</file>
             <file>tests/Middleware/LocaleMiddlewareTest.php</file>
             <file>tests/ConfigTest.php</file>
             <file>tests/TranslatorTest.php</file>
+            <!--<file>tests/Database/CommentsInteractionTests.php</file>!-->
+            <!--<file>tests/Helper/CommentHelperTest.php</file>!-->
+            <!--<file>tests/Helper/CommentAdditionTest.php</file>!-->
         </testsuite>
   </testsuites>
 </phpunit>

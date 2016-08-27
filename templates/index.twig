@@ -11,7 +11,7 @@
                     <h4>{% trans %}Popular files{% endtrans %}</h4>
                     <ol>
                         {% for popularFile in popularFiles %}
-                            <li><a href="/{{ lang }}/file/{{ popularFile.id }}/">{{ popularFile.getClientFilename }}</a></li>
+                            <li><a href="{{ linkHelper.getLinkToFile(popularFile) }}">{{ popularFile.getClientFilename }}</a></li>
                         {% endfor %}
                     </ol>
                 </div>
@@ -21,7 +21,8 @@
                     <h4>{% trans %}Last files{% endtrans %}</h4>
                     <ol>
                         {% for lastFile in lastFiles %}
-                            <li><a href="/{{ lang }}/file/{{ lastFile.id }}/">{{ lastFile.getClientFilename }}</a></li>
+
+                            <li><a href="{{ linkHelper.getLinkToFile(lastFile) }}">{{ lastFile.getClientFilename }}</a></li>
                         {% endfor %}
                     </ol>
                 </div>

@@ -8,7 +8,6 @@ use \Filehosting\Database\SearchGateway;
 use \Filehosting\Database\CommentMapper;
 use \Filehosting\Config;
 use \Filehosting\Helper\FileHelper;
-use \Filehosting\Helper\TokenGenerator;
 use \Filehosting\Helper\CommentHelper;
 use \Filehosting\Helper\PathingHelper;
 use \Filehosting\Helper\IdHelper;

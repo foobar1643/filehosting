@@ -10,10 +10,13 @@ use Slim\Http\RequestBody;
 use Slim\Http\UploadedFile;
 use Slim\Http\Uri;
 use Filehosting\Entity\Comment;
+use Filehosting\Entity\TreeNode;
+use Filehosting\Entity\File;
 
 class Factory
 {
-    private static $commentId = 1;
+    private static $fileId = 0;
+    private static $commentId = 0;
 
     public static function requestFactory($envData = [], $uriString = 'https://example.com/en/')
     {
@@ -31,10 +34,23 @@ class Factory
     public static function commentFactory()
     {
         $comment = new Comment();
-        $comment->setId(Factory::$commentId)
+        $comment->setId(Factory::$commentId++)
             ->setCommentText('Test comment')
             ->setAuthor('Anonymous');
-        Factory::$commentId++;
         return $comment;
+    }
+
+    public static function treeNodeFactory()
+    {
+        return new TreeNode(Factory::commentFactory());
+    }
+
+    public static function fileFactory($name = 'example.txt', $size = 250000, $uploader = 'Test')
+    {
+        $file = new File();
+        return $file->setId(Factory::$fileId++)
+            ->setName($name)
+            ->setSize($size)
+            ->setUploader($uploader);
     }
 }

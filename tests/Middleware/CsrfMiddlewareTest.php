@@ -12,36 +12,38 @@ use Testsuite\Utils\CookieUtils;
 
 class CsrfMiddlewareTest extends TestCase
 {
-    protected static $callable;
-    protected static $csrfMiddleware;
+    protected $middleware;
+    protected $callable;
+    protected $csrfCookie;
 
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        self::$callable = function($req, $res) { return $res; };
-        self::$csrfMiddleware = new CsrfMiddleware('PT3H', 65);
+        $this->middleware = new CsrfMiddleware('PT3H', 65);
+        $this->callable = function($req, $res) { return $res; };
+        $response = $this->middleware->__invoke(Factory::requestFactory(), new Response(), $this->callable);
+        $this->csrfCookie = CookieUtils::getResponse($response, 'csrf_token');
     }
 
-    public function testSetToken()
+    public function testCsrfToken()
     {
-        $mw = self::$csrfMiddleware;
-        $response = $mw(Factory::requestFactory(), new Response(), self::$callable);
-        $this->assertRegExp('/^[\d\w]{65}$/', CookieUtils::getResponse($response, 'csrf_token')->getValue());
+        $this->assertNotEmpty($this->csrfCookie->getValue());
+        $this->assertRegExp('/^.{45,}$/u', $this->csrfCookie->getValue());
     }
 
     public function testTokenValid()
     {
-        $mw = self::$csrfMiddleware;
-        $csrfToken = '1234567890';
-        $request = Factory::requestFactory()->withMethod('POST')->withParsedBody(['csrf_token' => $csrfToken]);
-        $request = CookieUtils::setRequest($request, 'csrf_token', $csrfToken);
-        $this->assertEquals(200, $mw($request, new Response(), self::$callable)->getStatusCode());
+        $request = Factory::requestFactory()->withMethod('POST')->withParsedBody(['csrf_token' => $this->csrfCookie->getValue()]);
+        $request = CookieUtils::setRequest($request, $this->csrfCookie->getName(), $this->csrfCookie->getValue());
+        $response = $this->middleware->__invoke($request, new Response(), $this->callable);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 
     public function testTokenInvalid()
     {
-        $mw = self::$csrfMiddleware;
         // Request is missing CSRF POST variable
-        $request = CookieUtils::setRequest(Factory::requestFactory()->withMethod('POST'), 'csrf_token', '1234567890');
-        $this->assertEquals(400, $mw($request, new Response(), self::$callable)->getStatusCode());
+        $request = Factory::requestFactory()->withMethod('POST');
+        $request = CookieUtils::setRequest($request, $this->csrfCookie->getName(), $this->csrfCookie->getValue());
+        $response = $this->middleware->__invoke($request, new Response(), $this->callable);
+        $this->assertEquals(400, $response->getStatusCode());
     }
 }

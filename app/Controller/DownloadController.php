@@ -29,7 +29,7 @@ class DownloadController
         if($this->fileHelper->fileExists($args['id'])) {
             $file = $this->fileMapper->getFile($args['id']);
             $filePath = $this->pathingHelper->getPathToFile($file);
-            if(!isset($params['flag']) || $params['flag'] != 'nocount') {
+            if(!isset($params['type']) || $params['type'] != 'stream') {
                 $file->setDownloads($file->getDownloads() + 1);
                 $this->fileMapper->updateFile($file);
             }

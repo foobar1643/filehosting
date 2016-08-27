@@ -5,7 +5,7 @@ namespace Filehosting;
 class Config
 {
     /* Default settings */
-    private $appSizeLimit = 10;
+    private $appSizeLimit = 10485760;
     private $appEnableXsendfile = 0;
 
     private $dbHost = "127.0.0.1";
@@ -25,7 +25,7 @@ class Config
                 if(isset($this->{$section . ucfirst($name)})) {
                     $this->{$section . ucfirst($name)} = $value;
                 } else {
-                    throw new \Exception(_("Can't set value, no such value in the config (Section: $section; Key: $name)"));
+                    throw new \InvalidArgumentException(_("Can't set value, no such value in the config (Section: $section; Key: $name)"));
                 }
             }
         }

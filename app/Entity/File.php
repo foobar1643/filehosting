@@ -3,31 +3,19 @@
 namespace Filehosting\Entity;
 use Slim\Http\UploadedFile;
 
-class File extends UploadedFile
+class File
 {
     const WHITELISTED_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webm", "mp3", "mp4"];
 
     protected $id;
-    /* $name - extends from parent */
-    /* $type - extends from parent */
-    /* $size - extends from parent */
-    /* $error - extends from parent */
+    protected $uploadedFile;
+    protected $name;
+    protected $size;
     protected $uploader;
     protected $upload_date;
     protected $downloads;
     protected $auth_token;
     protected $isDeleted;
-
-    public function __construct() { }
-
-    public function fromUploadedFile(UploadedFile $uploaded)
-    {
-        $this->file = $uploaded->file;
-        $this->name = $uploaded->getClientFilename();
-        $this->type = $uploaded->getClientMediaType();
-        $this->size = $uploaded->getSize();
-        $this->error = $uploaded->getError();
-    }
 
     public function getId()
     {
@@ -38,6 +26,24 @@ class File extends UploadedFile
     {
         $this->id = $id;
         return $this;
+    }
+
+    public function getUploadedFile()
+    {
+        return $this->uploadedFile;
+    }
+
+    public function setUploadedFile(UploadedFile $uploaded)
+    {
+        $this->uploadedFile = $uploaded;
+        $this->name = $uploaded->getClientFilename();
+        $this->size = $uploaded->getSize();
+        return $this;
+    }
+
+    public function getClientFilename()
+    {
+        return $this->name;
     }
 
     public function setName($name)
@@ -61,6 +67,11 @@ class File extends UploadedFile
     {
         $this->size = $size;
         return $this;
+    }
+
+    public function getSize()
+    {
+        return $this->size;
     }
 
     public function getDatabaseDate()
@@ -117,19 +128,7 @@ class File extends UploadedFile
         return $this;
     }
 
-    public function getFormattedSize()
-    {
-        // 1000000000 - GB, 1000000 - MB, 1000 - KB
-        if(($this->size / 1000000) > 1000000) {
-            return round($this->size / 1000000000, 1, PHP_ROUND_HALF_DOWN) . " GB";
-        }
-       if(($this->size / 1000) > 1000) {
-           return round($this->size / 1000000, 1, PHP_ROUND_HALF_DOWN) . " MB";
-       }
-       return round($this->size / 1000, 0, PHP_ROUND_HALF_UP) . " KB";
-    }
-
-    public function getExtention()
+    public function getExtension()
     {
         return pathinfo($this->name, PATHINFO_EXTENSION);
     }
@@ -146,32 +145,21 @@ class File extends UploadedFile
         return 100;
     }
 
-    public function getDownloadLink()
-    {
-        $encodedName = urlencode($this->name);
-        return "/file/get/{$this->id}/{$encodedName}";
-    }
-
     public function getThumbnailName()
     {
         return "thumb_{$this->getDiskName()}";
     }
 
-    public function getLinkToPreview()
-    {
-        return "/thumbnails/{$this->getThumbnailName()}";
-    }
-
     public function getDiskName()
     {
-        $fileExtension = $this->getExtention();
+        $fileExtension = $this->getExtension();
         $normalized = $this->name;
         if(strlen($normalized) > 20) {
             $normalized = $this->getStrippedName();
             $normalized = substr($normalized, 0, 20);
             $normalized .= "." . $fileExtension;
         }
-        if(!in_array($fileExtension, self::WHITELISTED_EXTENSIONS)) {
+        if(!in_array(strtolower($fileExtension), self::WHITELISTED_EXTENSIONS)) {
             $normalized .= ".txt";
         }
         $normalized = substr_replace($normalized, "{$this->id}_", 0, 0);

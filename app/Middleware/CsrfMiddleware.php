@@ -5,7 +5,7 @@ namespace Filehosting\Middleware;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 use \Filehosting\Helper\CookieHelper;
-use \Filehosting\Helper\TokenGenerator;
+use \Filehosting\Helper\Utils;
 
 class CsrfMiddleware
 {
@@ -18,12 +18,11 @@ class CsrfMiddleware
         $this->tokenLength = $tokenLength;
     }
 
-    public function __invoke(Request $request, Response $response, callable $next)
+    public function __invoke(Request $request, Response $response, callable $next) // split this into two methods - validate csrf token and set csrf token
     {
         $cookieHelper = new CookieHelper($request, $response);
         if($request->isPost()) {
-            $postVars = $request->getParsedBody();
-            $formToken = isset($postVars["csrf_token"]) ? $postVars["csrf_token"] : NULL;
+            $formToken = $request->getParsedBodyParam('csrf_token');
             $cookieToken = $cookieHelper->getRequestCookie('csrf_token');
             if(!$this->validateCsrfToken($formToken, $cookieToken)) {
                 $failure = $this->getFailureCallable();
@@ -31,8 +30,7 @@ class CsrfMiddleware
             }
         }
         if(!$cookieHelper->requestCookieExists('csrf_token')) {
-            $tokenGenerator = new TokenGenerator();
-            $csrfToken = $tokenGenerator->generateToken($this->tokenLength);
+            $csrfToken = Utils::generateToken($this->tokenLength);
             $request = $cookieHelper->setRequestCookie('csrf_token', $csrfToken);
         } else {
             $csrfToken = $cookieHelper->getRequestCookie('csrf_token');

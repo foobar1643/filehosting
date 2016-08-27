@@ -13,35 +13,40 @@ use Testsuite\Utils\CookieUtils;
 
 class AuthHelperTest extends TestCase
 {
-    protected static $authHelper;
+    protected $authHelper;
+    protected $authCookie;
+    protected $authToken;
 
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        $request = CookieUtils::setRequest(Factory::requestFactory(), 'auth', '1234567890');
-        self::$authHelper = new AuthHelper(new CookieHelper($request, new Response()));
+        $this->authHelper = new AuthHelper(new CookieHelper(Factory::requestFactory(), new Response()));
+        $response = $this->authHelper->authorizeUser();
+        $this->authCookie = CookieUtils::getResponse($response, 'auth');
+        $this->authToken = $this->authHelper->getUserToken();
     }
 
-    public function testUserAuthorization()
+    public function testAuthCookies()
     {
-        $response = self::$authHelper->authorizeUser();
-        $this->assertRegExp('/^[\d\w]{45}$/', CookieUtils::getResponse($response, 'auth')->getValue());
+        $this->assertNotEmpty($this->authCookie->getValue());
+    }
+
+    public function testAuthTokenSecurity()
+    {
+        $this->assertRegExp('/^.{45,}$/u', $this->authToken);
+    }
+
+    public function testUserNotAuthorized()
+    {
+        $newHelper = new AuthHelper(new CookieHelper(Factory::requestFactory(), new Response()));
+        $this->assertFalse($newHelper->isAuthorized());
     }
 
     public function testUserAuthorized()
     {
-        $this->assertTrue(self::$authHelper->isAuthorized());
-    }
-
-    public function testCanManageFile()
-    {
-        $file = $this->createMock(File::class);
-        $file->method('getAuthToken')->willReturn('1234567890');
-        $this->assertTrue(self::$authHelper->canManageFile($file));
-    }
-
-    public function testCannotManageFile()
-    {
-        $file = $this->createMock(File::class);
-        $this->assertFalse(self::$authHelper->canManageFile($file));
+        $request = Factory::requestFactory();
+        $request = CookieUtils::setRequest($request, $this->authCookie->getName(), $this->authCookie->getValue());
+        $newHelper = new AuthHelper(new CookieHelper($request, new Response()));
+        $this->assertTrue($newHelper->isAuthorized());
+        $this->assertEquals($this->authToken, $newHelper->getUserToken());
     }
 }

@@ -4,7 +4,8 @@ namespace Filehosting\Validation;
 
 use \Filehosting\Entity\File;
 use \Filehosting\Entity\Comment;
-use \Filehosting\Helper\UploadHelper;
+use \Filehosting\Helper\Utils;
+use Slim\Http\UploadedFile;
 
 class Validation
 {
@@ -19,18 +20,18 @@ class Validation
         $this->fileMapper = $c->get('FileMapper');
     }
 
-    public function validateFile(File $file)
+    public function validateUploadedFile(UploadedFile $uploadedFile)
     {
         $config = $this->container->get('config');
         $errors = null;
-        if(is_null($file->getClientFilename())) {
+        if(is_null($uploadedFile->getClientFilename())) {
             $errors['noFile'] = _("Attach a file and try again.");
         }
-        if(!is_null($file->getClientFilename()) && $file->getSize() > $config->getValue('app', 'sizeLimit') * 1000000) {
+        if(!is_null($uploadedFile->getClientFilename()) && $uploadedFile->getSize() > $config->getValue('app', 'sizeLimit')) {
             $errors['sizeLimit'] = _("File size is exceeding the maximum.");
         }
-        if(!is_null($file->getClientFilename()) && $file->getError() != UPLOAD_ERR_OK) {
-            $errors['other'] = UploadHelper::parseCode($file->getError());
+        if(!is_null($uploadedFile->getClientFilename()) && $uploadedFile->getError() != UPLOAD_ERR_OK) {
+            $errors['other'] = Utils::parseFileFormErrorCode($uploadedFile->getError());
         }
         return $errors;
     }
@@ -51,10 +52,10 @@ class Validation
         if(strlen(trim($comment->getCommentText())) > 300) {
             $errors["commentTooBig"] = _("Comment mustn't be longer than 300 symbols.");
         }
-        if($comment->getParentId() != null && !isset($parentComment)) {
+        if($comment->getParentId() != null && !$parentComment) {
             $errors["noParent"] = _("Parent comment does not exists.");
         }
-        if($comment->getParentId() != null && isset($parentComment) && $parentComment->getDepth() >= 5) {
+        if($comment->getParentId() != null && $parentComment && $parentComment->getDepth() >= 5) {
             $errors["maxDepthReached"] = _("Maximum comment depth reached.");
         }
         return $errors;

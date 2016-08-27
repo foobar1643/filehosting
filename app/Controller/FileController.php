@@ -56,7 +56,6 @@ class FileController
             'commentErrors' => $commentErrors,
             'canManageFile' => $authHelper->canManageFile($file),
             'comments' => $this->commentHelper->getComments($file->getId()),
-            'lang' => $args['lang'],
             'translator' => new Translator(\Locale::getDefault()),
             'langHelper' => new LanguageHelper($request),
             'csrf_token' => $cookieHelper->getRequestCookie('csrf_token')]);

@@ -16,16 +16,17 @@ CREATE TABLE comments (
     parent_id integer,
     file_id integer NOT NULL,
     author character varying(35) NOT NULL,
-    date_posted timestamp NOT NULL,
+    date_posted timestamp DEFAULT CURRENT_TIMESTAMP,
     comment_text text NOT NULL,
-    parent_path character varying(255),
+    matpath character varying(255),
     CONSTRAINT comments_pkey PRIMARY KEY (id),
     FOREIGN KEY (parent_id) REFERENCES comments (id),
-    FOREIGN KEY (file_id) REFERENCES files (id)
+    FOREIGN KEY (file_id) REFERENCES files (id),
+    UNIQUE(file_id, matpath)
 ) WITH (
   OIDS=FALSE
 );
 
 CREATE INDEX upload_date_index ON files (upload_date);
 CREATE INDEX downloads_index ON files (downloads);
-CREATE INDEX comments_matpath_index ON comments (parent_path);
+CREATE INDEX comments_matpath_index ON comments (matpath);

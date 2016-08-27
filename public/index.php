@@ -7,6 +7,8 @@ use \Psr\Http\Message\ResponseInterface as Response;
 use \Filehosting\Middleware\LocaleMiddleware;
 use \Filehosting\Middleware\CsrfMiddleware;
 use \Filehosting\Helper\LanguageHelper;
+use Filehosting\Helper\Utils;
+use Filehosting\Helper\LinkHelper;
 
 $app = new \Slim\App($container);
 
@@ -16,7 +18,13 @@ $container['view'] = function ($container) {
     $view = new \Slim\Views\Twig('../templates/', [
         'cache' => false
     ]);
+    $formatSize = new Twig_SimpleFunction('formatSize', function ($size) {
+        return Utils::formatSize($size);
+    });
+    $view->getEnvironment()->addFunction('formatSize', $formatSize);
+    $view->getEnvironment()->addGlobal('linkHelper', new LinkHelper(\Locale::getDefault()));
     $view->addExtension(new Twig_Extensions_Extension_I18n());
+    $view->addExtension(new Twig_Extensions_Extension_Intl());
     $view->addExtension(new \Slim\Views\TwigExtension(
         $container['router'],
         $container['request']->getUri()
@@ -47,8 +55,8 @@ $container['notFoundHandler'] = function ($container) {
 
 $container['errorHandler'] = function ($container) {
     return function ($request, $response, $exception) use ($container) {
-        $response = $response->withStatus(503)->withHeader('Content-Type', 'text/html');
         error_log($exception->__toString());
+        $response = $response->withStatus(503)->withHeader('Content-Type', 'text/html');;
         return $container['view']->render($response, 'error.twig',
             ['title' => _("503 Service temporarily unavailable"),
             'messageTitle' => _("Something went wrong."),
@@ -62,7 +70,7 @@ $app->add($container->get('LocaleMiddleware'));
 
 $app->get('/', function (Request $request, Response $response, $args)
 {
-    $redirectLocale = \Locale::getDefault();
+    $redirectLocale = LanguageHelper::DEFAULT_LOCALE;
     $langHelper = new LanguageHelper($request);
     $userLocale = $langHelper->getUserLocale();
     if(!is_null($userLocale) && $langHelper->languageAvailable($userLocale)) {
@@ -80,7 +88,6 @@ $app->get('/{lang}/', function (Request $request, Response $response, $args)
     return $this->get('view')->render($response, 'index.twig', [
         'lastFiles' => $lastFiles,
         'popularFiles' => $popularFiles,
-        'lang' => $args['lang'],
         'langHelper' => new LanguageHelper($request)]);
 });
 
@@ -99,8 +106,8 @@ $app->map(['GET', 'POST'], '/{lang}/settings/', function (Request $request, Resp
 });
 $app->map(['GET', 'POST'], '/{lang}/upload/', '\Filehosting\Controller\UploadController');
 $app->map(['GET', 'POST'], '/{lang}/file/{id:[0-9]+}/', '\Filehosting\Controller\FileController')->add($container->get('CsrfMiddleware'));
-$app->post('/{lang}/file/{id:[0-9]+}/delete', '\Filehosting\Controller\FileController:deleteFile')->add($container->get('CsrfMiddleware'));
+$app->post('/{lang}/file/{id:[0-9]+}/delete/', '\Filehosting\Controller\FileController:deleteFile')->add($container->get('CsrfMiddleware'));
 $app->get('/{lang}/search/', '\Filehosting\Controller\SearchController');
-$app->get('/file/get/{id:[0-9]+}[/{filename}]', '\Filehosting\Controller\DownloadController');
+$app->get('/{lang}/file/get/{id:[0-9]+}[/{filename}]', '\Filehosting\Controller\DownloadController');
 
 $app->run();

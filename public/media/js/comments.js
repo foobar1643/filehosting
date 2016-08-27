@@ -1,19 +1,24 @@
+var requestType = "comment";
+
 $(".comments-reply-button").on('click', function() {
     var parentCommentId = $(this).attr('id').split("-").pop();
     showReplyForm(parentCommentId, $(this).parent().parent().parent());
 });
 
 $("#comment-button").click(function() {
+    removeErrorElements('comment');
     postComment($("#comment-field").val(), null)
 });
 
 function postComment(comment, parentId) {
+    requestType = "comment";
     var data = {
         "comment": comment,
         "csrf_token": $("#csrf-token-input").val()
     };
     if(parentId != null) {
         data.parentComment = parentId;
+        requestType = "reply";
     }
     $.ajax({
         type: "POST",
@@ -34,16 +39,15 @@ function showReplyForm(parentId, parentObj) { // shows comment reply form to use
     $(replyForm).html(replyFormHtml);
     $(replyForm).appendTo(parent);
     $("#reply-button").click(function() {
-        $(replyForm).hide("fast");
-        postComment($("#reply-field").val(), parentId)
+        removeErrorElements('reply');
+        postComment($("#reply-field").val(), parentId);
     });
 }
 
 function showErrors(response) { // shows errors to user
     errors = response.errors;
-    var formType = getCommentType(response.comment.parentId);
+    var formType = requestType;
     removeErrorElements(formType);
-    $("#" + formType + "-form").show("fast");
     $("#" + formType + "-form-group").addClass("has-error");
     for(var error in errors) {
         var errorLabel = $("#error-label-template").html();
@@ -63,7 +67,7 @@ function showComment(comment) {
     $(commentElement).css('display', "none");
     commentTemplate = commentTemplate.replace("%commentDate%", comment.date);
     commentTemplate = commentTemplate.replace("%commentAuthor%", htmlspecialchars(comment.author));
-    commentTemplate = commentTemplate.replace("%commentText%", htmlspecialchars(comment.text));
+    commentTemplate = commentTemplate.replace("%commentText%", nl2br(htmlspecialchars(comment.text)));
     commentTemplate = commentTemplate.replace("%commentId%", comment.id);
     $(commentElement).html(commentTemplate);
     var replyButton = $(commentElement).find("#reply-" + comment.id);
@@ -84,7 +88,7 @@ function showComment(comment) {
         $("#comment-" + comment.parentId).children(".children").append(commentElement);
     }
     $(commentElement).show("fast");
-    incrementCommentsCount();
+    //incrementCommentsCount();
 }
 
 function removeCommentsFallback() { // removes fallback elements for non-javascript users
@@ -104,8 +108,7 @@ function incrementCommentsCount() {
 }
 
 function getCommentDepth(matPath) {
-    path = matPath.split(".");
-    return path.length;
+    return matPath.split(".").length;
 }
 
 function htmlspecialchars(text) {
@@ -119,6 +122,10 @@ function htmlspecialchars(text) {
     return text.replace(/[<>'"&]/g, function(s) { return specialChars[s] });
 }
 
+function nl2br(text) {
+    return text.replace(new RegExp('\n', 'g'), "<br>");
+}
+
 function getCommentType(parentId) {
     if(parentId != null) {
         return "reply";
@@ -128,12 +135,37 @@ function getCommentType(parentId) {
 }
 
 function handleJsonResponse(response) {
-    console.log(response);
     if(response.errors != null) {
         showErrors(response);
     } else {
+        $("#reply-form").hide("fast");
         showComment(response.comment);
     }
 }
 
-removeCommentsFallback();
+function toggleForm(formType) {
+    var button = $("#" + formType + "-button");
+    var field = $("#" + formType + "-field");
+    button.attr('disabled', !button.attr('disabled'));
+    field.attr('disabled', !field.attr('disabled'));
+    if(field.hasClass('loading')) {
+        field.removeClass('loading');
+    } else {
+        field.addClass('loading');
+    }
+}
+
+function ajaxRequestError(event, request, settings) {
+    var data = {
+        "errors": { "serverError": request.status + ": " + request.statusText }
+    };
+    showErrors(data);
+}
+
+window.onload = function() {
+    removeCommentsFallback();
+
+    $(document).ajaxStart(function() { toggleForm(requestType) });
+    $(document).ajaxStop(function() { toggleForm(requestType) });
+    $(document).ajaxError(ajaxRequestError);
+}

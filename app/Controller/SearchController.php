@@ -39,7 +39,6 @@ class SearchController
             'page' => intval($page),
             'pager' => $pager,
             'files' => $searchResults["results"],
-            'lang' => $args['lang'],
             'langHelper' => new LanguageHelper($request)]
         );
     }

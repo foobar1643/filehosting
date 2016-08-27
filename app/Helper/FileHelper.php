@@ -8,6 +8,7 @@ use \Filehosting\Entity\File;
 use \Filehosting\Exception\FileUploadException;
 use \Filehosting\Database\FileMapper;
 use \Filehosting\Database\SearchGateway;
+use Slim\Http\UploadedFile;
 
 class FileHelper
 {
@@ -36,7 +37,7 @@ class FileHelper
         $file->setId($this->fileMapper->createFile($file));
         try {
             $this->isFileFolderAvailable($this->pathingHelper->getPathToFileFolder($file)); // throws FileUploadException
-            $file->moveTo($this->pathingHelper->getPathToFile($file)); //  throws \InvalidArgumentException and \RuntimeException
+            $file->getUploadedFile()->moveTo($this->pathingHelper->getPathToFile($file)); //  throws \InvalidArgumentException and \RuntimeException
         } catch(\Exception $e) {
             $this->fileMapper->rollBack();
             throw new $e;

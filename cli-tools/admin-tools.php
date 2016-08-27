@@ -3,7 +3,7 @@
 
 require(__DIR__ . "/../app/init.php");
 
-use \Filehosting\Helper\TokenGenerator;
+use \Filehosting\Helper\Utils;
 use \Filehosting\Entity\Comment;
 
 class CLItools
@@ -99,10 +99,11 @@ class CLItools
         $tempname = tempnam("/tmp", "filehosting");
         copy($filepath, $tempname);
         $uploadedFile = new Slim\Http\UploadedFile($tempname, pathinfo($filepath, PATHINFO_BASENAME), mime_content_type($filepath), filesize($filepath), UPLOAD_ERR_OK);
-        $tokenGenerator = new TokenGenerator();
         $file = new \Filehosting\Entity\File();
-        $file->fromUploadedFile($uploadedFile);
-        $file->setAuthToken($tokenGenerator->generateToken(45))->setUploader('Administrator');
+        $file->setUploadedFile($uploadedFile)
+            ->setAuthToken(Utils::generateToken(45))
+            //notes: Default uploader name for administrator, displays in file information section
+            ->setUploader(dcgettext('en_US', 'Administrator', LC_MESSAGES));
         $file = $this->fileHelper->uploadFile($file);
         print("File sucsessfuly added. ID: {$file->getId()}" . PHP_EOL);
     }
@@ -137,7 +138,7 @@ class CLItools
         $comment = new Comment();
         $dateTime = new \DateTime("now");
         $comment->setFileId($fileId)
-            ->setAuthor("Administrator")
+            ->setAuthor(dcgettext('en_US', 'Administrator', LC_MESSAGES))
             ->setDatePosted($dateTime->format(\DateTime::ATOM))
             ->setCommentText($text)
             ->setParentId((isset($parentId) ? $parentId : NULL));

@@ -1,4 +1,4 @@
-.navbar-default .navbar-nav>li>a:active { background-color: #2A6796; }
+.navbar-default .navbar-nav>li>a:active { background-color: #2A6796; } /* 2A6796 */
 .navbar-default .navbar-nav>li>a:hover, .navbar-default .navbar-nav>li>a:focus,
 .navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover { background-color: #2E70A5; }
 .navbar-default .navbar-nav>.active>a { background-color: #2C6C9E; }
@@ -8,7 +8,6 @@
 .footer-link { margin-left: 10px; }
 #popular-files { margin-right: 9px; }
 #comment-form .page-header, #reply-form .page-header { margin: 0; }
-#comments-section .page-header { margin: 0; }
 #file-info .table { margin-bottom: 0; }
 #file-delete-button { vertical-align: top; }
 #file-delete-form { display: inline; }
@@ -36,7 +35,7 @@ div .media:target { background-color: #F4F1DE; }
 
 body {
     font-family: Tahoma, sans-serif, arial, times;
-    background-color: #F7F7F7;
+    background-color: #F4F4F4; /* F7F7F7 */
  }
 
 .language-select {
@@ -45,8 +44,45 @@ body {
     width: 100%;
 }
 
+.loading {
+    background-image: url("/media/img/loading.gif");
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
 #search-panel nav {
     text-align: center;
+}
+
+#comments-panel .panel-heading {
+    font-size: 16px;
+}
+
+#comments-panel .panel-footer {
+    background-color: #fff;
+}
+
+#file-comments-list .media .media-body .user-name {
+    display: inline-block;
+}
+
+#file-comments-list .media .media-body .comment-date {
+    display: inline;
+}
+
+#file-comments-list .media .media-body .comment-date small {
+    color: grey;
+    font-size: 8pt;
+    vertical-align: text-top;
+}
+
+#file-comments-list .media .media-body .comment-text {
+    display: block;
+    word-break: break-all;
+}
+
+#file-comments-list .media .children {
+    margin-left: 25px;
 }
 
 #main-page-row .panel {

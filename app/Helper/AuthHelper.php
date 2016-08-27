@@ -33,8 +33,7 @@ class AuthHelper
 
     public function authorizeUser()
     {
-        $tokenGenerator = new TokenGenerator();
-        $this->authToken = $tokenGenerator->generateToken(45);
+        $this->authToken = Utils::generateToken(45);
         return $this->cookieHelper->setResponseCookie('auth', $this->authToken, new \DateInterval('P30D'), '/');
     }
 }

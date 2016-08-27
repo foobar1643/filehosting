@@ -36,7 +36,6 @@ class CookieHelperTest extends TestCase
      */
     public function testGettingRequestCookie($requestCookie)
     {
-
         $this->assertEquals($requestCookie->getValue(), self::$cookieHelper->getRequestCookie($requestCookie->getName()));
     }
 

@@ -20,7 +20,7 @@ class PreviewHelper
     private function loadImage(File $file)
     {
         $pathToFile = $this->pathingHelper->getPathToFile($file);
-        switch($file->getExtention()) {
+        switch(strtolower($file->getExtension())) {
             case "jpeg":
             case "jpg":
                 return imagecreatefromjpeg($pathToFile);
@@ -62,8 +62,8 @@ class PreviewHelper
 
     public function generatePreview(File $file)
     {
-        if(!in_array($file->getExtention(), self::ALLOWED_EXTENSIONS)) {
-            return false;
+        if(!in_array(strtolower($file->getExtension()), self::ALLOWED_EXTENSIONS)) {
+            throw new \Exception(_("Can't generate preview for {$file->getExtension()} type."));
         }
         $image = $this->loadImage($file);
         $imageWidth = imagesx($image);

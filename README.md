@@ -21,7 +21,7 @@
 4. [jQuery] javascript library
 5. [video.js] video player
 6. [PHPUnit]
-7. Composer compatible [GetId3]
+7. [GetId3]
 
 ## Requirements
 1. Web server with [PHP] >=5.6 support.
@@ -68,7 +68,7 @@ This application is licensed under the MIT license. For more information refer t
 [Sphinx]: <http://sphinxsearch.com/>
 [PostgreSQL]: <http://www.postgresql.org/>
 [Composer]: <https://getcomposer.org/>
-[GetId3]: <https://github.com/phansys/GetId3>
+[GetId3]: <http://getid3.sourceforge.net/>
 [jQuery]: <https://jquery.org/>
 [video.js]: <http://videojs.com/>
 [Twig]: <http://twig.sensiolabs.org/>

@@ -7,6 +7,7 @@ use \Slim\Http\Response;
 
 class LanguageHelper
 {
+    const DEFAULT_LOCALE = "en_US";
     const AVAILABLE_LANGUAGES = ["en", "ru"];
 
     private $request;

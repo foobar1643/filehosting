@@ -22,7 +22,7 @@ class ValidationTest extends TestCase
         $container = new \Slim\Container();
         $container['config'] = function ($container) {
             $configMock = $this->createMock(Config::class);
-            $configMock->method('getValue')->willReturn(25);
+            $configMock->method('getValue')->willReturn(2500000);
             return $configMock;
         };
         $container['CommentMapper'] = function ($container) {
@@ -40,15 +40,13 @@ class ValidationTest extends TestCase
     public function testSuccessfulFileValidation()
     {
         $uploadedFile = new UploadedFile("/tmp/tempname", "example", "image/png", 1500000, UPLOAD_ERR_OK);
-        $file = new File();
-        $file->fromUploadedFile($uploadedFile);
-        $this->assertEmpty($this->validator->validateFile($file));
+        $this->assertEmpty($this->validator->validateUploadedFile($uploadedFile));
     }
 
     public function testUnseccessfulFileValidation()
     {
-        $file = new File();
-        $this->assertNotEmpty($this->validator->validateFile($file));
+        $file = new UploadedFile("/tmp/tempname", "example", "image/png", 1500000, UPLOAD_ERR_NO_FILE);
+        $this->assertNotEmpty($this->validator->validateUploadedFile($file));
     }
 
     public function testSuccessfulCommentValidation()

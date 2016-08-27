@@ -4,54 +4,56 @@ namespace Testsuite\Entity;
 
 use PHPUnit\Framework\TestCase;
 use Filehosting\Entity\File;
+use Testsuite\Utils\Factory;
 
 class FileEntityTest extends TestCase
 {
-    protected static $file;
+    protected $file;
 
-    public static function setUpBeforeClass()
+    protected function setUp()
     {
-        self::$file = new File();
-        self::$file->setId(368)
-            ->setName('example.png')
-            ->setSize(2500000)
-            ->setUploader('Test');
+        $this->file = Factory::fileFactory('exampleName.txt')->setId(436);
     }
 
-    public function testGetExtension()
+    public function extensionsProvider()
     {
-        $this->assertEquals('png', self::$file->getExtention());
+        return [
+            'noExtension' => [Factory::fileFactory('fileWithoutExtension'), ""],
+            'multipleExtensions' => [Factory::fileFactory('file.txt.mp3.png'), 'png'],
+            'dotExtension' => [Factory::fileFactory('.dotFilename.bin'), "bin"],
+            'numberExtension' => [Factory::fileFactory('example.5343'), "5343"]
+        ];
+    }
+
+    /**
+     * @dataProvider extensionsProvider
+     */
+    public function testGetExtension(File $file, $expected)
+    {
+        $this->assertEquals($expected, $file->getExtension());
     }
 
     public function testGetStrippedName()
     {
-        $this->assertEquals('example', self::$file->getStrippedName());
+        $this->assertNotEmpty($this->file->getStrippedName());
+        $this->assertNotEquals($this->file->getStrippedName(), Factory::fileFactory()->getStrippedName());
     }
 
     public function testGetFolder()
     {
-        $this->assertEquals(300, self::$file->getFolder());
-    }
-
-    public function testGetDownloadLink()
-    {
-        $name = urlencode(self::$file->getClientFilename());
-        $this->assertEquals("/file/get/" . self::$file->getId() ."/{$name}", self::$file->getDownloadLink());
+        $this->assertNotEmpty($this->file->getFolder());
+        $this->assertNotEquals($this->file->getFolder(), Factory::fileFactory()->getFolder());
     }
 
     public function testGetDiskName()
     {
-        $diskName = self::$file->getDiskName();
-        $this->assertEquals(self::$file->getId() . "_" . self::$file->getClientFilename(), $diskName);
-        return $diskName;
+        $this->assertNotEmpty($this->file->getDiskName());
+        $this->assertNotEquals($this->file->getDiskName(), Factory::fileFactory()->getDiskName());
     }
 
-    /**
-     * @depends testGetDiskName
-     */
-    public function testGetThumbnailName($diskName)
+    public function testGetThumbnailName()
     {
-        $this->assertEquals("thumb_{$diskName}", self::$file->getThumbnailName());
+        $this->assertNotEmpty($this->file->getThumbnailName());
+        $this->assertNotEquals($this->file->getThumbnailName(), Factory::fileFactory()->getThumbnailName());
     }
-
 }

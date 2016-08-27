@@ -16,4 +16,9 @@ class Translator
         $messageFormatter = new \MessageFormatter($this->locale, _($text));
         return $messageFormatter->format([$number]);
     }
+
+    public function translate($text)
+    {
+        return _($text);
+    }
 }

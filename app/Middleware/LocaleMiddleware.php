@@ -19,11 +19,13 @@ class LocaleMiddleware
 
     public function __invoke(Request $request, Response $response, callable $next)
     {
-        \Locale::setDefault('en_US');
+        \Locale::setDefault(LanguageHelper::DEFAULT_LOCALE);
         $cookieHelper = new CookieHelper($request, $response);
         $languageHelper = new LanguageHelper($request);
         $appLocale = $languageHelper->getAppLocale();
-        if(isset($appLocale) && $languageHelper->languageAvailable($appLocale)) {
+        if(!$languageHelper->languageAvailable($appLocale)) {
+            throw new \Slim\Exception\NotFoundException($request, $response);
+        } else if(isset($appLocale) && $languageHelper->languageAvailable($appLocale)) {
             $this->setTextDomain($appLocale);
             if($languageHelper->canShowLangMsg() == true) {
                 $msgViews = intval($cookieHelper->getRequestCookie('langChangeShown')) + 1;

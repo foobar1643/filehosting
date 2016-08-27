@@ -2,7 +2,7 @@
 
  namespace Filehosting\Entity;
 
- class Comment implements \JsonSerializable
+ class Comment implements \JsonSerializable, TreeNodeSearchable
  {
      private $id;
      private $file_id;
@@ -10,9 +10,7 @@
      private $author;
      private $date_posted;
      private $comment_text;
-     private $parent_path;
-
-     private $childNodes = [];
+     private $matpath;
 
      public function getId()
      {
@@ -22,13 +20,12 @@
      public function setId($id)
      {
          $this->id = $id;
-         $this->addToPath(str_pad($id, 3, "0", STR_PAD_LEFT));
          return $this;
      }
 
      public function getParentId()
      {
-         return intval($this->parent_id);
+         return $this->parent_id;
      }
 
      public function setParentId($parentId)
@@ -91,56 +88,26 @@
          return $this;
      }
 
-     public function getParentPath()
+     public function getMatPath() // getParentPath
      {
-         return $this->parent_path;
+         return $this->matpath;
      }
 
-     public function addToPath($addition)
+     public function addToPath($addition) // substr_replace($this->matPath, "{$addition}.", 0, 0)  - prepend to path
      {
-         $this->parent_path = !is_null($this->parent_path) ?  substr_replace($this->parent_path, "{$addition}.", 0, 0) : $addition;
-         return $this->parent_path;
+         $this->matpath .= !is_null($this->matpath) ? ".{$addition}" : $addition;
+         return $this->matpath;
      }
 
-     public function setParentPath($parentPath)
+     public function setMatPath($matPath) // setParentPath
      {
-         $this->parent_path = $parentPath;
+         $this->matpath = $matPath;
          return $this;
-     }
-
-     public function addChildNode(Comment $child)
-     {
-         $child->setParentId($this->id);
-         $child->addToPath($this->parent_path);
-         $this->childNodes[$child->id] = $child;
-         return $child;
-     }
-
-     public function getChildren()
-     {
-         return $this->childNodes;
-     }
-
-     public function countChildNodes()
-     {
-         return count($this->childNodes);
-     }
-
-     public function countDescendants()
-     {
-         $size = 0;
-         foreach($this->childNodes as $id => $comment) {
-             $size++;
-             if(count($comment->getChildren()) > 0) {
-                 $size = $size + $comment->countDescendants();
-             }
-         }
-         return $size;
      }
 
      public function getDepth()
      {
-         $path = preg_split("/[.]/", $this->parent_path);
+         $path = preg_split("/[.]/", $this->matpath);
          return count($path);
      }
 
@@ -152,7 +119,7 @@
              'author' => $this->author,
              'date' => $this->getDatePosted(),
              'text' => $this->comment_text,
-             'path' => $this->parent_path
+             'path' => $this->matpath
          ];
      }
  }

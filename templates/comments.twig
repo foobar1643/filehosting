@@ -1,43 +1,47 @@
 {% macro display(comments, errors, replyTo, lang, csrfToken) %}
-    {% for comment in comments %}
-        <div class="media" id="comment-{{ comment.getId }}">
-            <p class="pull-right"><small>{{ comment.getDatePosted }}</small></p>
+    {% for commentNode in comments %}
+        <div class="media" id="comment-{{ commentNode.object.getId }}">
             <div class="media-body">
-                <h4 class="media-heading user-name">{{ comment.getAuthor }}</h4>
-                <span class="comment-text">{{ comment.getCommentText }}</span>
-                {% if comment.getDepth < 5 %}
+                <h4 class="media-heading user-name">{{ commentNode.object.getAuthor }}</h4>
+                <p class="comment-date"><small>{{ commentNode.object.getDatePosted }}</small></p>
+                <span class="comment-text">{{ commentNode.object.getCommentText|nl2br }}</span>
+                {% if commentNode.object.getDepth < 5 %}
                     <p><small>
-                        <a id="reply-{{ comment.getId }}" href="/{{ lang }}/file/{{ comment.fileId }}/?reply={{ comment.getId }}" class="comments-reply-button">{% trans %}Reply{% endtrans %}</a>
+                        <a id="reply-{{ commentNode.object.getId }}"
+                            href="{{ linkHelper.getCommentReplyLink(commentNode.object) }}"
+                            class="comments-reply-button">{% trans %}Reply{% endtrans %}</a>
                     </small></p>
                 {% endif %}
-                {% if replyTo == comment.getId %}
-                    <form method="post" id="fallback-reply-form" action="/{{ lang }}/file/{{ comment.fileId }}/">
-                        <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
-                        <input type="hidden" name="parentComment" value="{{ comment.getId }}">
-                        <div class="page-header">
-                            <h3>{% trans %}Reply to the comment{% endtrans %}</h3>
-                        </div>
-                        <div class="form-group {% if errors != null %} has-error {% endif %}" id="comment-form-group">
-                            <label for="comment">{% trans %}Comment:{% endtrans %}</label>
-                            <textarea class="form-control" rows="5" id="comment-field" name="comment"></textarea>
-                            {% if errors != null %}
-                                {% for error in errors %}
-                                    <label style="display: block;" class='control-label' for='comment'>{{ error }}</label>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" id="comment-button" class="btn btn-default">{% trans %}Send{% endtrans %}</button>
-                        </div>
-                    </form>
+                {% if replyTo == commentNode.object.getId %}
+                    {% import _self as selfMacro %}
+                    {{ selfMacro.showReplyForm(commentNode, errors, replyTo, lang, csrfToken) }}
                 {% endif %}
             </div>
-            <div class="children" style="margin-left: 25px;">
+            <div class="children">
                 {% import _self as selfMacro %}
-                {% if comment.getChildren|length > 0 %}
-                    {{ selfMacro.display(comment.getChildren, errors, replyTo, lang, csrfToken) }}
+                {% if commentNode.countChildren > 0 %}
+                    {{ selfMacro.display(commentNode.getChildren, errors, replyTo, lang, csrfToken) }}
                 {% endif %}
             </div>
         </div>
     {% endfor %}
+{% endmacro %}
+
+{% macro showReplyForm(commentNode, errors, replyTo, lang, csrfToken) %}
+<form method="post" id="fallback-reply-form" action="{{ linkHelper.getCommentFormReplyLink(commentNode.object.getFileId) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrfToken }}">
+    <input type="hidden" name="parentComment" value="{{ commentNode.object.getId }}">
+    <div class="form-group {% if errors != null %} has-error {% endif %}" id="comment-form-group">
+        <label for="comment">{% trans %}Reply: {% notes %}Label for comment reply textarea{% endtrans %}</label>
+        <textarea class="form-control" rows="5" id="comment-field" name="comment"></textarea>
+        {% if errors != null %}
+            {% for error in errors %}
+                <label style="display: block;" class='control-label' for='comment'>{{ error }}</label>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <button type="submit" id="comment-button" class="btn btn-default">{% trans %}Send{% endtrans %}</button>
+    </div>
+</form>
 {% endmacro %}

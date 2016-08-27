@@ -3,6 +3,7 @@
 namespace Filehosting\Helper;
 
 use \Filehosting\Entity\Comment;
+use \Filehosting\Entity\TreeNode;
 
 class CommentHelper
 {
@@ -15,22 +16,31 @@ class CommentHelper
 
     public function addComment(Comment $comment)
     {
-        $comment->setId($this->commentMapper->addComment($comment));
-        if($comment->getParentId() != NULL) {
+        if(is_null($comment->getParentId())) { // root comment
+            $maxPath = $this->commentMapper->getRootMaxPath($comment->getFileId());
+            $maxPath = intval($maxPath) + 1;
+            $comment->setMatPath($this->normalizePath($maxPath));
+        } else { // child comment
             $parentComment = $this->commentMapper->getComment($comment->getParentId());
-            $comment->addToPath($parentComment->getParentPath());
-            //$comment->setParentPath($this->appendToPath($parentComment->getParentPath(), $comment->getId()));
+            $comment->setMatPath($parentComment->getMatPath());
+            $rawPath = $this->commentMapper->getChildMaxPath($comment->getParentId());
+            $splitPath = $this->splitPath($rawPath);
+            $maxPath = intval($splitPath[count($splitPath) - 1]);
+            $maxPath = is_null($maxPath) ? 0 : intval($maxPath) + 1;
+            $comment->addToPath($this->normalizePath($maxPath));
         }
-        $this->commentMapper->updatePath($comment);
+        # SELECT MAX(matpath) FROM comments WHERE NOT (parent_id IS NOT NULL) AND file_id = ?; - FOR ROOT COMMENT ADDITION
+        # SELECT MAX(matpath) FROM comments WHERE parent_id = ?; - FOR CHILD COMMENT ADDITION
+        $comment->setId($this->commentMapper->addComment($comment));
         return $comment;
     }
 
     public function getComments($fileId)
     {
         $rawComments = $this->commentMapper->getComments($fileId);
-        $comments = $this->makeTrees($rawComments);
-        $commentsCount = $this->countTotalComments($comments);
-        return ["count" => $commentsCount, "comments" => $comments];
+        $commentTrees = $this->makeTrees($rawComments);
+        $commentsCount = $this->countTotalComments($commentTrees);
+        return ["count" => $commentsCount, "comments" => $commentTrees];
     }
 
     public function commentExists($commentId)
@@ -42,23 +52,30 @@ class CommentHelper
         return false;
     }
 
-    public function appendToPath($old, $new)
+    public function makeTrees($rawComments)
     {
-        return $this->normalizePath($old) . "." . $this->normalizePath($new);
+        $trees = [];
+        $treeRoot = null;
+        foreach($rawComments as $comment) {
+            if($comment->getParentId() == null) { // tree root
+                $treeRoot = new TreeNode($comment);
+                $trees[$comment->getId()] = $treeRoot;
+            } else if($comment->getParentId() == $treeRoot->getObject()->getId()) {
+                $treeRoot->addChildNode(new TreeNode($comment));
+            } else {
+                $parentNode = $treeRoot->findChildByObjectId($comment->getParentId());
+                $parentNode->addChildNode(new TreeNode($comment));
+            }
+        }
+        return $trees;
     }
 
-    public function getMargin($path)
-    {
-        $split = $this->splitPath($path);
-        return (count($split) - 1) * 25;
-    }
-
-    public function splitPath($path)
+    private function splitPath($path)
     {
         return preg_split("/[.]/", $path);
     }
 
-    public function normalizePath($path)
+    private function normalizePath($path)
     {
         $split = $this->splitPath($path);
         $newStr = "";
@@ -68,50 +85,11 @@ class CommentHelper
         return $newStr;
     }
 
-    public function parseComments($comments)
-    {
-        $result = [];
-        foreach($comments as $comment) {
-            $result[$comment->getId()] = $comment;
-        }
-        return $result;
-    }
-
-    public function getParent($path, Comment $treeRoot)
-    {
-        $split = $this->splitPath($path);
-        if(count($split) <= 2) {
-            return $treeRoot;
-        }
-        $childNodes = $treeRoot->getChildren();
-        $arr = [$childNodes[intval($split[1])]];
-        for($i = 1; $i < count($split) - 2; $i++) {
-            $children = $arr[$i-1]->getChildren();
-            $arr[$i] = $children[intval($split[$i + 1])];
-        }
-        return $arr[count($arr) - 1];
-    }
-
-    public function makeTrees($comments)
-    {
-        $trees = [];
-        foreach($comments as $comment) {
-            $split = $this->splitPath($comment->getParentPath());
-            if(count($split) == 1) { // tree root
-                $trees[intval($split[0])] = $comment;
-            } else {
-                $parentNode = $this->getParent($comment->getParentPath(), $trees[intval($split[0])]);
-                $parentNode->addChildNode($comment);
-            }
-        }
-        return $trees;
-    }
-
-    public function countTotalComments($comments)
+    private function countTotalComments(array $comments)
     {
         $size = 0;
-        foreach($comments as $id => $comment) {
-            $size += $comment->countDescendants() + 1;
+        foreach($comments as $id => $treeNode) {
+            $size += $treeNode->countDescendants() + 1;
         }
         return $size;
     }

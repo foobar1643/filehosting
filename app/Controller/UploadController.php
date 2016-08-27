@@ -31,7 +31,7 @@ class UploadController
         if($request->isPost()) {
             $authHelper = new AuthHelper(new CookieHelper($request, $response));
             $file = $this->createFromRequest($request);
-            $errors = $this->validator->validateFile($file);
+            $errors = $this->validator->validateUploadedFile($file->getUploadedFile());
             if(!$errors) {
                 if(!$authHelper->isAuthorized()) {
                     $response = $authHelper->authorizeUser();
@@ -43,8 +43,7 @@ class UploadController
         }
         return $this->view->render($response, 'upload.twig',
             ['sizeLimit' => $this->config->getValue('app', 'sizeLimit'),
-            'errors' => $errors, 'lang' => $args['lang'],
-            'langHelper' => new LanguageHelper($request)]);
+            'errors' => $errors, 'langHelper' => new LanguageHelper($request)]);
     }
 
     private function createFromRequest(Request $request)
@@ -52,8 +51,9 @@ class UploadController
         $uploadedFiles = $request->getUploadedFiles();
         if(array_key_exists("uploaded-file", $uploadedFiles)) {
             $file = new File();
-            $file->fromUploadedFile($uploadedFiles['uploaded-file']);
-            $file->setUploader('Anonymous');
+            $file->setUploadedFile($uploadedFiles['uploaded-file'])
+                //notes: Default uploader name for user, displays in file information section 
+                ->setUploader(dcgettext('en_US', 'Anonymous', LC_MESSAGES));
             return $file;
         }
         return new File();

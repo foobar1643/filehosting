@@ -12,11 +12,21 @@ class ConfigTest extends TestCase
     protected function setUp()
     {
         $this->config = new Config();
+        $this->config->loadFromFile(__DIR__ . "/Assets/test-config.ini");
     }
 
     public function testGetValue()
     {
-        $this->assertEquals('127.0.0.1', $this->config->getValue('db', 'host'));
+        $this->assertEquals(500, $this->config->getValue('app', 'sizeLimit'));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testWrongFileLoading()
+    {
+        $config = new Config();
+        $this->config->loadFromFile(__DIR__ . "/Assets/test-wrong-config.ini");
     }
 
     /**
@@ -24,7 +34,7 @@ class ConfigTest extends TestCase
      */
     public function testFailureGetValue()
     {
-        $this->config->getValue('example', 'failure');
+        $this->config->getValue('non-existing-key', 'failure');
     }
 
 }

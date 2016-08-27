@@ -27,7 +27,10 @@ class PaginationHelperTest extends TestCase
 
     public function testLink()
     {
-        $this->assertEquals("example.php?page=5", self::$pager->getLink(5));
+        $link = self::$pager->getLink(5);
+        $this->assertNotEmpty(self::$pager->getLink(5));
+        $this->assertNotEquals(self::$pager->getLink(5), self::$pager->getLink(2));
+        $this->assertFalse(strpos(" ", self::$pager->getLink(5)));
     }
 
     public function testPageChecking()

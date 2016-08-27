@@ -6,8 +6,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="shortcut icon" type="image/x-icon" href="/media/img/favicon.ico"/>
         <link href="/media/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/media/css/style.css" rel="stylesheet">
         <link href="/media/css/videojs/video-js.min.css" rel="stylesheet">
+        <link href="/media/css/style.css" rel="stylesheet">
         <title>Filehosting - {% block pageTitle%}{% endblock %}</title>
     </head>
     <body>
@@ -22,22 +22,29 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="/{{ lang }}/" id="bar-title">Filehosting</a>
+                    <a class="navbar-brand" href="{{ linkHelper.generateLink('/') }}" id="bar-title">Filehosting</a>
                 </div>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right">
-                        <li {% if navLink == "search" %} class="active" {% endif %}><a href="/{{ lang }}/search/">{% trans %}Search {% notes %} Navbar menu button {% endtrans %}</a></li>
-                        <li {% if navLink == "upload" %} class="active" {% endif %}><a href="/{{ lang }}/upload/">{% trans %}Upload file {% notes %} Navbar menu button {% endtrans %}</a></li>
-                        <li {% if navLink == "settings" %} class="active" {% endif %}><a href="/{{ lang }}/settings/">{% trans %}Settings {% notes %} Navbar menu button {% endtrans %}</a></li>
+                        <li {% if navLink == "search" %} class="active" {% endif %}>
+                            <a href="{{ linkHelper.generateLink('/search/') }}">{% trans %}Search {% notes %} Navbar menu button {% endtrans %}</a>
+                        </li>
+                        <li {% if navLink == "upload" %} class="active" {% endif %}>
+                            <a href="{{ linkHelper.generateLink('/upload/') }}">{% trans %}Upload file {% notes %} Navbar menu button {% endtrans %}</a>
+                        </li>
+                        <li {% if navLink == "settings" %} class="active" {% endif %}>
+                            <a href="{{ linkHelper.generateLink('/settings/') }}">{% trans %}Settings {% notes %} Navbar menu button {% endtrans %}</a>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
         {% if langHelper.canShowLangMsg %}
             <div class="container-fluid">
-                <div class="alert alert-warning col-xs-8 col-xs-offset-2" role="alert">
+                <div class="alert alert-warning col-xs-6 col-xs-offset-3" role="alert">
+                    {% set settingsLink = linkHelper.generateLink('/settings/') %}
                     {% trans %}
-                    This website is available in your native language. If you want to change language, you can do so on the <a href="/{{ lang }}/settings/">settings page</a>
+                    This website is available in your native language. If you want to change language, you can do so on the <a href="{{ settingsLink }}">settings page</a>
                     {% endtrans %}
                 </div>
             </div>

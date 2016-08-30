@@ -2,24 +2,41 @@
 
 namespace Filehosting\Helper;
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
-use \Filehosting\Entity\File;
-use \Filehosting\Exception\FileUploadException;
-use \Filehosting\Database\FileMapper;
-use \Filehosting\Database\SearchGateway;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Filehosting\Entity\File;
+use Filehosting\Exception\FileUploadException;
+use Filehosting\Database\FileMapper;
+use Filehosting\Database\SearchGateway;
 use Slim\Http\UploadedFile;
 
+/**
+ * Adds or deletes files from the database.
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class FileHelper
 {
+    /** @var Config $request An app Config class instance. */
     private $config;
+    /** @var PreviewHelper $request PreviewHelper instance. */
     private $previewHelper;
+    /** @var PathingHelper $request PathingHelper instance. */
     private $pathingHelper;
+    /** @var FileMapper $request FileMapper instance. */
     private $fileMapper;
+    /** @var CommentMapper $request CommentMapper insance. */
     private $commentMapper;
+    /** @var SearchGateway $request SearchGateway instance. */
     private $searchGateway;
+    /** @var IdHelper $request IdHelper instance. */
     private $idHelper;
 
+    /**
+     * Constructor.
+     *
+     * @param \Slim\Container $c DI container.
+     */
     public function __construct(\Slim\Container $c)
     {
         $this->config = $c->get('config');
@@ -31,6 +48,15 @@ class FileHelper
         $this->idHelper =  $c->get('IdHelper');
     }
 
+    /**
+     * Adds a given file to the database and moves it to the storage folder.
+     *
+     * @param File $file A file entity to add.
+     *
+     * @throws Exception if failed to access or create a storage folder
+     *
+     * @return File
+     */
     public function uploadFile(File $file)
     {
         $this->fileMapper->beginTransaction();
@@ -51,6 +77,15 @@ class FileHelper
         return $file;
     }
 
+    /**
+     * Deletes a given file from the database and a storage folder.
+     *
+     * @param File $file A file entity to delete.
+     *
+     * @throws Exception if failed to delete file from the filesystem
+     *
+     * @return bool
+     */
     public function deleteFile(File $file)
     {
         $fileInfo = $this->idHelper->analyzeFile($file);
@@ -66,6 +101,15 @@ class FileHelper
         return true;
     }
 
+    /**
+     * Checks if a file with a given ID exists.
+     *
+     * @todo Refactor this code, make it more simple.
+     *
+     * @param int $fileId A file ID in the database.
+     *
+     * @return bool
+     */
     public function fileExists($fileId)
     {
         $file = $this->fileMapper->getFile($fileId);
@@ -75,6 +119,19 @@ class FileHelper
         return false;
     }
 
+    /**
+     * Returns a Response object with HTTP headers for X-Sendfile file download.
+     *
+     * @todo Make this static and relocate to Utils class.
+     *
+     * @param Request $fileId A file ID in the database.
+     * @param Response $fileId A file ID in the database.
+     * @param File $fileId A file ID in the database.
+     *
+     * @throws Exception if X-Sendfile module is not found.
+     *
+     * @return Response
+     */
     public function getXsendfileHeaders(Request $request, Response $response, File $file)
     {
         $serverParams = $request->getServerParams();
@@ -89,6 +146,15 @@ class FileHelper
         throw new \Exception(_("X-Sendfile either is not enabled or not supported by the server."));
     }
 
+    /**
+     * Checks if given file folder exists, and if not, trys to create it.
+     *
+     * @param int $fileId A file ID in the database.
+     *
+     * @throws FileUploadException if folder is not found and it cannot be created.
+     *
+     * @return bool
+     */
     private function isFileFolderAvailable($fileFolder)
     {
         if(!is_dir($fileFolder)) {

@@ -2,32 +2,65 @@
 
 namespace Filehosting\Database;
 
-use \Filehosting\Entity\File;
+use Filehosting\Entity\File;
 
+/**
+ * Provides a simple interface that works with a 'files' table in the database.
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class FileMapper
 {
+    /** @var PDO $pdo PDO object. */
     private $pdo;
 
+    /**
+     * Constructor.
+     *
+     * @param PDO $pdo PDO object.
+     */
     public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
     }
 
+    /**
+     * Begins database transaction.
+     *
+     * @return void
+     */
     public function beginTransaction()
     {
         $this->pdo->beginTransaction();
     }
 
+    /**
+     * Commits database transaction.
+     *
+     * @return void
+     */
     public function commit()
     {
         $this->pdo->commit();
     }
 
+    /**
+     * Rolls back database transaction.
+     *
+     * @return void
+     */
     public function rollBack()
     {
         $this->pdo->rollBack();
     }
 
+    /**
+     * Deletes file from the database.
+     *
+     * @param File $file A File entity to delete.
+     *
+     * @return void
+     */
     public function deleteFile(File $file)
     {
         $query = $this->pdo->prepare("DELETE FROM files WHERE id = :id_bind");
@@ -35,6 +68,13 @@ class FileMapper
         $query->execute();
     }
 
+    /**
+     * Updates file in the database.
+     *
+     * @param File $file A File entity to update.
+     *
+     * @return void
+     */
     public function updateFile(File $file)
     {
         $query = $this->pdo->prepare("UPDATE files SET name = :name_bind,"
@@ -45,6 +85,13 @@ class FileMapper
         $query->execute();
     }
 
+    /**
+     * Returns an array with last files.
+     *
+     * @param int $count A number of files to select.
+     *
+     * @return array
+     */
     public function getLastFiles($count)
     {
         $query = $this->pdo->prepare("SELECT * FROM files ORDER BY upload_date DESC LIMIT 10");
@@ -53,6 +100,13 @@ class FileMapper
         return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
     }
 
+    /**
+     * Returns an array with popular files.
+     *
+     * @param int $count A number of files to select.
+     *
+     * @return array
+     */
     public function getPopularFiles($count)
     {
         $query = $this->pdo->prepare("SELECT * FROM files ORDER BY downloads DESC LIMIT 10");
@@ -61,6 +115,13 @@ class FileMapper
         return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
     }
 
+    /**
+     * Adds a file to the database and returns the ID of the added file.
+     *
+     * @param File $file A File entity to be added.
+     *
+     * @return int
+     */
     public function createFile(File $file)
     {
         $query = $this->pdo->prepare("INSERT INTO files (name, uploader, size, auth_token)"
@@ -73,6 +134,13 @@ class FileMapper
         return $query->fetchColumn();
     }
 
+    /**
+     * Counts the amount of files in the database.
+     *
+     * @todo Remove this method.
+     *
+     * @return int
+     */
     public function countFiles()
     {
         $query = $this->pdo->prepare("SELECT COUNT(*) FROM files");
@@ -80,6 +148,16 @@ class FileMapper
         return $query->fetchColumn();
     }
 
+    /**
+     * Selects files from the database. Returns an array with selected files.
+     *
+     * @todo Remove this method.
+     *
+     * @param int $limit A File entity to delete.
+     * @param int $offset A File entity to delete.
+     *
+     * @return array
+     */
     public function getFiles($limit, $offset)
     {
         $query = $this->pdo->prepare("SELECT * FROM files ORDER BY id DESC LIMIT :limit_bind OFFSET :offset_bind");
@@ -89,6 +167,15 @@ class FileMapper
         return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
     }
 
+    /**
+     * Filters files using their IDs, reutrns files that are present in the database.
+     *
+     * @todo Refactor this code.
+     *
+     * @param File $file A File entity to delete.
+     *
+     * @return array
+     */
     public function getFilteredFiles($ids)
     {
         if(empty($ids)) {
@@ -104,6 +191,13 @@ class FileMapper
         return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
     }
 
+    /**
+     * Returns a single file from the database.
+     *
+     * @param int $id ID of the file in the database.
+     *
+     * @return File
+     */
     public function getFile($id)
     {
         $query = $this->pdo->prepare("SELECT * FROM files WHERE id = :id_bind");

@@ -3,17 +3,17 @@
 require(__DIR__ . "/../vendor/autoload.php");
 require(__DIR__ . '/../vendor/james-heinrich/getid3/getid3/getid3.php');
 
-use \Filehosting\Database\FileMapper;
-use \Filehosting\Database\SearchGateway;
-use \Filehosting\Database\CommentMapper;
-use \Filehosting\Config;
-use \Filehosting\Helper\FileHelper;
-use \Filehosting\Helper\CommentHelper;
-use \Filehosting\Helper\PathingHelper;
-use \Filehosting\Helper\IdHelper;
-use \Filehosting\Validation\Validation;
-use \Filehosting\Helper\SearchHelper;
-use \Filehosting\Helper\PreviewHelper;
+use Filehosting\Database\FileMapper;
+use Filehosting\Database\SearchGateway;
+use Filehosting\Database\CommentMapper;
+use Filehosting\Config;
+use Filehosting\Helper\FileHelper;
+use Filehosting\Helper\CommentHelper;
+use Filehosting\Helper\PathingHelper;
+use Filehosting\Helper\IdHelper;
+use Filehosting\Validation\Validation;
+use Filehosting\Helper\SearchHelper;
+use Filehosting\Helper\PreviewHelper;
 
 set_error_handler(function ($errno, $errstr, $errfile, $errline)
 {

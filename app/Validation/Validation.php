@@ -2,17 +2,30 @@
 
 namespace Filehosting\Validation;
 
-use \Filehosting\Entity\File;
-use \Filehosting\Entity\Comment;
-use \Filehosting\Helper\Utils;
+use Filehosting\Entity\File;
+use Filehosting\Entity\Comment;
+use Filehosting\Helper\Utils;
 use Slim\Http\UploadedFile;
 
+/**
+ * Validates File and Comment entities.
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class Validation
 {
+    /** @var \Slim\Container $container DI container instance. */
     private $container;
+    /** @var CommentMapper $commentMapper CommentMapper instance. */
     private $commentMapper;
+    /** @var FileMapper $fileMapper FileMapper instance. */
     private $fileMapper;
 
+    /**
+     * Constructor.
+     *
+     * @param Container $c DI container.
+     */
     public function __construct(\Slim\Container $c)
     {
         $this->container = $c;
@@ -20,6 +33,13 @@ class Validation
         $this->fileMapper = $c->get('FileMapper');
     }
 
+    /**
+     * Validates given UploadedFile object and returns an array with or without errors.
+     *
+     * @param UploadedFile $uploadedFile UploadedFile object to validate.
+     *
+     * @return array
+     */
     public function validateUploadedFile(UploadedFile $uploadedFile)
     {
         $config = $this->container->get('config');
@@ -36,6 +56,13 @@ class Validation
         return $errors;
     }
 
+    /**
+     * Validates given Comment object and returns an array with or without errors.
+     *
+     * @param Comment $comment Comment object to validate.
+     *
+     * @return array
+     */
     public function validateComment(Comment $comment)
     {
         $parentComment = null;

@@ -2,18 +2,39 @@
 
 namespace Filehosting\Helper;
 
-use \Filehosting\Entity\Comment;
-use \Filehosting\Entity\TreeNode;
+use Filehosting\Entity\Comment;
+use Filehosting\Entity\TreeNode;
+use Filehosting\Database\CommentMapper;
 
+/**
+ * Adds, deletes and selects comments from the database.
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class CommentHelper
 {
+    /** @var CommentMapper $commentMapper CommentMapper instance */
     private $commentMapper;
 
-    public function __construct(\Filehosting\Database\CommentMapper $mapper)
+    /**
+     * Constructor.
+     *
+     * @param CommentMapper $mapper A CommentMapper instance.
+     */
+    public function __construct(CommentMapper $mapper)
     {
         $this->commentMapper = $mapper;
     }
 
+    /**
+     * Adds given comment to the database.
+     *
+     * @todo Add database locks when adding comments.
+     *
+     * @param Comment $comment A comment entity.
+     *
+     * @return Comment
+     */
     public function addComment(Comment $comment)
     {
         if(is_null($comment->getParentId())) { // root comment
@@ -35,6 +56,13 @@ class CommentHelper
         return $comment;
     }
 
+    /**
+     * Gets comments for a given file ID.
+     *
+     * @param int $fileId File ID in the database.
+     *
+     * @return Array
+     */
     public function getComments($fileId)
     {
         $rawComments = $this->commentMapper->getComments($fileId);
@@ -43,6 +71,15 @@ class CommentHelper
         return ["count" => $commentsCount, "comments" => $commentTrees];
     }
 
+    /**
+     * Checks if comment with a given ID exists.
+     *
+     * @todo Refactor this code, make it more simple.
+     *
+     * @param int $commentId Comment ID in the database.
+     *
+     * @return Array
+     */
     public function commentExists($commentId)
     {
         $comment = $this->commentMapper->getComment($commentId);
@@ -52,6 +89,13 @@ class CommentHelper
         return false;
     }
 
+    /**
+     * Makes a Tree data structure out of array of comments.
+     *
+     * @param array $rawComments Array of comments.
+     *
+     * @return Array
+     */
     public function makeTrees($rawComments)
     {
         $trees = [];
@@ -70,11 +114,27 @@ class CommentHelper
         return $trees;
     }
 
+    /**
+     * Splits a given matpath to an array.
+     *
+     * @param string $path Matpath of the comment.
+     *
+     * @return Array
+     */
     private function splitPath($path)
     {
         return preg_split("/[.]/", $path);
     }
 
+    /**
+     * Normalizes given matpath, adding leading zeroes to numbers.
+     *
+     * @todo Refactor this code.
+     *
+     * @param string $path Matpath of the comment.
+     *
+     * @return string
+     */
     private function normalizePath($path)
     {
         $split = $this->splitPath($path);
@@ -85,6 +145,13 @@ class CommentHelper
         return $newStr;
     }
 
+    /**
+     * Counts total number of comments that is present in a tree sturcture.
+     *
+     * @param array $comments Array of Tree stuctured comments.
+     *
+     * @return int
+     */
     private function countTotalComments(array $comments)
     {
         $size = 0;

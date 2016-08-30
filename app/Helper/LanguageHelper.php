@@ -2,21 +2,42 @@
 
 namespace Filehosting\Helper;
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Slim\Http\Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Http\Response;
 
+/**
+ * Gets an application or user locale, checks if language change message needs to be shown to user.
+ *
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class LanguageHelper
 {
+    /** @var string DEFAULT_LOCALE Default application locale. */
     const DEFAULT_LOCALE = "en_US";
+    /** @var array AVAILABLE_LANGUAGES Available application languages. */
     const AVAILABLE_LANGUAGES = ["en", "ru"];
 
+    /** @var Request $request Slim Framework request instance. */
     private $request;
 
+    /**
+     * Constructor.
+     *
+     * @param Request $request Slim Framework request instance.
+     */
     public function __construct(Request $request)
     {
         $this->request = $request;
     }
 
+    /**
+     * Returns readable language display name. Example: en -> English.
+     *
+     * @param string $language String with a language name.
+     *
+     * @return string
+     */
     public function getLanguageDisplayName($language)
     {
         $locale = $this->composeFromLanguage($language);
@@ -24,6 +45,13 @@ class LanguageHelper
         return mb_strtoupper(mb_substr($displayLanguage, 0, 1)) . mb_substr($displayLanguage, 1);
     }
 
+    /**
+     * Checks if language change message needs to be shown to user.
+     *
+     * @todo Refactor a return operator.
+     *
+     * @return bool
+     */
     public function canShowLangMsg()
     {
         $cookieHelper = new CookieHelper($this->request, new Response());
@@ -36,11 +64,23 @@ class LanguageHelper
         return false;
     }
 
+    /**
+     * Returns a constant with available languages. Generally this is used in templates.
+     *
+     * @return array
+     */
     public function getAvailableLanguages()
     {
         return self::AVAILABLE_LANGUAGES;
     }
 
+    /**
+     * Checks if a given language is available in the application.
+     *
+     * @todo Refactor a return operator.
+     *
+     * @return bool
+     */
     public function languageAvailable($locale)
     {
         $parsedLocale = \Locale::parseLocale($locale);
@@ -50,6 +90,11 @@ class LanguageHelper
         return false;
     }
 
+    /**
+     * Returns current application locale.
+     *
+     * @return string
+     */
     public function getAppLocale()
     {
         $requestTarget = $this->request->getRequestTarget();
@@ -58,6 +103,11 @@ class LanguageHelper
         return $this->composeFromLanguage($urlLanguage);
     }
 
+    /**
+     * Returns current user locale from HTTP headers (if present).
+     *
+     * @return string|null
+     */
     public function getUserLocale()
     {
         if($this->request->hasHeader('HTTP_ACCEPT_LANGUAGE')) {
@@ -67,6 +117,13 @@ class LanguageHelper
         return null;
     }
 
+    /**
+     * Composes a locale from given language string
+     *
+     * @param string $language A language string.
+     *
+     * @return string
+     */
     private function composeFromLanguage($language)
     {
         $parsedLocale = \Locale::parseLocale($language);

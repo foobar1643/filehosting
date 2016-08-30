@@ -2,8 +2,20 @@
 
 namespace Filehosting\Helper;
 
+/**
+ * General utility class.
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class Utils
 {
+    /**
+     * Generates a random string with a given length. This is not cryptographically secure.
+     *
+     * @param int $length A length of a random string.
+     *
+     * @return string
+     */
     public static function generateToken($length)
     {
         $result = null;
@@ -16,6 +28,13 @@ class Utils
         return $result;
     }
 
+    /**
+     * Formats a given size to readable string.
+     *
+     * @param int $size A size number to format.
+     *
+     * @return string
+     */
     public static function formatSize($size)
     {
         switch(true) { // 1073741824 B - 1 GB, 1048576 B - 1 MB, 1024 B - 1 KB
@@ -34,6 +53,13 @@ class Utils
         }
     }
 
+    /**
+     * Parses a given file upload error code and returns a readable string.
+     *
+     * @param int $code A upload error code.
+     *
+     * @return string
+     */
     public static function parseFileFormErrorCode($code)
     {
         switch($code) {

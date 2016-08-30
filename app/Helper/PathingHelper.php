@@ -2,7 +2,7 @@
 
 namespace Filehosting\Helper;
 
-use \Filehosting\Entity\File;
+use Filehosting\Entity\File;
 
 class PathingHelper
 {

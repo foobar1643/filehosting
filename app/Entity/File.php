@@ -1,7 +1,6 @@
 <?php
 
 namespace Filehosting\Entity;
-use Slim\Http\UploadedFile;
 
 class File
 {
@@ -33,7 +32,7 @@ class File
         return $this->uploadedFile;
     }
 
-    public function setUploadedFile(UploadedFile $uploaded)
+    public function setUploadedFile(\Slim\Http\UploadedFile $uploaded)
     {
         $this->uploadedFile = $uploaded;
         $this->name = $uploaded->getClientFilename();

@@ -2,7 +2,7 @@
 
 namespace Filehosting\Exception;
 
-use \Filehosting\Helper\Utils;
+use Filehosting\Helper\Utils;
 
 class FileUploadException extends \Exception
 {

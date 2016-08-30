@@ -2,17 +2,32 @@
 
 namespace Filehosting\Controller;
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
-use \Filehosting\Entity\Comment;
-use \Filehosting\Helper\CommentHelper;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Filehosting\Entity\Comment;
+use Filehosting\Helper\CommentHelper;
 
+/**
+ * Callable, provides a way to add comments to the database.
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class CommentController
 {
+    /** @var Filehosting\Validation\Validation $validator Validation object instance. */
     private $validator;
+    /** @var \Slim\Container $container DI container. */
     private $container;
+    /** @var CommentHelper $commentHelper CommentHelper instance. */
     private $commentHelper;
 
+    /**
+     * Constructor.
+     *
+     * @todo Remove unused container class field.
+     *
+     * @param \Slim\Container $c DI container.
+     */
     public function __construct(\Slim\Container $c)
     {
         $this->container = $c;
@@ -20,6 +35,15 @@ class CommentController
         $this->commentHelper = $c->get('CommentHelper');
     }
 
+    /**
+     * A method that allows to use this class as a callable.
+     *
+     * @param Request $request Slim Framework request instance.
+     * @param Response $response Slim Framework response instance.
+     * @param array $args Array with additional arguments.
+     *
+     * @return array
+     */
     public function __invoke(Request $request, Response $response, $args)
     {
         $getVars = $request->getQueryParams();
@@ -32,7 +56,17 @@ class CommentController
         return ["errors" => $errors, "comment" => $comment];
     }
 
-    public function parsePostRequest($postVars, $fileId)
+    /**
+     * Parses POST request and returns a Comment entity.
+     *
+     * @todo Make this method private.
+     *
+     * @param array $postVars Array with variables from POST request.
+     * @param int $fileId ID of the file in the database.
+     *
+     * @return Comment
+     */
+    public function parsePostRequest(array $postVars, $fileId)
     {
         $comment = new Comment();
         $dateTime = new \DateTime("now");

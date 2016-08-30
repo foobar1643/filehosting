@@ -2,24 +2,50 @@
 
 namespace Filehosting\Controller;
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
-use \Filehosting\Helper\PaginationHelper;
-use \Filehosting\Helper\LanguageHelper;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Filehosting\Helper\PaginationHelper;
+use Filehosting\Helper\LanguageHelper;
 
+/**
+ * Callable, provides a way to search through files.
+ *
+ * @todo Refactor this code.
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class SearchController
 {
+    /** @var int RESULTS_PER_PAGE Number of elements to show per page. */
     const RESULTS_PER_PAGE = 15;
 
+    /** @var mixed $view View object. */
     private $view;
+    /** @var SearchHelper $searchHelper SearchHelper instance. */
     private $searchHelper;
 
+    /**
+     * Constructor.
+     *
+     * @param \Slim\Container $c DI container.
+     */
     public function __construct(\Slim\Container $c)
     {
         $this->view = $c->get('view');
         $this->searchHelper = $c->get('SearchHelper');
     }
 
+    /**
+     * A method that allows to use this class as a callable.
+     *
+     * @todo Refactor this code.
+     *
+     * @param Request $request Slim Framework request instance.
+     * @param Response $response Slim Framework response instance.
+     * @param array $args Array with additional arguments.
+     *
+     * @return Response
+     */
     public function __invoke(Request $request, Response $response, $args)
     {
         $params = $request->getQueryParams();

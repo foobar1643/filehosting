@@ -2,21 +2,42 @@
 
 namespace Filehosting\Helper;
 
-use \Filehosting\Entity\File;
+use Filehosting\Entity\File;
 
+/**
+ * Generates thumbnails for files.
+ *
+ * @author foobar1643 <foobar76239@gmail.com>
+ */
 class PreviewHelper
 {
+    /** @var PathingHelper $pathingHelper PathingHelper instance. */
     private $pathingHelper;
+    /** @var resource $image Current image resource. */
     private $image;
-    private $file;
 
+    /** @var array ALLOWED_EXTENSIONS Allowed file extensions array. */
     const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif"];
 
+    /**
+     * Constructor.
+     *
+     * @param PathingHelper $h A pathing helper instance.
+     */
     public function __construct(PathingHelper $h)
     {
         $this->pathingHelper = $h;
     }
 
+    /**
+     * Loads given file to the memory.
+     *
+     * @param File $file A file entity to load.
+     *
+     * @throws Exception if file of this type can't be loaded.
+     *
+     * @return resource|bool
+     */
     private function loadImage(File $file)
     {
         $pathToFile = $this->pathingHelper->getPathToFile($file);
@@ -33,6 +54,14 @@ class PreviewHelper
         }
     }
 
+    /**
+     * Returns a compression ratio for a given width and height parameters.
+     *
+     * @param int $width Width of an image.
+     * @param int $height Height of an image.
+     *
+     * @return int
+     */
     private function getMaxRatio($width, $height)
     {
         $sizeSum = $width + $height;
@@ -47,6 +76,14 @@ class PreviewHelper
         return $maxRatio;
     }
 
+    /**
+     * Returns an array with compressed width and height for a given width and height values.
+     *
+     * @param int $width Width of an image.
+     * @param int $height Height of an image.
+     *
+     * @return array
+     */
     private function getPreviewSize($width, $height)
     {
         if($width > $height) {
@@ -60,6 +97,17 @@ class PreviewHelper
         return ["width" => ceil($width * $ratio), "height" => ceil($height * $ratio)];
     }
 
+    /**
+     * Generates a thumbnail for a given file entity.
+     *
+     * @todo Think about how Exceptions are thrown, maybe it is unnecessary to throw it here?
+     *
+     * @param File $file File entity for which the thumbnail will be generated.
+     *
+     * @throws Exception if can't generate a thumbnail for this file type.
+     *
+     * @return void
+     */
     public function generatePreview(File $file)
     {
         if(!in_array(strtolower($file->getExtension()), self::ALLOWED_EXTENSIONS)) {
@@ -78,6 +126,15 @@ class PreviewHelper
         imagedestroy($image);
     }
 
+    /**
+     * Deletes a thumbnail for a given file entity.
+     *
+     * @param File $file File entity for which the thumbnail will be deleted.
+     *
+     * @throws Exception if can't delete a file from the filesystem.
+     *
+     * @return bool
+     */
     public function deletePreview(File $file)
     {
         if(!unlink("{$this->pathingHelper->getPathToThumbnails()}/{$file->getThumbnailName()}")) {

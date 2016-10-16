@@ -24,6 +24,7 @@
 		"phpunit/dbunit": "^2.0"
 	},
 	"scripts": {
-		"post-update-cmd": "./post-install.sh"
+		"post-install-cmd": "Filehosting\\Installer\\FilehostingInstaller::installDependencies",
+		"post-update-cmd": "Filehosting\\Installer\\FilehostingInstaller::installDependencies"
 	}
 }

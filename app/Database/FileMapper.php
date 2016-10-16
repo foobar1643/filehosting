@@ -135,42 +135,7 @@ class FileMapper
     }
 
     /**
-     * Counts the amount of files in the database.
-     *
-     * @todo Remove this method.
-     *
-     * @return int
-     */
-    public function countFiles()
-    {
-        $query = $this->pdo->prepare("SELECT COUNT(*) FROM files");
-        $query->execute();
-        return $query->fetchColumn();
-    }
-
-    /**
-     * Selects files from the database. Returns an array with selected files.
-     *
-     * @todo Remove this method.
-     *
-     * @param int $limit A File entity to delete.
-     * @param int $offset A File entity to delete.
-     *
-     * @return array
-     */
-    public function getFiles($limit, $offset)
-    {
-        $query = $this->pdo->prepare("SELECT * FROM files ORDER BY id DESC LIMIT :limit_bind OFFSET :offset_bind");
-        $query->bindValue(":limit_bind", $limit, \PDO::PARAM_INT);
-        $query->bindValue(":offset_bind", $offset, \PDO::PARAM_INT);
-        $query->execute();
-        return $query->fetchAll(\PDO::FETCH_CLASS, '\Filehosting\Entity\File');
-    }
-
-    /**
      * Filters files using their IDs, reutrns files that are present in the database.
-     *
-     * @todo Refactor this code.
      *
      * @param File $file A File entity to delete.
      *

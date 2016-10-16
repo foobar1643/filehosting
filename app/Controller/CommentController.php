@@ -16,21 +16,16 @@ class CommentController
 {
     /** @var Filehosting\Validation\Validation $validator Validation object instance. */
     private $validator;
-    /** @var \Slim\Container $container DI container. */
-    private $container;
     /** @var CommentHelper $commentHelper CommentHelper instance. */
     private $commentHelper;
 
     /**
      * Constructor.
      *
-     * @todo Remove unused container class field.
-     *
      * @param \Slim\Container $c DI container.
      */
     public function __construct(\Slim\Container $c)
     {
-        $this->container = $c;
         $this->validator = $c->get('Validation');
         $this->commentHelper = $c->get('CommentHelper');
     }
@@ -59,14 +54,12 @@ class CommentController
     /**
      * Parses POST request and returns a Comment entity.
      *
-     * @todo Make this method private.
-     *
      * @param array $postVars Array with variables from POST request.
      * @param int $fileId ID of the file in the database.
      *
      * @return Comment
      */
-    public function parsePostRequest(array $postVars, $fileId)
+    protected function parsePostRequest(array $postVars, $fileId)
     {
         $comment = new Comment();
         $dateTime = new \DateTime("now");

@@ -48,8 +48,6 @@ class LanguageHelper
     /**
      * Checks if language change message needs to be shown to user.
      *
-     * @todo Refactor a return operator.
-     *
      * @return bool
      */
     public function canShowLangMsg()
@@ -58,10 +56,7 @@ class LanguageHelper
         $msgShown = $cookieHelper->getRequestCookie('langChangeShown');
         $appLocale = $this->getAppLocale();
         $userLocale = $this->getUserLocale();
-        if($userLocale != $appLocale && $this->languageAvailable($userLocale) && intval($msgShown) < 7) {
-            return true;
-        }
-        return false;
+        return ($userLocale != $appLocale && $this->languageAvailable($userLocale) && intval($msgShown) < 7);
     }
 
     /**
@@ -77,17 +72,12 @@ class LanguageHelper
     /**
      * Checks if a given language is available in the application.
      *
-     * @todo Refactor a return operator.
-     *
      * @return bool
      */
     public function languageAvailable($locale)
     {
         $parsedLocale = \Locale::parseLocale($locale);
-        if(!is_null($locale) && in_array($parsedLocale['language'], self::AVAILABLE_LANGUAGES)) {
-            return true;
-        }
-        return false;
+        return (!is_null($locale) && in_array($parsedLocale['language'], self::AVAILABLE_LANGUAGES));
     }
 
     /**

@@ -31,14 +31,11 @@ class DownloadController
     public function __construct(\Slim\Container $c)
     {
         $this->fileMapper = $c->get('FileMapper');
-        $this->pathingHelper = $c->get('PathingHelper');
         $this->fileHelper = $c->get('FileHelper');
     }
 
     /**
      * A method that allows to use this class as a callable.
-     *
-     * @todo Refactor this code.
      *
      * @param Request $request Slim Framework request instance.
      * @param Response $response Slim Framework response instance.
@@ -50,40 +47,18 @@ class DownloadController
      */
     public function __invoke(Request $request, Response $response, $args)
     {
-        $params = $request->getQueryParams();
-        if($this->fileHelper->fileExists($args['id'])) {
+        if(!$this->fileHelper->fileExists($args['id'])) {
+            throw new \Slim\Exception\NotFoundException($request, $response);
+        } else {
             $file = $this->fileMapper->getFile($args['id']);
-            $filePath = $this->pathingHelper->getPathToFile($file);
-            if(!isset($params['type']) || $params['type'] != 'stream') {
-                $file->setDownloads($file->getDownloads() + 1);
-                $this->fileMapper->updateFile($file);
-            }
-            $response = $this->getDownloadHeaders($response);
-            $response = $response->withHeader('Content-Length', filesize($filePath));
+            $file = ($request->getQueryParam('type') !== 'stream') ? $this->fileHelper->incrementDownloadsCounter($file) : $file;
+            $response = $fileHelper->getDownloadHeaders($response, $file);
             try {
                 $response = $this->fileHelper->getXsendfileHeaders($request, $response, $file);
             } catch(\Exception $e) {
-                $fileStream = new Stream(fopen($filePath, "r"));
-                $response = $response->write($fileStream->getContents());
+                $response = $this->fileHelper->writeToResponse($response, $file);
             }
             return $response;
-        } else {
-            throw new \Slim\Exception\NotFoundException($request, $response);
         }
-    }
-
-    /**
-     * Returns a Response object with headers for file download.
-     *
-     * @param Response $response Slim Framework response instance.
-     *
-     * @return Response
-     */
-    private function getDownloadHeaders(Response $response)
-    {
-        return $response->withHeader('Content-Description', "File Transfer")
-            ->withHeader('Content-Type', "application/octet-stream")
-            ->withHeader('Cache-Control', "must-revalidate")
-            ->withHeader('Pragma', "public");
     }
 }

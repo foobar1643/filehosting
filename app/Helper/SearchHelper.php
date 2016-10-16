@@ -3,6 +3,7 @@
 namespace Filehosting\Helper;
 
 use Filehosting\Database\FileMapper;
+use Filehosting\Database\SearchGateway;
 use Filehosting\Entity\File;
 
 /**
@@ -20,12 +21,10 @@ class SearchHelper
     /**
      * Constructor.
      *
-     * @todo Type Hinting for this constructor.
-     *
      * @param mixed $searchGateway A search gateway instance.
      * @param mixed $fileMapper A file mapper instance.
      */
-    public function __construct($searchGateway, $fileMapper)
+    public function __construct(SearchGateway $searchGateway, FileMapper $fileMapper)
     {
         $this->searchGateway = $searchGateway;
         $this->fileMapper = $fileMapper;
@@ -46,7 +45,10 @@ class SearchHelper
         $rawSearchResults = $this->searchGateway->searchQuery($this->escapeString($query), $offset, $limit);
         $searchMeta = $this->searchGateway->showMeta();
         $filteredResults = $this->fileMapper->getFilteredFiles($rawSearchResults);
-        $results = $this->showDeleted($rawSearchResults, $filteredResults);
+        // This is needed because number of total records for pagination is retrieved
+        // from Sphinx metadata. Therefore, search() method should return every item
+        // found, even if it's deleted in the actual database.
+        $results = $this->markDeleted($rawSearchResults, $filteredResults);
         return ["totalFound" => $searchMeta[0]['Value'], "results" => $results];
     }
 
@@ -68,23 +70,19 @@ class SearchHelper
      * Checks if there is a deleted files in a given results array.
      *  If there is a deleted files - marks them as such.
      *
-     * @todo Refactor this code.
-     *
-     * @param array $ids An array with raw file IDs.
-     * @param array $results An array with filtered file IDs.
+     * @param array $rawIds An array with raw file IDs.
+     * @param array $filteredFiles An array with filtered file IDs.
      *
      * @return array
      */
-    public function showDeleted($ids, $results)
+    public function markDeleted($rawIds, $filteredFiles)
     {
-        $newResults = $results;
-        if(count($ids) > count($results)) {
-            for($i = 0; $i < (count($ids) - count($results)); $i++) {
-                $deletedFile = new File();
-                $deletedFile->setDeleted(true);
-                array_push($newResults, $deletedFile);
-            }
+        $diff = count($rawIds) - count($filteredFiles);
+        for($i = 0; $i < $diff; $i++) {
+            $deletedFile = new File();
+            $deletedFile->setDeleted(true);
+            $filteredFiles[] = $deletedFile;
         }
-        return $newResults;
+        return $filteredFiles;
     }
 }

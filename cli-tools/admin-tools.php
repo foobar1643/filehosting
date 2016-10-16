@@ -103,7 +103,7 @@ class CLItools
         $file->setUploadedFile($uploadedFile)
             ->setAuthToken(Utils::generateToken(45))
             //notes: Default uploader name for administrator, displays in file information section
-            ->setUploader(dcgettext('en_US', 'Administrator', LC_MESSAGES));
+            ->setUploader('Administrator');
         $file = $this->fileHelper->uploadFile($file);
         print("File sucsessfuly added. ID: {$file->getId()}" . PHP_EOL);
     }

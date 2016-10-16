@@ -110,8 +110,6 @@ class CommentMapper
     /**
      * Deletes comment and his children from the database. Returns number of rows affected.
      *
-     * @todo Remove string concatenation.
-     *
      * @param int $commentId Comment ID in the database.
      *
      * @return int
@@ -119,7 +117,7 @@ class CommentMapper
     public function deleteComment($commentId)
     {
         $query = $this->pdo->prepare("DELETE FROM comments WHERE parent_path LIKE :comment_id");
-        $query->bindValue(":comment_id", "%" . $commentId . "%", \PDO::PARAM_STR);
+        $query->bindValue(":comment_id", "%{$commentId}%", \PDO::PARAM_STR);
         $query->execute();
         return $query->rowCount();
     }

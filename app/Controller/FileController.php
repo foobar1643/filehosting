@@ -13,9 +13,6 @@ use Filehosting\Translator;
 /**
  * Callable, provides a way to download files.
  *
- * @todo Refactor this code.
- * @todo Relocate comments selection to CommentController
- *
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class FileController
@@ -51,8 +48,6 @@ class FileController
     /**
      * A method that allows to use this class as a callable.
      *
-     * @todo Refactor this code.
-     *
      * @param Request $request Slim Framework request instance.
      * @param Response $response Slim Framework response instance.
      * @param array $args Array with additional arguments.
@@ -73,7 +68,7 @@ class FileController
         }
         if($request->isPost()) {
             $commentController = new CommentController($this->container);
-            $postResult = $commentController->__invoke($request, $response, $args);
+            $postResult = $commentController($request, $response, $args);
             $commentErrors = $postResult["errors"];
             $replyTo = isset($commentErrors) ? $postResult["comment"]->getParentId() : NULL;
             if($request->isXhr()) {

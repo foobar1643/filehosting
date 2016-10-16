@@ -2,6 +2,9 @@
 
 namespace Filehosting\Entity;
 
+/**
+ * Think about storing information from getId3 in the file entity (and prehaps database?).
+ */
 class File
 {
     const WHITELISTED_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webm", "mp3", "mp4"];

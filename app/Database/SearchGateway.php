@@ -25,23 +25,6 @@ class SearchGateway
     }
 
     /**
-     * Counts total matches in a given query.
-     *
-     * @todo Remove this method.
-     *
-     * @param string $searchQuery A query to count matches in.
-     *
-     * @return int
-     */
-    public function countSearchResults($searchQuery)
-    {
-        $query = $this->pdo->prepare("SELECT COUNT(*) FROM index_files, rt_files WHERE MATCH(:match_bind);");
-        $query->bindValue(":match_bind", $searchQuery, \PDO::PARAM_STR);
-        $query->execute();
-        return $query->fetchColumn();
-    }
-
-    /**
      * Returns additional meta information.
      *
      * @return array

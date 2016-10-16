@@ -19,7 +19,7 @@ class TreeNode
 
     public function addChildNode(TreeNode $node)
     {
-        array_push($this->childNodes, $node);
+        $this->childNodes[] = $node;
         return $node;
     }
 

@@ -18,18 +18,46 @@ use Slim\Http\UploadedFile;
 class FileHelper
 {
     /** @var Config $request An app Config class instance. */
+    /**
+     * Config instance.
+     * @var \Filehosting\Config
+     */
     private $config;
-    /** @var PreviewHelper $request PreviewHelper instance. */
+
+    /**
+     * PreviewHelper instance.
+     * @var \Filehosting\Helper\PreviewHelper
+     */
     private $previewHelper;
-    /** @var PathingHelper $request PathingHelper instance. */
+
+    /**
+     * PathingHelper instance.
+     * @var \Filehosting\Helper\PathingHelper
+     */
     private $pathingHelper;
-    /** @var FileMapper $request FileMapper instance. */
+
+    /**
+     * FileMapper instance.
+     * @var \Filehosting\Database\FileMapper
+     */
     private $fileMapper;
-    /** @var CommentMapper $request CommentMapper insance. */
+
+    /**
+     * CommentMapper insance.
+     * @var \Filehosting\Database\CommentMapper
+     */
     private $commentMapper;
-    /** @var SearchGateway $request SearchGateway instance. */
+
+    /**
+     * SearchGateway instance.
+     * @var \Filehosting\Database\SearchGateway
+     */
     private $searchGateway;
-    /** @var IdHelper $request IdHelper instance. */
+
+    /**
+     * IdHelper instance.
+     * @var \Filehosting\Helper\IdHelper
+     */
     private $idHelper;
 
     /**
@@ -66,7 +94,7 @@ class FileHelper
             $file->getUploadedFile()->moveTo($this->pathingHelper->getPathToFile($file)); //  throws \InvalidArgumentException and \RuntimeException
         } catch(\Exception $e) {
             $this->fileMapper->rollBack();
-            throw new $e;
+            throw new \Exception($e->getMessage(), $e->getCode(), $e);
         }
         $this->searchGateway->indexNewFile($file);
         $fileInfo = $this->idHelper->analyzeFile($file);
@@ -102,9 +130,22 @@ class FileHelper
     }
 
     /**
-     * Checks if a file with a given ID exists.
+     * Increments a downloads counter for a given file. Updates a record in the
+     * database as well.
      *
-     * @todo Refactor this code, make it more simple.
+     * @param File $file Fille entity to increment downloads counter in.
+     *
+     * @return \Filehosting\Entity\File File entity with incremented downloads counter.
+     */
+    public function incrementDownloadsCounter(File $file)
+    {
+        $file->setDownloads($file->getDownloads() + 1);
+        $this->fileMapper->updateFile($file);
+        return $file;
+    }
+
+    /**
+     * Checks if a file with a given ID exists.
      *
      * @param int $fileId A file ID in the database.
      *
@@ -113,16 +154,11 @@ class FileHelper
     public function fileExists($fileId)
     {
         $file = $this->fileMapper->getFile($fileId);
-        if($file && file_exists($this->pathingHelper->getPathToFile($file))) {
-            return true;
-        }
-        return false;
+        return (!is_null($file) && file_exists($this->pathingHelper->getPathToFile($file)));
     }
 
     /**
      * Returns a Response object with HTTP headers for X-Sendfile file download.
-     *
-     * @todo Make this static and relocate to Utils class.
      *
      * @param Request $fileId A file ID in the database.
      * @param Response $fileId A file ID in the database.
@@ -144,6 +180,34 @@ class FileHelper
             }
         }
         throw new \Exception(_("X-Sendfile either is not enabled or not supported by the server."));
+    }
+
+    /**
+     * Returns a Response object with headers for file download.
+     *
+     * @param Response $response Slim Framework response instance.
+     *
+     * @return Response
+     */
+    public function getDownloadHeaders(Response $response, File $file)
+    {
+        $pathToFile = $this->pathingHelper->getPathToFile($file);
+        return $response->withHeader('Content-Description', "File Transfer")
+            ->withHeader('Content-Type', "application/octet-stream")
+            ->withHeader('Cache-Control', "must-revalidate")
+            ->withHeader('Pragma', "public")
+            ->withHeader('Content-Length', filesize($pathToFile));
+    }
+
+    /**
+     * Writes a file to the Response instance.
+     *
+     * @return \Psr\Http\Message\ResponseInterface Response
+     */
+    public function writeToResponse(Response $response, File $file)
+    {
+        $fileStream = new Stream(fopen($this->pathingHelper->getPathToFile($file), "r"));
+        return $response->write($fileStream->getContents());
     }
 
     /**

@@ -68,26 +68,17 @@ class PaginationHelper
     /**
      * Validates a given page, if it's not valid - returns page number 1.
      *
-     * @todo Refactor a return operator code.
-     * @todo Do something with a maximum page value, right now it's forced number 30, which is not very smart.
-     *
      * @param int $page Page number to check.
      *
      * @return int
      */
     public function checkPage($page)
     {
-        if($page == null || $page > 30) {
-            return 1;
-        }
-        return $page;
+        return ($page == null || $page > 30) ? 1 : $page;
     }
 
     /**
      * Returns a URL for a given page.
-     *
-     * @todo Relocate this method to a LinkHelper class.
-     * @todo Refactor a return operator code.
      *
      * @param int $page Page number.
      *
@@ -97,10 +88,7 @@ class PaginationHelper
     {
         $parsedUrl = parse_url($this->link);
         $pageQuery = http_build_query(["page" => $page]);
-        if(isset($parsedUrl['query'])) {
-            return "{$this->link}&{$pageQuery}";
-        }
-        return "{$this->link}?{$pageQuery}";
+        return $this->link . ((isset($parsedUrl['query'])) ? "&" : "?") . $pageQuery;
     }
 
     /**

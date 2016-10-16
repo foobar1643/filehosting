@@ -83,7 +83,7 @@ class UploadController
             $file = new File();
             $file->setUploadedFile($uploadedFiles['uploaded-file'])
                 //notes: Default uploader name for user, displays in file information section
-                ->setUploader(dcgettext('en_US', 'Anonymous', LC_MESSAGES));
+                ->setUploader('Anonymous');
             return $file;
         }
         return new File();

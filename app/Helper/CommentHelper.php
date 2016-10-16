@@ -13,7 +13,10 @@ use Filehosting\Database\CommentMapper;
  */
 class CommentHelper
 {
-    /** @var CommentMapper $commentMapper CommentMapper instance */
+    /**
+     * CommentMapper instance.
+     * @var \Filehosting\Database\CommentMapper
+     */
     private $commentMapper;
 
     /**
@@ -74,19 +77,13 @@ class CommentHelper
     /**
      * Checks if comment with a given ID exists.
      *
-     * @todo Refactor this code, make it more simple.
-     *
      * @param int $commentId Comment ID in the database.
      *
-     * @return Array
+     * @return boolean True if comment exists, false otherwise.
      */
     public function commentExists($commentId)
     {
-        $comment = $this->commentMapper->getComment($commentId);
-        if($comment) {
-            return true;
-        }
-        return false;
+        return !empty($this->commentMapper->getComment($commentId));
     }
 
     /**
@@ -128,8 +125,6 @@ class CommentHelper
 
     /**
      * Normalizes given matpath, adding leading zeroes to numbers.
-     *
-     * @todo Refactor this code.
      *
      * @param string $path Matpath of the comment.
      *

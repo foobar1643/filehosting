@@ -1,3 +1,16 @@
-# Ignoring composer binary files and directories
-vendor/
+# Mandatory composer executable, although i use it globally
 composer.phar
+
+# Ignore application configuration file
+config.ini
+
+# Ignore broken documentation and dependencies
+docs/*
+vendor/*
+
+# Ignore Bootstrap, jQuery and video.js
+public/media/bootstrap/*
+public/media/css/videojs/*
+public/media/flash/videojs/*
+public/media/js/*
+!public/media/js/comments.js

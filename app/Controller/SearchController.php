@@ -10,8 +10,6 @@ use Filehosting\Helper\LanguageHelper;
 /**
  * Callable, provides a way to search through files.
  *
- * @todo Refactor this code.
- *
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class SearchController
@@ -37,8 +35,6 @@ class SearchController
 
     /**
      * A method that allows to use this class as a callable.
-     *
-     * @todo Refactor this code.
      *
      * @param Request $request Slim Framework request instance.
      * @param Response $response Slim Framework response instance.

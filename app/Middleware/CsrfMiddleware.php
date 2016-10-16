@@ -8,7 +8,7 @@ use Filehosting\Helper\CookieHelper;
 use Filehosting\Helper\Utils;
 
 /**
- * Middleware for Slim Framework, it provides protection against CSRF exploit using Cookies. 
+ * Middleware for Slim Framework, it provides protection against CSRF exploit using Cookies.
  *
  * @author foobar1643 <foobar76239@gmail.com>
  */
@@ -18,6 +18,12 @@ class CsrfMiddleware
     private $cookieLifetime;
     /** @var int $tokenLength Csrf token length in symbols. */
     private $tokenLength;
+
+    /**
+     * Cookie helper instance.
+     * @var \Filehosting\Helper\CookieHelper
+     */
+    protected $cookieHelper;
 
     /**
      * Constructor.
@@ -34,9 +40,6 @@ class CsrfMiddleware
     /**
      * A method that allows to use this class as a callable.
      *
-     * @todo Refactor this code.
-     * @todo Split this into two methods - validate csrf token and set csrf token.
-     *
      * @param Request $request A request instance.
      * @param Response $response A response instance.
      * @param callable $next Next callable.
@@ -45,23 +48,30 @@ class CsrfMiddleware
      */
     public function __invoke(Request $request, Response $response, callable $next)
     {
-        $cookieHelper = new CookieHelper($request, $response);
+        $this->cookieHelper = new CookieHelper($request, $response);
         if($request->isPost()) {
             $formToken = $request->getParsedBodyParam('csrf_token');
-            $cookieToken = $cookieHelper->getRequestCookie('csrf_token');
+            $cookieToken = $this->cookieHelper->getRequestCookie('csrf_token');
             if(!$this->validateCsrfToken($formToken, $cookieToken)) {
                 $failure = $this->getFailureCallable();
                 return $failure($request, $response, $next);
             }
         }
-        if(!$cookieHelper->requestCookieExists('csrf_token')) {
-            $csrfToken = Utils::generateToken($this->tokenLength);
-            $request = $cookieHelper->setRequestCookie('csrf_token', $csrfToken);
-        } else {
-            $csrfToken = $cookieHelper->getRequestCookie('csrf_token');
-        }
-        $response = $cookieHelper->setResponseCookie('csrf_token', $csrfToken, new \DateInterval($this->cookieLifetime), '/');
+        $csrfToken = $this->getCsrfToken();
+        $request = $this->cookieHelper->setRequestCookie('csrf_token', $csrfToken);
+        $response = $this->cookieHelper->setResponseCookie('csrf_token', $csrfToken, new \DateInterval($this->cookieLifetime), '/');
         return $next($request, $response);
+    }
+
+    /**
+     * [getCsrfToken description]
+     *
+     * @return string CSRF token.
+     */
+    protected function getCsrfToken()
+    {
+        $requestToken = $this->cookieHelper->getRequestCookie('csrf_token');
+        return !empty($requestToken) ? $requestToken : Utils::generateToken($this->tokenLength);
     }
 
     /**
@@ -72,7 +82,7 @@ class CsrfMiddleware
      *
      * @return bool
      */
-    private function validateCsrfToken($formToken, $cookieToken)
+    protected function validateCsrfToken($formToken, $cookieToken)
     {
         return ($formToken !== NULL && $cookieToken !== NULL && $formToken === $cookieToken);
     }
@@ -82,7 +92,7 @@ class CsrfMiddleware
      *
      * @return callable
      */
-    private function getFailureCallable()
+    protected function getFailureCallable()
     {
         return function (Request $request, Response $response, $next) {
             $body = new \Slim\Http\Body(fopen('php://temp', 'r+'));

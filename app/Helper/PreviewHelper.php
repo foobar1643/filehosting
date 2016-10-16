@@ -100,8 +100,6 @@ class PreviewHelper
     /**
      * Generates a thumbnail for a given file entity.
      *
-     * @todo Think about how Exceptions are thrown, maybe it is unnecessary to throw it here?
-     *
      * @param File $file File entity for which the thumbnail will be generated.
      *
      * @throws Exception if can't generate a thumbnail for this file type.

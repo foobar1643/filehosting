@@ -10,7 +10,7 @@ class PathingHelper
 
     public function __construct($initDir)
     {
-        $this->basePath = str_replace("/app", "", $initDir);
+        $this->basePath = str_replace(DIRECTORY_SEPARATOR . "app", "", $initDir);
     }
 
     public function getPathToBase()

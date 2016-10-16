@@ -23,7 +23,7 @@
         <p>{{ messageHelp }}</p>
         <p><a href="{{ linkHelper.generateLink('/') }}">{% trans %}You can also return to the main page.{% endtrans %}</a></p>
         {% if displayErrors == 1 %}
-            <p>{{ debugInfo }}</p>
+            <p>{{ debugInfo|nl2br }}</p>
         {% endif %}
     </body>
 </html>

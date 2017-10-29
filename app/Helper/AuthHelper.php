@@ -64,7 +64,7 @@ class AuthHelper
     /**
      * Authorizes current user.
      *
-     * @return Response
+     * @return Psr\Http\Message\ResponseInterface
      */
     public function authorizeUser()
     {

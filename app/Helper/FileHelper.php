@@ -6,9 +6,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Filehosting\Entity\File;
 use Filehosting\Exception\FileUploadException;
-use Filehosting\Database\FileMapper;
-use Filehosting\Database\SearchGateway;
-use Slim\Http\UploadedFile;
+use Slim\Container;
 
 /**
  * Adds or deletes files from the database.
@@ -17,19 +15,39 @@ use Slim\Http\UploadedFile;
  */
 class FileHelper
 {
-    /** @var Config $request An app Config class instance. */
+    /**
+     * @var \Filehosting\Config An app Config instance.
+     */
     private $config;
-    /** @var PreviewHelper $request PreviewHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\PreviewHelper PreviewHelper instance.
+     */
     private $previewHelper;
-    /** @var PathingHelper $request PathingHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\PreviewHelper PathingHelper instance.
+     */
     private $pathingHelper;
-    /** @var FileMapper $request FileMapper instance. */
+
+    /**
+     * @var \Filehosting\Database\FileMapper FileMapper instance.
+     */
     private $fileMapper;
-    /** @var CommentMapper $request CommentMapper insance. */
+
+    /**
+     * @var \Filehosting\Database\CommentMapper CommentMapper Instance
+     */
     private $commentMapper;
-    /** @var SearchGateway $request SearchGateway instance. */
+
+    /**
+     * @var \Filehosting\Database\SearchGateway SearchGateway instance.
+     */
     private $searchGateway;
-    /** @var IdHelper $request IdHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\IdHelper IdHelper instance.
+     */
     private $idHelper;
 
     /**
@@ -37,7 +55,7 @@ class FileHelper
      *
      * @param \Slim\Container $c DI container.
      */
-    public function __construct(\Slim\Container $c)
+    public function __construct(Container $c)
     {
         $this->config = $c->get('config');
         $this->previewHelper = $c->get('PreviewHelper');
@@ -53,7 +71,7 @@ class FileHelper
      *
      * @param File $file A file entity to add.
      *
-     * @throws Exception if failed to access or create a storage folder
+     * @throws \Exception if failed to access or create a storage folder
      *
      * @return File
      */
@@ -62,15 +80,17 @@ class FileHelper
         $this->fileMapper->beginTransaction();
         $file->setId($this->fileMapper->createFile($file));
         try {
-            $this->isFileFolderAvailable($this->pathingHelper->getPathToFileFolder($file)); // throws FileUploadException
-            $file->getUploadedFile()->moveTo($this->pathingHelper->getPathToFile($file)); //  throws \InvalidArgumentException and \RuntimeException
-        } catch(\Exception $e) {
+            // throws FileUploadException
+            $this->isFileFolderAvailable($this->pathingHelper->getPathToFileFolder($file));
+            // throws \InvalidArgumentException and \RuntimeException
+            $file->getUploadedFile()->moveTo($this->pathingHelper->getPathToFile($file));
+        } catch (\Exception $e) {
             $this->fileMapper->rollBack();
             throw new $e;
         }
         $this->searchGateway->indexNewFile($file);
         $fileInfo = $this->idHelper->analyzeFile($file);
-        if($this->idHelper->isPreviewable($fileInfo)) {
+        if ($this->idHelper->isPreviewable($fileInfo)) {
             $this->previewHelper->generatePreview($file);
         }
         $this->fileMapper->commit();
@@ -82,7 +102,7 @@ class FileHelper
      *
      * @param File $file A file entity to delete.
      *
-     * @throws Exception if failed to delete file from the filesystem
+     * @throws \Exception if failed to delete file from the filesystem
      *
      * @return bool
      */
@@ -91,11 +111,11 @@ class FileHelper
         $fileInfo = $this->idHelper->analyzeFile($file);
         $this->commentMapper->purgeComments($file->getId());
         $this->searchGateway->deleteIndexedFile($file);
-        if($this->idHelper->isPreviewable($fileInfo)) {
+        if ($this->idHelper->isPreviewable($fileInfo)) {
             $this->previewHelper->deletePreview($file);
         }
         $this->fileMapper->deleteFile($file);
-        if(!unlink($this->pathingHelper->getPathToFile($file))) {
+        if (!unlink($this->pathingHelper->getPathToFile($file))) {
             throw new \Exception(_("Can't unlink file. Try again or contact server administrators."));
         }
         return true;
@@ -104,19 +124,15 @@ class FileHelper
     /**
      * Checks if a file with a given ID exists.
      *
-     * @todo Refactor this code, make it more simple.
-     *
      * @param int $fileId A file ID in the database.
      *
      * @return bool
      */
-    public function fileExists($fileId)
+    public function fileExists(int $fileId): bool
     {
         $file = $this->fileMapper->getFile($fileId);
-        if($file && file_exists($this->pathingHelper->getPathToFile($file))) {
-            return true;
-        }
-        return false;
+
+        return ($file && file_exists($this->pathingHelper->getPathToFile($file)));
     }
 
     /**
@@ -124,22 +140,23 @@ class FileHelper
      *
      * @todo Make this static and relocate to Utils class.
      *
-     * @param Request $fileId A file ID in the database.
-     * @param Response $fileId A file ID in the database.
-     * @param File $fileId A file ID in the database.
+     * @param Request $request PSR-7 Request instance.
+     * @param Response $response PSR-7 Response instance.
+     * @param File $file File to download.
      *
-     * @throws Exception if X-Sendfile module is not found.
+     * @throws \Exception if X-Sendfile module is not found.
      *
      * @return Response
      */
-    public function getXsendfileHeaders(Request $request, Response $response, File $file)
+    public function getXsendfileHeaders(Request $request, Response $response, File $file): Response
     {
         $serverParams = $request->getServerParams();
-        if($this->config->getValue('app', 'enableXsendfile') == 1) {
-            if(strpos($serverParams["SERVER_SOFTWARE"], "nginx") !== false) {
+        if ($this->config->getValue('app', 'enableXsendfile') == 1) {
+            if (strpos($serverParams["SERVER_SOFTWARE"], "nginx") !== false) {
                 return $response->withHeader('X-Accel-Redirect', $this->pathingHelper->getXaccelPath($file))
                     ->withHeader('X-Accel-Charset', "utf-8");
-            } else if(strpos($serverParams["SERVER_SOFTWARE"], "apache") !== false && in_array("mod_xsendfile", apache_get_modules())) {
+            } elseif (strpos($serverParams["SERVER_SOFTWARE"], "apache") !== false
+                && in_array("mod_xsendfile", apache_get_modules())) {
                 return $response->withHeader('X-Sendfile', $this->pathingHelper->getPathToFile($file));
             }
         }
@@ -147,18 +164,19 @@ class FileHelper
     }
 
     /**
-     * Checks if given file folder exists, and if not, trys to create it.
+     * Checks if given file folder exists, and if not, tries to create it.
      *
-     * @param int $fileId A file ID in the database.
+     * @param string $fileFolder
      *
      * @throws FileUploadException if folder is not found and it cannot be created.
      *
-     * @return bool
+     * @return bool if folder is not found and it cannot be created.
+     *
      */
-    private function isFileFolderAvailable($fileFolder)
+    private function isFileFolderAvailable(string $fileFolder): bool
     {
-        if(!is_dir($fileFolder)) {
-            if(!mkdir($fileFolder)) {
+        if (!is_dir($fileFolder)) {
+            if (!mkdir($fileFolder)) {
                 throw new FileUploadException(UPLOAD_ERR_CANT_WRITE);
             }
         }

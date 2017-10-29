@@ -13,18 +13,19 @@ use Slim\Http\Response;
  */
 class LanguageHelper
 {
-    /** @var string DEFAULT_LOCALE Default application locale. */
     const DEFAULT_LOCALE = "en_US";
-    /** @var array AVAILABLE_LANGUAGES Available application languages. */
+
     const AVAILABLE_LANGUAGES = ["en", "ru"];
 
-    /** @var Request $request Slim Framework request instance. */
+    /**
+     * @var \Psr\Http\Message\ServerRequestInterface Slim Framework request instance.
+     */
     private $request;
 
     /**
      * Constructor.
      *
-     * @param Request $request Slim Framework request instance.
+     * @param \Psr\Http\Message\ServerRequestInterface $request PSR-7 request instance.
      */
     public function __construct(Request $request)
     {
@@ -48,20 +49,18 @@ class LanguageHelper
     /**
      * Checks if language change message needs to be shown to user.
      *
-     * @todo Refactor a return operator.
+     * @todo Do something with hard-coded value '7', define it somewhere else.
      *
      * @return bool
      */
-    public function canShowLangMsg()
+    public function canShowLangMsg(): bool
     {
         $cookieHelper = new CookieHelper($this->request, new Response());
         $msgShown = $cookieHelper->getRequestCookie('langChangeShown');
         $appLocale = $this->getAppLocale();
         $userLocale = $this->getUserLocale();
-        if($userLocale != $appLocale && $this->languageAvailable($userLocale) && intval($msgShown) < 7) {
-            return true;
-        }
-        return false;
+
+        return ($userLocale != $appLocale && $this->languageAvailable($userLocale) && intval($msgShown) < 7);
     }
 
     /**
@@ -69,7 +68,7 @@ class LanguageHelper
      *
      * @return array
      */
-    public function getAvailableLanguages()
+    public function getAvailableLanguages(): array
     {
         return self::AVAILABLE_LANGUAGES;
     }
@@ -77,17 +76,14 @@ class LanguageHelper
     /**
      * Checks if a given language is available in the application.
      *
-     * @todo Refactor a return operator.
+     * @param string $locale
      *
      * @return bool
      */
-    public function languageAvailable($locale)
+    public function languageAvailable(string $locale): bool
     {
         $parsedLocale = \Locale::parseLocale($locale);
-        if(!is_null($locale) && in_array($parsedLocale['language'], self::AVAILABLE_LANGUAGES)) {
-            return true;
-        }
-        return false;
+        return (!is_null($locale) && in_array($parsedLocale['language'], self::AVAILABLE_LANGUAGES));
     }
 
     /**
@@ -99,7 +95,7 @@ class LanguageHelper
     {
         $requestTarget = $this->request->getRequestTarget();
         $language = preg_split("/\//", $requestTarget);
-        $urlLanguage = isset($language[1]) ? $language[1] : NULL;
+        $urlLanguage = isset($language[1]) ? $language[1] : null;
         return $this->composeFromLanguage($urlLanguage);
     }
 
@@ -110,7 +106,7 @@ class LanguageHelper
      */
     public function getUserLocale()
     {
-        if($this->request->hasHeader('HTTP_ACCEPT_LANGUAGE')) {
+        if ($this->request->hasHeader('HTTP_ACCEPT_LANGUAGE')) {
             $header = $this->request->getHeader('HTTP_ACCEPT_LANGUAGE');
             return $this->composeFromLanguage($header[0]);
         }

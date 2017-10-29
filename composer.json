@@ -1,10 +1,10 @@
 {
 	"name": "foobar1643/filehosting",
-	"description": "Light and easy filesharing app",
+	"description": "Light and easy file sharing app",
 	"require": {
-		"php": ">=5.6",
-		"slim/slim": "^3.0",
-		"twig/twig": "~1.0",
+		"php": ">=7.0",
+		"slim/slim": "^3.8",
+		"twig/twig": "~2.4",
 		"slim/twig-view": "^2.0",
 		"dflydev/fig-cookies": "^1.0",
 		"twig/extensions": "^1.3",

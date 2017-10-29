@@ -5,22 +5,30 @@ namespace Filehosting\Controller;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Slim\Http\Stream as Stream;
-use Filehosting\Entity\File;
-use Filehosting\Helper\FileHelper;
-use Filehosting\Exception\FileNotFoundException;
+use Slim\Container;
+use Slim\Exception\NotFoundException;
 
 /**
  * Callable, provides a way to download files.
  *
+ * @package Filehosting\Contoller
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class DownloadController
 {
-    /** @var FileMapper $fileMapper FileHelper instance. */
+    /**
+     * @var \Filehosting\Database\FileMapper FileMapper instance.
+     */
     private $fileMapper;
-    /** @var PathingHelper $pathingHelper PathingHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\PathingHelper PathingHelper instance.
+     */
     private $pathingHelper;
-    /** @var FileHelper $fileHelper FileHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\FileHelper FileHelper instance.
+     */
     private $fileHelper;
 
     /**
@@ -28,7 +36,7 @@ class DownloadController
      *
      * @param \Slim\Container $c DI container.
      */
-    public function __construct(\Slim\Container $c)
+    public function __construct(Container $c)
     {
         $this->fileMapper = $c->get('FileMapper');
         $this->pathingHelper = $c->get('PathingHelper');
@@ -44,17 +52,17 @@ class DownloadController
      * @param Response $response Slim Framework response instance.
      * @param array $args Array with additional arguments.
      *
-     * @throws NotFoundException if file not found.
+     * @throws \Slim\Exception\NotFoundException if file not found.
      *
      * @return Response
      */
     public function __invoke(Request $request, Response $response, $args)
     {
         $params = $request->getQueryParams();
-        if($this->fileHelper->fileExists($args['id'])) {
+        if ($this->fileHelper->fileExists($args['id'])) {
             $file = $this->fileMapper->getFile($args['id']);
             $filePath = $this->pathingHelper->getPathToFile($file);
-            if(!isset($params['type']) || $params['type'] != 'stream') {
+            if (!isset($params['type']) || $params['type'] != 'stream') {
                 $file->setDownloads($file->getDownloads() + 1);
                 $this->fileMapper->updateFile($file);
             }
@@ -62,13 +70,13 @@ class DownloadController
             $response = $response->withHeader('Content-Length', filesize($filePath));
             try {
                 $response = $this->fileHelper->getXsendfileHeaders($request, $response, $file);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $fileStream = new Stream(fopen($filePath, "r"));
                 $response = $response->write($fileStream->getContents());
             }
             return $response;
         } else {
-            throw new \Slim\Exception\NotFoundException($request, $response);
+            throw new NotFoundException($request, $response);
         }
     }
 

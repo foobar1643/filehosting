@@ -3,6 +3,7 @@
 namespace Filehosting\Helper;
 
 use Filehosting\Database\FileMapper;
+use Filehosting\Database\SearchGateway;
 use Filehosting\Entity\File;
 
 /**
@@ -12,20 +13,23 @@ use Filehosting\Entity\File;
  */
 class SearchHelper
 {
-    /** @var SearchGateway $searchGateway SearchGateway instance. */
+    /**
+     * @var \Filehosting\Database\SearchGateway SearchGateway instance.
+     */
     private $searchGateway;
-    /** @var FileMapper $fileMapper FileMapper instance. */
+
+    /**
+     * @var \Filehosting\Database\FileMapper FileMapper instance.
+     */
     private $fileMapper;
 
     /**
      * Constructor.
      *
-     * @todo Type Hinting for this constructor.
-     *
-     * @param mixed $searchGateway A search gateway instance.
-     * @param mixed $fileMapper A file mapper instance.
+     * @param \Filehosting\Database\SearchGateway $searchGateway A search gateway instance.
+     * @param \Filehosting\Database\FileMapper $fileMapper A file mapper instance.
      */
-    public function __construct($searchGateway, $fileMapper)
+    public function __construct(SearchGateway $searchGateway, FileMapper $fileMapper)
     {
         $this->searchGateway = $searchGateway;
         $this->fileMapper = $fileMapper;
@@ -33,7 +37,7 @@ class SearchHelper
 
     /**
      * Executes given search query with offset and limit.
-     *  Returns an array with search results and total number of matches for a query.
+     * Returns an array with search results and total number of matches for a query.
      *
      * @param string $query A search query to execute.
      * @param int $offset A offset for a search query.
@@ -41,7 +45,7 @@ class SearchHelper
      *
      * @return array
      */
-    public function search($query, $offset, $limit)
+    public function search(string $query, int $offset, int $limit)
     {
         $rawSearchResults = $this->searchGateway->searchQuery($this->escapeString($query), $offset, $limit);
         $searchMeta = $this->searchGateway->showMeta();
@@ -57,16 +61,16 @@ class SearchHelper
      *
      * @return string
      */
-    public function escapeString($string)
+    public function escapeString(string $string)
     {
-        $from = array('\\', '(',')','|','-','!','@','~','"','&', '/', '^', '$', '=');
-        $to = array('\\\\', '\(','\)','\|','\-','\!','\@','\~','\"', '\&', '\/', '\^', '\$', '\=');
+        $from = ['\\', '(',')','|','-','!','@','~','"','&', '/', '^', '$', '='];
+        $to = ['\\\\', '\(','\)','\|','\-','\!','\@','\~','\"', '\&', '\/', '\^', '\$', '\='];
         return str_replace($from, $to, $string);
     }
 
     /**
      * Checks if there is a deleted files in a given results array.
-     *  If there is a deleted files - marks them as such.
+     * If there are deleted files in results array - marks them as such.
      *
      * @todo Refactor this code.
      *
@@ -75,11 +79,11 @@ class SearchHelper
      *
      * @return array
      */
-    public function showDeleted($ids, $results)
+    public function showDeleted(array $ids, array $results)
     {
         $newResults = $results;
-        if(count($ids) > count($results)) {
-            for($i = 0; $i < (count($ids) - count($results)); $i++) {
+        if (count($ids) > count($results)) {
+            for ($i = 0; $i < (count($ids) - count($results)); $i++) {
                 $deletedFile = new File();
                 $deletedFile->setDeleted(true);
                 array_push($newResults, $deletedFile);

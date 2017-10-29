@@ -16,13 +16,13 @@ class Utils
      *
      * @return string
      */
-    public static function generateToken($length)
+    public static function generateToken(int $length): string
     {
         $result = null;
         $source = str_split('abcdefghijklmnopqrstuvwxyz'
           .'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
           .'0123456789');
-        for($i = 0; $i < $length; $i++) {
+        for ($i = 0; $i < $length; $i++) {
             $result .= $source[mt_rand(0, count($source) - 1)];
         }
         return $result;
@@ -35,9 +35,9 @@ class Utils
      *
      * @return string
      */
-    public static function formatSize($size)
+    public static function formatSize(int $size): string
     {
-        switch(true) { // 1073741824 B - 1 GB, 1048576 B - 1 MB, 1024 B - 1 KB
+        switch (true) { // 1073741824 B - 1 GB, 1048576 B - 1 MB, 1024 B - 1 KB
             case ($size >= pow(1024, 3)):
                 //notes: GB (Gigabyte) - a unit of digital information, displays near formatted file size
                 return round($size / pow(1024, 3), 3, PHP_ROUND_HALF_DOWN) . str_pad(_("GB"), 3, ' ', STR_PAD_LEFT);
@@ -60,9 +60,9 @@ class Utils
      *
      * @return string
      */
-    public static function parseFileFormErrorCode($code)
+    public static function parseFileFormErrorCode(int $code): string
     {
-        switch($code) {
+        switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
                 return _("File size is exceeding the maximum.");
             case UPLOAD_ERR_FORM_SIZE:

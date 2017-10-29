@@ -11,41 +11,45 @@ use Filehosting\Entity\File;
  */
 class IdHelper
 {
-    /** @var array IMAGES_MIME_TYPES Image mime types. */
     const IMAGES_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
-    /** @var array AUDIO_MIME_TYPES Audio mime types. */
+
     const AUDIO_MIME_TYPES = ['audio/mpeg'];
-    /** @var array VIDEO_MIME_TYPES Video mime types. */
+
     const VIDEO_MIME_TYPES = ['video/webm', 'video/x-flv', 'video/quicktime'];
 
-    /** @var getID3 $getId3 getID3 instance. */
+    /**
+     * @var \getID3 getID3 instance.
+     */
     private $getId3;
-    /** @var PathingHelper $pathingHelper PathingHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\PathingHelper PathingHelper instance.
+     */
     private $pathingHelper;
 
     /**
      * Constructor.
      *
-     * @param getID3 $id3 A getID3 instance.
-     * @param PathingHelper $helper A PathingHelper instance.
+     * @param \getID3 $id3 A getID3 instance.
+     * @param \Filehosting\Helper\PathingHelper $helper A PathingHelper instance.
      */
     public function __construct(\getID3 $id3, PathingHelper $helper)
     {
         $this->getId3 = $id3;
         $this->getId3->option_md5_data = true;
-		$this->getId3->option_md5_data_source = true;
-		$this->getId3->encoding = 'UTF-8';
+        $this->getId3->option_md5_data_source = true;
+        $this->getId3->encoding = 'UTF-8';
         $this->pathingHelper = $helper;
     }
 
     /**
      * Analyzes a given file using getID3 library. Returns an array with information about file.
      *
-     * @param File $file A file entity to analyze.
+     * @param \Filehosting\Entity\File $file A file entity to analyze.
      *
      * @return array
      */
-    public function analyzeFile(File $file)
+    public function analyzeFile(File $file): array
     {
         return $this->getId3->analyze($this->pathingHelper->getPathToFile($file));
     }
@@ -57,7 +61,7 @@ class IdHelper
      *
      * @return bool
      */
-    public function isPreviewable(array $fileInfo)
+    public function isPreviewable(array $fileInfo): bool
     {
         return (isset($fileInfo['mime_type']) && in_array($fileInfo['mime_type'], self::IMAGES_MIME_TYPES));
     }
@@ -69,7 +73,7 @@ class IdHelper
      *
      * @return bool
      */
-    public function isAudio(array $fileInfo)
+    public function isAudio(array $fileInfo): bool
     {
         return (isset($fileInfo['mime_type']) && in_array($fileInfo['mime_type'], self::AUDIO_MIME_TYPES));
     }
@@ -81,7 +85,7 @@ class IdHelper
      *
      * @return bool
      */
-    public function isVideo(array $fileInfo)
+    public function isVideo(array $fileInfo): bool
     {
         return (isset($fileInfo['mime_type']) && in_array($fileInfo['mime_type'], self::VIDEO_MIME_TYPES));
     }

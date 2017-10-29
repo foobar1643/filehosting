@@ -6,22 +6,28 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Filehosting\Helper\PaginationHelper;
 use Filehosting\Helper\LanguageHelper;
+use Slim\Container;
 
 /**
  * Callable, provides a way to search through files.
  *
  * @todo Refactor this code.
  *
+ * @package Filehosting\Controller
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class SearchController
 {
-    /** @var int RESULTS_PER_PAGE Number of elements to show per page. */
     const RESULTS_PER_PAGE = 15;
 
-    /** @var mixed $view View object. */
+    /**
+     * @var mixed View object.
+     */
     private $view;
-    /** @var SearchHelper $searchHelper SearchHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\SearchHelper SearchHelper instance.
+     */
     private $searchHelper;
 
     /**
@@ -29,7 +35,7 @@ class SearchController
      *
      * @param \Slim\Container $c DI container.
      */
-    public function __construct(\Slim\Container $c)
+    public function __construct(Container $c)
     {
         $this->view = $c->get('view');
         $this->searchHelper = $c->get('SearchHelper');
@@ -46,26 +52,30 @@ class SearchController
      *
      * @return Response
      */
-    public function __invoke(Request $request, Response $response, $args)
+    public function __invoke(Request $request, Response $response, array $args)
     {
-        $params = $request->getQueryParams();
         $page = is_null($request->getQueryParam('page')) ? 1 : $request->getQueryParam('page');
         $query = $request->getQueryParam('query');
         $pager = null;
         $searchResults = null;
-        if(!is_null($query)) { // query is not empty
+        if (!is_null($query)) {
             $pager = new PaginationHelper(self::RESULTS_PER_PAGE, "/{$args['lang']}/search/?query={$query}");
             $page = $pager->checkPage($page);
             $offset = $pager->getOffset($page);
             $searchResults = $this->searchHelper->search($query, $offset, self::RESULTS_PER_PAGE);
             $pager->setTotalRecords($searchResults["totalFound"]);
         }
-        return $this->view->render($response, 'search.twig', [
-            'query' => $query,
-            'page' => intval($page),
-            'pager' => $pager,
-            'files' => $searchResults["results"],
-            'langHelper' => new LanguageHelper($request)]
+
+        return $this->view->render(
+            $response,
+            'search.twig',
+            [
+                'query' => $query,
+                'page' => intval($page),
+                'pager' => $pager,
+                'files' => $searchResults["results"],
+                'langHelper' => new LanguageHelper($request)
+            ]
         );
     }
 }

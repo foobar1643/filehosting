@@ -2,6 +2,7 @@
 
 namespace Filehosting\Helper;
 
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Dflydev\FigCookies\SetCookie;
@@ -16,16 +17,21 @@ use Dflydev\FigCookies\FigRequestCookies;
  */
 class CookieHelper
 {
-    /** @var Request $request Slim Framework request instance. */
+    /**
+     * @var \Psr\Http\Message\ServerRequestInterface PSR-7 Request instance.
+     */
     private $request;
-    /** @var Response $response Slim Framework response instance. */
+
+    /**
+     * @var \Psr\Http\Message\ResponseInterface PSR-7 Response instance.
+     */
     private $response;
 
     /**
      * Constructor.
      *
-     * @param Request $request Slim Framework request instance.
-     * @param Response $response Slim Framework response instance.
+     * @param \Psr\Http\Message\ServerRequestInterface $request PSR-7 Request instance.
+     * @param \Psr\Http\Message\ResponseInterface $response PSR-7 Response instance.
      */
     public function __construct(Request $request, Response $response)
     {
@@ -38,19 +44,20 @@ class CookieHelper
      *
      * @param string $name Cookie name.
      * @param string $value Cookie Value.
-     * @param DateInterval $time Expires date.
+     * @param \DateInterval $time Expires date.
      * @param string $path Cookie Path.
      *
-     * @return Request
+     * @return \Psr\Http\Message\ResponseInterface
      */
-    public function setResponseCookie($name, $value, \DateInterval $time, $path)
+    public function setResponseCookie(string $name, string $value, \DateInterval $time, string $path): Response
     {
         $dateTime = new \DateTime("now");
         $dateTime->add($time);
-        $this->response = FigResponseCookies::set($this->response,
+        return FigResponseCookies::set(
+            $this->response,
             SetCookie::create($name)->withValue($value)
-            ->withExpires($dateTime->format(\DateTime::COOKIE))->withPath($path));
-        return $this->response;
+                ->withExpires($dateTime->format(\DateTime::COOKIE))->withPath($path)
+        );
     }
 
     /**
@@ -59,12 +66,11 @@ class CookieHelper
      * @param string $name Cookie name.
      * @param string $value Cookie Value.
      *
-     * @return Request
+     * @return \Psr\Http\Message\RequestInterface
      */
-    public function setRequestCookie($name, $value)
+    public function setRequestCookie(string $name, string $value): RequestInterface
     {
-        $this->request = FigRequestCookies::set($this->request, Cookie::create($name, $value));
-        return $this->request;
+        return FigRequestCookies::set($this->request, Cookie::create($name, $value));
     }
 
     /**
@@ -74,7 +80,7 @@ class CookieHelper
      *
      * @return string
      */
-    public function getRequestCookie($name)
+    public function getRequestCookie(string $name): string
     {
         return FigRequestCookies::get($this->request, $name)->getValue();
     }
@@ -86,7 +92,7 @@ class CookieHelper
      *
      * @return bool
      */
-    public function requestCookieExists($name)
+    public function requestCookieExists(string $name): bool
     {
         return !is_null(FigRequestCookies::get($this->request, $name)->getValue());
     }

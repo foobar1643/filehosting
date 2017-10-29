@@ -4,15 +4,16 @@ namespace Filehosting\Controller;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Slim\Http\UploadedFile;
 use Filehosting\Entity\File;
 use Filehosting\Helper\LanguageHelper;
 use Filehosting\Helper\CookieHelper;
 use Filehosting\Helper\AuthHelper;
+use Slim\Container;
 
 /**
  * Callable, provides a way to upload files.
  *
+ * @package Filehosting\Controller
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class UploadController
@@ -31,7 +32,7 @@ class UploadController
      *
      * @param \Slim\Container $c DI container.
      */
-    public function __construct(\Slim\Container $c)
+    public function __construct(Container $c)
     {
         $this->view = $c->get('view');
         $this->config = $c->get('config');
@@ -48,15 +49,15 @@ class UploadController
      *
      * @return Response
      */
-    public function __invoke(Request $request, Response $response, $args)
+    public function __invoke(Request $request, Response $response, array $args)
     {
         $errors = null;
-        if($request->isPost()) {
+        if ($request->isPost()) {
             $authHelper = new AuthHelper(new CookieHelper($request, $response));
             $file = $this->createFromRequest($request);
             $errors = $this->validator->validateUploadedFile($file->getUploadedFile());
-            if(!$errors) {
-                if(!$authHelper->isAuthorized()) {
+            if (!$errors) {
+                if (!$authHelper->isAuthorized()) {
                     $response = $authHelper->authorizeUser();
                 }
                 $file->setAuthToken($authHelper->getUserToken());
@@ -64,9 +65,15 @@ class UploadController
                 return $response->withRedirect("/{$args['lang']}/file/{$file->getId()}/");
             }
         }
-        return $this->view->render($response, 'upload.twig',
-            ['sizeLimit' => $this->config->getValue('app', 'sizeLimit'),
-            'errors' => $errors, 'langHelper' => new LanguageHelper($request)]);
+        return $this->view->render(
+            $response,
+            'upload.twig',
+            [
+                'sizeLimit' => $this->config->getValue('app', 'sizeLimit'),
+                'errors' => $errors,
+                'langHelper' => new LanguageHelper($request)
+            ]
+        );
     }
 
     /**
@@ -79,7 +86,7 @@ class UploadController
     private function createFromRequest(Request $request)
     {
         $uploadedFiles = $request->getUploadedFiles();
-        if(array_key_exists("uploaded-file", $uploadedFiles)) {
+        if (array_key_exists("uploaded-file", $uploadedFiles)) {
             $file = new File();
             $file->setUploadedFile($uploadedFiles['uploaded-file'])
                 //notes: Default uploader name for user, displays in file information section

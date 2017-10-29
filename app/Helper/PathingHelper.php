@@ -20,17 +20,17 @@ class PathingHelper
 
     public function getPathToThumbnails()
     {
-        return $this->basePath . "/public/thumbnails";
+        return "{$this->basePath}/public/thumbnails";
     }
 
     public function getPathToStorage()
     {
-        return $this->basePath . "/storage";
+        return "{$this->basePath}/storage";
     }
 
     public function getPathToLocales()
     {
-        return $this->basePath . "/locale";
+        return "{$this->basePath}/locale";
     }
 
     public function getPathToFileFolder(File $file)
@@ -45,7 +45,7 @@ class PathingHelper
 
     public function getXsendfilePath(File $file)
     {
-        return $pathingHelper->getPathToBase() . "/storage/{$file->getFolder()}/{$file->getDiskName()}";
+        return "{$this->getPathToBase()}/storage/{$file->getFolder()}/{$file->getDiskName()}";
     }
 
     public function getXaccelPath(File $file)

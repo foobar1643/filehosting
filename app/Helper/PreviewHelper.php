@@ -11,18 +11,22 @@ use Filehosting\Entity\File;
  */
 class PreviewHelper
 {
-    /** @var PathingHelper $pathingHelper PathingHelper instance. */
-    private $pathingHelper;
-    /** @var resource $image Current image resource. */
-    private $image;
-
-    /** @var array ALLOWED_EXTENSIONS Allowed file extensions array. */
     const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif"];
+
+    /**
+     * @var \Filehosting\Helper\PathingHelper PathingHelper instance.
+     */
+    private $pathingHelper;
+
+    /**
+     * @var resource Current image resource.
+     */
+    private $image;
 
     /**
      * Constructor.
      *
-     * @param PathingHelper $h A pathing helper instance.
+     * @param \Filehosting\Helper\PathingHelper $h A pathing helper instance.
      */
     public function __construct(PathingHelper $h)
     {
@@ -32,16 +36,16 @@ class PreviewHelper
     /**
      * Loads given file to the memory.
      *
-     * @param File $file A file entity to load.
+     * @param \Filehosting\Entity\File $file A file entity to load.
      *
-     * @throws Exception if file of this type can't be loaded.
+     * @throws \Exception if file of this type can't be loaded.
      *
      * @return resource|bool
      */
     private function loadImage(File $file)
     {
         $pathToFile = $this->pathingHelper->getPathToFile($file);
-        switch(strtolower($file->getExtension())) {
+        switch (strtolower($file->getExtension())) {
             case "jpeg":
             case "jpg":
                 return imagecreatefromjpeg($pathToFile);
@@ -62,18 +66,18 @@ class PreviewHelper
      *
      * @return int
      */
-    private function getMaxRatio($width, $height)
+    private function getMaxRatio(int $width, int $height)
     {
         $sizeSum = $width + $height;
-        $maxRatio = null;
-        if($sizeSum > 2000) {
-            $maxRatio = 0.05;
-        } else if($sizeSum > 500) {
-            $maxRatio = 0.15;
-        } else {
-            $maxRatio = 0.45;
+
+        switch (true) {
+            case ($sizeSum > 2000):
+                return 0.05;
+            case ($sizeSum > 500):
+                return 0.15;
+            default:
+                return 0.45;
         }
-        return $maxRatio;
     }
 
     /**
@@ -84,16 +88,14 @@ class PreviewHelper
      *
      * @return array
      */
-    private function getPreviewSize($width, $height)
+    private function getPreviewSize(int $width, int $height)
     {
-        if($width > $height) {
-            $ratio = $width / $height;
-        } else {
-            $ratio = $height / $width;
-        }
-        if($ratio >= 1) {
+        $ratio = ($width > $height) ? $width / $height : $height / $width;
+
+        if ($ratio >= 1) {
             $ratio = $this->getMaxRatio($width, $height);
         }
+
         return ["width" => ceil($width * $ratio), "height" => ceil($height * $ratio)];
     }
 
@@ -104,13 +106,13 @@ class PreviewHelper
      *
      * @param File $file File entity for which the thumbnail will be generated.
      *
-     * @throws Exception if can't generate a thumbnail for this file type.
+     * @throws \Exception if can't generate a thumbnail for this file type.
      *
      * @return void
      */
     public function generatePreview(File $file)
     {
-        if(!in_array(strtolower($file->getExtension()), self::ALLOWED_EXTENSIONS)) {
+        if (!in_array(strtolower($file->getExtension()), self::ALLOWED_EXTENSIONS)) {
             throw new \Exception(_("Can't generate preview for {$file->getExtension()} type."));
         }
         $image = $this->loadImage($file);
@@ -131,13 +133,13 @@ class PreviewHelper
      *
      * @param File $file File entity for which the thumbnail will be deleted.
      *
-     * @throws Exception if can't delete a file from the filesystem.
+     * @throws \Exception if can't delete a file from the filesystem.
      *
      * @return bool
      */
     public function deletePreview(File $file)
     {
-        if(!unlink("{$this->pathingHelper->getPathToThumbnails()}/{$file->getThumbnailName()}")) {
+        if (!unlink("{$this->pathingHelper->getPathToThumbnails()}/{$file->getThumbnailName()}")) {
             throw new \Exception(_("Can't unlink thumbnail. Try again or contact server administrators."));
         }
         return true;

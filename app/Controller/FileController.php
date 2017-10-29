@@ -4,11 +4,12 @@ namespace Filehosting\Controller;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
-use Filehosting\Entity\File;
 use Filehosting\Helper\LanguageHelper;
 use Filehosting\Helper\CookieHelper;
 use Filehosting\Helper\AuthHelper;
 use Filehosting\Translator;
+use Slim\Container;
+use Slim\Exception\NotFoundException;
 
 /**
  * Callable, provides a way to download files.
@@ -16,21 +17,39 @@ use Filehosting\Translator;
  * @todo Refactor this code.
  * @todo Relocate comments selection to CommentController
  *
+ * @package Filehosting\Controller
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class FileController
 {
-    /** @var \Slim\Container $container DI container. */
+    /**
+     * @var \Slim\Container Slim Framework DI container.
+     */
     private $container;
-    /** @var mixed $view View instance. */
+
+    /**
+     * @var mixed View instance.
+     */
     private $view;
-    /** @var FileHelper $fileHelper FileHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\FileHelper FileHelper instance.
+     */
     private $fileHelper;
-    /** @var FileMapper $fileMapper FileMapper instance. */
+
+    /**
+     * @var \Filehosting\Database\FileMapper FileMapper instance.
+     */
     private $fileMapper;
-    /** @var IdHelper $idHelper IdHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\IdHelper IdHelper instance.
+     */
     private $idHelper;
-    /** @var CommentHelper $commentHelper CommentHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\CommentHelper CommentHelper instance.
+     */
     private $commentHelper;
 
     /**
@@ -38,7 +57,7 @@ class FileController
      *
      * @param \Slim\Container $c DI container.
      */
-    public function __construct(\Slim\Container $c)
+    public function __construct(Container $c)
     {
         $this->container = $c;
         $this->view = $c->get('view');
@@ -57,26 +76,26 @@ class FileController
      * @param Response $response Slim Framework response instance.
      * @param array $args Array with additional arguments.
      *
-     * @throws NotFoundException if file not found.
+     * @throws \Slim\Exception\NotFoundException if file not found.
      *
      * @return Response
      */
-    public function __invoke(Request $request, Response $response, $args)
+    public function __invoke(Request $request, Response $response, array $args)
     {
         $cookieHelper = new CookieHelper($request, $response);
         $authHelper = new AuthHelper($cookieHelper);
         $commentErrors = null;
         $replyTo = $request->getParam('reply');
         $file = $this->fileMapper->getFile($args['id']);
-        if(!$this->fileHelper->fileExists($args['id'])) {
-            throw new \Slim\Exception\NotFoundException($request, $response);
+        if (!$this->fileHelper->fileExists($args['id'])) {
+            throw new NotFoundException($request, $response);
         }
-        if($request->isPost()) {
+        if ($request->isPost()) {
             $commentController = new CommentController($this->container);
             $postResult = $commentController->__invoke($request, $response, $args);
             $commentErrors = $postResult["errors"];
-            $replyTo = isset($commentErrors) ? $postResult["comment"]->getParentId() : NULL;
-            if($request->isXhr()) {
+            $replyTo = isset($commentErrors) ? $postResult["comment"]->getParentId() : null;
+            if ($request->isXhr()) {
                 return $response->withJson($postResult);
             }
         }
@@ -102,12 +121,11 @@ class FileController
      *
      * @return Response
      */
-    public function deleteFile(Request $request, Response $response, $args)
+    public function deleteFile(Request $request, Response $response, array $args)
     {
         $authHelper = new AuthHelper(new CookieHelper($request, $response));
-        $formData = $request->getParsedBody();
         $file = $this->fileMapper->getFile($args['id']);
-        if($this->fileHelper->fileExists($args['id']) && $authHelper->canManageFile($file)) {
+        if ($this->fileHelper->fileExists($args['id']) && $authHelper->canManageFile($file)) {
             $this->fileHelper->deleteFile($file);
         }
         return $response->withRedirect("/{$args['lang']}/");

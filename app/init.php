@@ -3,6 +3,7 @@
 require(__DIR__ . "/../vendor/autoload.php");
 require(__DIR__ . '/../vendor/james-heinrich/getid3/getid3/getid3.php');
 
+use \Slim\Container;
 use Filehosting\Database\FileMapper;
 use Filehosting\Database\SearchGateway;
 use Filehosting\Database\CommentMapper;
@@ -29,70 +30,77 @@ $configuration = [
     ],
 ];
 
-$container = new \Slim\Container($configuration);
+$container = new Container($configuration);
 
-$container['config'] = function ($container) {
+$container['config'] = function () {
     $config = new Config();
     $config->loadFromFile(__DIR__ . "/../config.ini");
     return $config;
 };
 
-$container['pdo'] = function ($container) {
+$container['pdo'] = function (Container $container): \PDO {
     $cfg = $container->get('config');
-    $dsn = sprintf("pgsql:host=%s;port=%s;dbname=%s",
+    $dsn = sprintf(
+        "pgsql:host=%s;port=%s;dbname=%s",
         $cfg->getValue('db', 'host'),
         $cfg->getValue('db', 'port'),
-        $cfg->getValue('db', 'name'));
-    $pdo = new \PDO($dsn,
-        $cfg->getValue('db', 'username'), $cfg->getValue('db', 'password'));
+        $cfg->getValue('db', 'name')
+    );
+
+    $pdo = new \PDO(
+        $dsn,
+        $cfg->getValue('db', 'username'),
+        $cfg->getValue('db', 'password')
+    );
     $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     return $pdo;
 };
 
-$container['SearchGateway'] = function ($container) {
+$container['SearchGateway'] = function (Container $container): SearchGateway {
     $cfg = $container->get('config');
-    $dsn = sprintf("mysql:host=%s;port=%s",
+    $dsn = sprintf(
+        "mysql:host=%s;port=%s",
         $cfg->getValue('sphinx', 'host'),
-        $cfg->getValue('sphinx', 'port'));
+        $cfg->getValue('sphinx', 'port')
+    );
     $pdo = new \PDO($dsn);
     $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     return new SearchGateway($pdo);
 };
 
-$container['CommentMapper'] = function ($container) {
+$container['CommentMapper'] = function (Container $container): CommentMapper {
     return new CommentMapper($container->get('pdo'));
 };
 
-$container['FileMapper'] = function ($container) {
+$container['FileMapper'] = function (Container $container): FileMapper {
     return new FileMapper($container->get('pdo'));
 };
 
-$container['SearchHelper'] = function ($container) {
+$container['SearchHelper'] = function (Container $container): SearchHelper {
     return new SearchHelper($container->get('SearchGateway'), $container->get('FileMapper'));
 };
 
-$container['FileHelper'] = function ($container) {
+$container['FileHelper'] = function (Container $container): FileHelper {
     return new FileHelper($container);
 };
 
-$container['CommentHelper'] = function ($container) {
+$container['CommentHelper'] = function (Container $container): CommentHelper {
     return new CommentHelper($container->get('CommentMapper'));
 };
 
-$container['PathingHelper'] = function ($container) {
+$container['PathingHelper'] = function (): PathingHelper {
     return new PathingHelper(__DIR__);
 };
 
-$container['Validation'] = function ($container) {
+$container['Validation'] = function (Container $container): Validation {
     return new Validation($container);
 };
 
-$container['IdHelper'] = function ($container) {
+$container['IdHelper'] = function (Container $container): IdHelper {
     $getId3 = new getID3();
     return new IdHelper($getId3, $container->get('PathingHelper'));
 };
 
-$container['PreviewHelper'] = function ($container) {
-    $cfg = $container->get('config');
+$container['PreviewHelper'] = function (Container $container): PreviewHelper {
     return new PreviewHelper($container->get('PathingHelper'));
 };

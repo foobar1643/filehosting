@@ -2,11 +2,11 @@
 
 require("../app/init.php");
 
-use \Psr\Http\Message\ServerRequestInterface as Request;
-use \Psr\Http\Message\ResponseInterface as Response;
-use \Filehosting\Middleware\LocaleMiddleware;
-use \Filehosting\Middleware\CsrfMiddleware;
-use \Filehosting\Helper\LanguageHelper;
+use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface as Response;
+use Filehosting\Middleware\LocaleMiddleware;
+use Filehosting\Middleware\CsrfMiddleware;
+use Filehosting\Helper\LanguageHelper;
 use Filehosting\Helper\Utils;
 use Filehosting\Helper\LinkHelper;
 
@@ -41,9 +41,11 @@ $container['CsrfMiddleware'] = function ($container) {
 };
 
 $container['notFoundHandler'] = function ($container) {
-    return function ($request, $response) use ($container) {
+    return function (Request $request, Response $response) use ($container) {
         $response = $response->withStatus(404)->withHeader('Content-Type', 'text/html');
-        return $container['view']->render($response, 'error.twig',
+        return $container['view']->render(
+            $response,
+            'error.twig',
             ['title' => _("404 Page not found"),
             'messageTitle' => _("Page you were looking for is not found on this server."),
             'messageHelp' => _('Check for errors in the URL.'),
@@ -54,15 +56,18 @@ $container['notFoundHandler'] = function ($container) {
 };
 
 $container['errorHandler'] = function ($container) {
-    return function ($request, $response, $exception) use ($container) {
+    return function (Request $request, Response $response, \Exception $exception) use ($container) {
         error_log($exception->__toString());
-        $response = $response->withStatus(503)->withHeader('Content-Type', 'text/html');;
-        return $container['view']->render($response, 'error.twig',
+        $response = $response->withStatus(503)->withHeader('Content-Type', 'text/html');
+        return $container['view']->render(
+            $response,
+            'error.twig',
             ['title' => _("503 Service temporarily unavailable"),
             'messageTitle' => _("Something went wrong."),
             'messageHelp' => _('Refresh the page after some time or contact the server administrator.'),
             'displayErrors' => ini_get("display_errors"),
-            'debugInfo' => $exception->__toString()]);
+            'debugInfo' => $exception->__toString()]
+        );
     };
 };
 
@@ -73,7 +78,7 @@ $app->get('/', function (Request $request, Response $response, $args)
     $redirectLocale = LanguageHelper::DEFAULT_LOCALE;
     $langHelper = new LanguageHelper($request);
     $userLocale = $langHelper->getUserLocale();
-    if(!is_null($userLocale) && $langHelper->languageAvailable($userLocale)) {
+    if (!is_null($userLocale) && $langHelper->languageAvailable($userLocale)) {
         $redirectLocale = $userLocale;
     }
     $redirectLang = \Locale::parseLocale($redirectLocale);
@@ -94,19 +99,25 @@ $app->get('/{lang}/', function (Request $request, Response $response, $args)
 $app->map(['GET', 'POST'], '/{lang}/settings/', function (Request $request, Response $response, $args)
 {
     $langHelper = new LanguageHelper($request);
-    if($request->isPost()) {
+    if ($request->isPost()) {
         $postVars = $request->getParsedBody();
-        $selectedLocale = isset($postVars['language']) ? strval($postVars['language']) : NULL;
-        if($langHelper->languageAvailable($selectedLocale)) {
+        $selectedLocale = isset($postVars['language']) ? strval($postVars['language']) : null;
+        if ($langHelper->languageAvailable($selectedLocale)) {
             return $response->withRedirect("/{$selectedLocale}/settings/");
         }
     }
-    return $this->get('view')->render($response, 'settings.twig',
-        ['lang' => $args['lang'], 'langHelper' => $langHelper]);
+    return $this->get('view')->render(
+        $response,
+        'settings.twig',
+        ['lang' => $args['lang'], 'langHelper' => $langHelper]
+    );
 });
+
 $app->map(['GET', 'POST'], '/{lang}/upload/', '\Filehosting\Controller\UploadController');
-$app->map(['GET', 'POST'], '/{lang}/file/{id:[0-9]+}/', '\Filehosting\Controller\FileController')->add($container->get('CsrfMiddleware'));
-$app->post('/{lang}/file/{id:[0-9]+}/delete/', '\Filehosting\Controller\FileController:deleteFile')->add($container->get('CsrfMiddleware'));
+$app->map(['GET', 'POST'], '/{lang}/file/{id:[0-9]+}/', '\Filehosting\Controller\FileController')
+    ->add($container->get('CsrfMiddleware'));
+$app->post('/{lang}/file/{id:[0-9]+}/delete/', '\Filehosting\Controller\FileController:deleteFile')
+    ->add($container->get('CsrfMiddleware'));
 $app->get('/{lang}/search/', '\Filehosting\Controller\SearchController');
 $app->get('/{lang}/file/get/{id:[0-9]+}[/{filename}]', '\Filehosting\Controller\DownloadController');
 

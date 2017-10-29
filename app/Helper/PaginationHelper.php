@@ -9,13 +9,24 @@ namespace Filehosting\Helper;
  */
 class PaginationHelper
 {
-    /** @var int $recordsPerPage Number of records to display per page. */
+    /**
+     * @var int Number of records to display per page.
+     */
     private $recordsPerPage;
-    /** @var string $link Link template. */
+
+    /**
+     * @var string Link template.
+     */
     private $link;
-    /** @var int $totalRecords Total number of records in the query. */
+
+    /**
+     * @var int Total number of records in the query.
+     */
     private $totalRecords;
-    /** @var int $totalPages Total pages in the query. */
+
+    /**
+     * @var int Total pages in the query.
+     */
     private $totalPages;
 
     /**
@@ -24,7 +35,7 @@ class PaginationHelper
      * @param int $recordsPerPage A number of records to display per page.
      * @param string $link A link template.
      */
-    public function __construct($recordsPerPage, $link)
+    public function __construct(int $recordsPerPage, string $link)
     {
         $this->recordsPerPage = $recordsPerPage;
         $this->link = $link;
@@ -48,7 +59,7 @@ class PaginationHelper
      *
      * @return int
      */
-    public function getPages()
+    public function getPages(): int
     {
         return $this->totalPages;
     }
@@ -60,7 +71,7 @@ class PaginationHelper
      *
      * @return int
      */
-    public function getOffset($page)
+    public function getOffset($page): int
     {
         return ($page - 1) * $this->recordsPerPage;
     }
@@ -68,39 +79,32 @@ class PaginationHelper
     /**
      * Validates a given page, if it's not valid - returns page number 1.
      *
-     * @todo Refactor a return operator code.
      * @todo Do something with a maximum page value, right now it's forced number 30, which is not very smart.
      *
      * @param int $page Page number to check.
      *
      * @return int
      */
-    public function checkPage($page)
+    public function checkPage(int $page): int
     {
-        if($page == null || $page > 30) {
-            return 1;
-        }
-        return $page;
+        return ($page == null || $page > 30) ? 1 : $page;
     }
 
     /**
      * Returns a URL for a given page.
      *
      * @todo Relocate this method to a LinkHelper class.
-     * @todo Refactor a return operator code.
      *
      * @param int $page Page number.
      *
      * @return string
      */
-    public function getLink($page)
+    public function getLink($page): string
     {
         $parsedUrl = parse_url($this->link);
         $pageQuery = http_build_query(["page" => $page]);
-        if(isset($parsedUrl['query'])) {
-            return "{$this->link}&{$pageQuery}";
-        }
-        return "{$this->link}?{$pageQuery}";
+
+        return (isset($parsedUrl['query'])) ? "{$this->link}&{$pageQuery}" : "{$this->link}?{$pageQuery}";
     }
 
     /**
@@ -108,7 +112,7 @@ class PaginationHelper
      *
      * @return int
      */
-    private function countPages()
+    private function countPages(): int
     {
         return ceil($this->totalRecords / $this->recordsPerPage);
     }

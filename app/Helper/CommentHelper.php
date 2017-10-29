@@ -13,13 +13,15 @@ use Filehosting\Database\CommentMapper;
  */
 class CommentHelper
 {
-    /** @var CommentMapper $commentMapper CommentMapper instance */
+    /**
+     * @var \Filehosting\Database\CommentMapper CommentMapper instance.
+     */
     private $commentMapper;
 
     /**
      * Constructor.
      *
-     * @param CommentMapper $mapper A CommentMapper instance.
+     * @param \Filehosting\Database\CommentMapper $mapper A CommentMapper instance.
      */
     public function __construct(CommentMapper $mapper)
     {
@@ -31,13 +33,13 @@ class CommentHelper
      *
      * @todo Add database locks when adding comments.
      *
-     * @param Comment $comment A comment entity.
+     * @param \Filehosting\Entity\Comment $comment A comment entity.
      *
-     * @return Comment
+     * @return \Filehosting\Entity\Comment
      */
-    public function addComment(Comment $comment)
+    public function addComment(Comment $comment): Comment
     {
-        if(is_null($comment->getParentId())) { // root comment
+        if (is_null($comment->getParentId())) { // root comment
             $maxPath = $this->commentMapper->getRootMaxPath($comment->getFileId());
             $maxPath = intval($maxPath) + 1;
             $comment->setMatPath($this->normalizePath($maxPath));
@@ -50,7 +52,7 @@ class CommentHelper
             $maxPath = is_null($maxPath) ? 0 : intval($maxPath) + 1;
             $comment->addToPath($this->normalizePath($maxPath));
         }
-        # SELECT MAX(matpath) FROM comments WHERE NOT (parent_id IS NOT NULL) AND file_id = ?; - FOR ROOT COMMENT ADDITION
+        # SELECT MAX(matpath) FROM comments WHERE NOT (parent_id IS NOT NULL) AND file_id = ?; FOR ROOT COMMENT ADDITION
         # SELECT MAX(matpath) FROM comments WHERE parent_id = ?; - FOR CHILD COMMENT ADDITION
         $comment->setId($this->commentMapper->addComment($comment));
         return $comment;
@@ -61,9 +63,9 @@ class CommentHelper
      *
      * @param int $fileId File ID in the database.
      *
-     * @return Array
+     * @return array
      */
-    public function getComments($fileId)
+    public function getComments(int $fileId): array
     {
         $rawComments = $this->commentMapper->getComments($fileId);
         $commentTrees = $this->makeTrees($rawComments);
@@ -74,19 +76,15 @@ class CommentHelper
     /**
      * Checks if comment with a given ID exists.
      *
-     * @todo Refactor this code, make it more simple.
-     *
      * @param int $commentId Comment ID in the database.
      *
-     * @return Array
+     * @return bool
      */
-    public function commentExists($commentId)
+    public function commentExists(int $commentId): bool
     {
         $comment = $this->commentMapper->getComment($commentId);
-        if($comment) {
-            return true;
-        }
-        return false;
+
+        return (bool)$comment;
     }
 
     /**
@@ -94,17 +92,17 @@ class CommentHelper
      *
      * @param array $rawComments Array of comments.
      *
-     * @return Array
+     * @return array
      */
-    public function makeTrees($rawComments)
+    public function makeTrees(array $rawComments): array
     {
         $trees = [];
         $treeRoot = null;
-        foreach($rawComments as $comment) {
-            if($comment->getParentId() == null) { // tree root
+        foreach ($rawComments as $comment) {
+            if ($comment->getParentId() == null) { // tree root
                 $treeRoot = new TreeNode($comment);
                 $trees[$comment->getId()] = $treeRoot;
-            } else if($comment->getParentId() == $treeRoot->getObject()->getId()) {
+            } elseif ($comment->getParentId() == $treeRoot->getObject()->getId()) {
                 $treeRoot->addChildNode(new TreeNode($comment));
             } else {
                 $parentNode = $treeRoot->findChildByObjectId($comment->getParentId());
@@ -119,9 +117,9 @@ class CommentHelper
      *
      * @param string $path Matpath of the comment.
      *
-     * @return Array
+     * @return array
      */
-    private function splitPath($path)
+    private function splitPath(string $path): array
     {
         return preg_split("/[.]/", $path);
     }
@@ -135,11 +133,11 @@ class CommentHelper
      *
      * @return string
      */
-    private function normalizePath($path)
+    private function normalizePath(string $path): string
     {
         $split = $this->splitPath($path);
         $newStr = "";
-        foreach($split as $elem) {
+        foreach ($split as $elem) {
             $newStr .= ($newStr != "" ? "." : "") . str_pad($elem, 3, "0", STR_PAD_LEFT);
         }
         return $newStr;
@@ -152,10 +150,10 @@ class CommentHelper
      *
      * @return int
      */
-    private function countTotalComments(array $comments)
+    private function countTotalComments(array $comments): int
     {
         $size = 0;
-        foreach($comments as $id => $treeNode) {
+        foreach ($comments as $id => $treeNode) {
             $size += $treeNode->countDescendants() + 1;
         }
         return $size;

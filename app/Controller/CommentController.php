@@ -5,20 +5,24 @@ namespace Filehosting\Controller;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 use Filehosting\Entity\Comment;
-use Filehosting\Helper\CommentHelper;
+use Slim\Container;
 
 /**
  * Callable, provides a way to add comments to the database.
  *
+ * @package Filehosting\Controller
  * @author foobar1643 <foobar76239@gmail.com>
  */
 class CommentController
 {
-    /** @var Filehosting\Validation\Validation $validator Validation object instance. */
+    /**
+     * @var \Filehosting\Validation\Validation Validation object instance.
+     */
     private $validator;
-    /** @var \Slim\Container $container DI container. */
-    private $container;
-    /** @var CommentHelper $commentHelper CommentHelper instance. */
+
+    /**
+     * @var \Filehosting\Helper\CommentHelper CommentHelper instance.
+     */
     private $commentHelper;
 
     /**
@@ -28,9 +32,8 @@ class CommentController
      *
      * @param \Slim\Container $c DI container.
      */
-    public function __construct(\Slim\Container $c)
+    public function __construct(Container $c)
     {
-        $this->container = $c;
         $this->validator = $c->get('Validation');
         $this->commentHelper = $c->get('CommentHelper');
     }
@@ -46,11 +49,10 @@ class CommentController
      */
     public function __invoke(Request $request, Response $response, $args)
     {
-        $getVars = $request->getQueryParams();
         $postVars = $request->getParsedBody();
         $comment = $this->parsePostRequest($postVars, $args['id']);
         $errors = $this->validator->validateComment($comment);
-        if(!$errors) {
+        if (!$errors) {
             $comment = $this->commentHelper->addComment($comment);
         }
         return ["errors" => $errors, "comment" => $comment];
@@ -70,11 +72,10 @@ class CommentController
     {
         $comment = new Comment();
         $dateTime = new \DateTime("now");
-        $comment->setFileId($fileId)
+        return $comment->setFileId($fileId)
             ->setAuthor("Anonymous")
             ->setDatePosted($dateTime->format(\DateTime::ATOM))
             ->setCommentText(isset($postVars['comment']) ? strval($postVars['comment']) : '')
-            ->setParentId((isset($postVars['parentComment']) ? $postVars['parentComment'] : NULL));
-        return $comment;
+            ->setParentId((isset($postVars['parentComment']) ? $postVars['parentComment'] : null));
     }
 }
